@@ -118,7 +118,7 @@ jobs:
         run: npm run test:cov
 
       - name: Upload coverage report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: coverage-report
@@ -149,7 +149,7 @@ jobs:
         run: npm run build
 
       - name: Upload API build artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: api-dist
           path: apps/api/dist/
