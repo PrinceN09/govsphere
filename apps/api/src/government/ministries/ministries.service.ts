@@ -1,11 +1,12 @@
 import { ConflictException, Injectable, NotFoundException } from "@nestjs/common";
 
-import { PrismaService } from "../../prisma/prisma.service";
 import { AuditService } from "../../identity/audit/audit.service";
-import type { AuthenticatedUser } from "../../common/types/auth.types";
+import { PrismaService } from "../../prisma/prisma.service";
+
 import type { CreateMinistryDto } from "./dto/create-ministry.dto";
-import type { UpdateMinistryDto } from "./dto/update-ministry.dto";
 import type { QueryMinistriesDto } from "./dto/query-ministry.dto";
+import type { UpdateMinistryDto } from "./dto/update-ministry.dto";
+import type { AuthenticatedUser } from "../../common/types/auth.types";
 import type { AuditAction } from "@prisma/client";
 
 export interface MinistriesPage {

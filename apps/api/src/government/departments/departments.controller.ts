@@ -14,14 +14,14 @@ import {
 
 import { DepartmentsService } from "./departments.service";
 import { CreateDepartmentDto } from "./dto/create-department.dto";
-import { UpdateDepartmentDto } from "./dto/update-department.dto";
 import { QueryDepartmentsDto } from "./dto/query-department.dto";
+import { UpdateDepartmentDto } from "./dto/update-department.dto";
 import { CurrentUser } from "../../common/decorators/current-user.decorator";
 import { RequirePermissions } from "../../common/decorators/permissions.decorator";
 
+import type { DepartmentsPage } from "./departments.service";
 import type { AuthenticatedUser } from "../../common/types/auth.types";
 import type { Request } from "express";
-import type { DepartmentsPage } from "./departments.service";
 
 const ip = (req: Request): string =>
   (req.headers["x-forwarded-for"] as string | undefined)?.split(",")[0]?.trim() ?? req.ip ?? "";

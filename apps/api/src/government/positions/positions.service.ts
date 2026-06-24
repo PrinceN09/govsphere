@@ -1,12 +1,13 @@
 import { ConflictException, Injectable, NotFoundException } from "@nestjs/common";
 import { AuditAction, Prisma } from "@prisma/client";
 
-import { PrismaService } from "../../prisma/prisma.service";
 import { AuditService } from "../../identity/audit/audit.service";
-import type { AuthenticatedUser } from "../../common/types/auth.types";
+import { PrismaService } from "../../prisma/prisma.service";
+
 import type { CreatePositionDto } from "./dto/create-position.dto";
-import type { UpdatePositionDto } from "./dto/update-position.dto";
 import type { QueryPositionsDto } from "./dto/query-position.dto";
+import type { UpdatePositionDto } from "./dto/update-position.dto";
+import type { AuthenticatedUser } from "../../common/types/auth.types";
 
 const LIST_INCLUDE = {
   ministry: { select: { id: true, name: true, code: true } },
@@ -160,7 +161,8 @@ export class PositionsService {
 
     this.auditService.log({
       userId: actor.id,
-      action: dto.isActive === false ? AuditAction.POSITION_DEACTIVATED : AuditAction.POSITION_UPDATED,
+      action:
+        dto.isActive === false ? AuditAction.POSITION_DEACTIVATED : AuditAction.POSITION_UPDATED,
       entityType: "POSITION",
       entityId: id,
       metadata: { changes: dto },

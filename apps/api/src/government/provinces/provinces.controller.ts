@@ -10,9 +10,9 @@ import {
   Req,
 } from "@nestjs/common";
 
-import { ProvincesService } from "./provinces.service";
 import { CreateProvinceDto } from "./dto/create-province.dto";
 import { UpdateProvinceDto } from "./dto/update-province.dto";
+import { ProvincesService } from "./provinces.service";
 import { CurrentUser } from "../../common/decorators/current-user.decorator";
 import { RequirePermissions } from "../../common/decorators/permissions.decorator";
 

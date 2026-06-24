@@ -12,16 +12,16 @@ import {
   Req,
 } from "@nestjs/common";
 
-import { MinistriesService } from "./ministries.service";
 import { CreateMinistryDto } from "./dto/create-ministry.dto";
-import { UpdateMinistryDto } from "./dto/update-ministry.dto";
 import { QueryMinistriesDto } from "./dto/query-ministry.dto";
+import { UpdateMinistryDto } from "./dto/update-ministry.dto";
+import { MinistriesService } from "./ministries.service";
 import { CurrentUser } from "../../common/decorators/current-user.decorator";
 import { RequirePermissions } from "../../common/decorators/permissions.decorator";
 
+import type { MinistriesPage } from "./ministries.service";
 import type { AuthenticatedUser } from "../../common/types/auth.types";
 import type { Request } from "express";
-import type { MinistriesPage } from "./ministries.service";
 
 const ip = (req: Request): string =>
   (req.headers["x-forwarded-for"] as string | undefined)?.split(",")[0]?.trim() ?? req.ip ?? "";

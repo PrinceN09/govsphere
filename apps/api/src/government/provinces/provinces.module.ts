@@ -2,8 +2,8 @@ import { Module } from "@nestjs/common";
 
 import { ProvincesController } from "./provinces.controller";
 import { ProvincesService } from "./provinces.service";
-import { PrismaModule } from "../../prisma/prisma.module";
 import { AuditModule } from "../../identity/audit/audit.module";
+import { PrismaModule } from "../../prisma/prisma.module";
 
 @Module({
   imports: [PrismaModule, AuditModule],

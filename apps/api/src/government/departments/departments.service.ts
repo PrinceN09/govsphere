@@ -1,11 +1,12 @@
 import { ConflictException, Injectable, NotFoundException } from "@nestjs/common";
 
-import { PrismaService } from "../../prisma/prisma.service";
 import { AuditService } from "../../identity/audit/audit.service";
-import type { AuthenticatedUser } from "../../common/types/auth.types";
+import { PrismaService } from "../../prisma/prisma.service";
+
 import type { CreateDepartmentDto } from "./dto/create-department.dto";
-import type { UpdateDepartmentDto } from "./dto/update-department.dto";
 import type { QueryDepartmentsDto } from "./dto/query-department.dto";
+import type { UpdateDepartmentDto } from "./dto/update-department.dto";
+import type { AuthenticatedUser } from "../../common/types/auth.types";
 import type { AuditAction } from "@prisma/client";
 
 export interface DepartmentsPage {

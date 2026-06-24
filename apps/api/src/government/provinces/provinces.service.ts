@@ -1,10 +1,11 @@
 import { ConflictException, Injectable, NotFoundException } from "@nestjs/common";
 
-import { PrismaService } from "../../prisma/prisma.service";
 import { AuditService } from "../../identity/audit/audit.service";
-import type { AuthenticatedUser } from "../../common/types/auth.types";
+import { PrismaService } from "../../prisma/prisma.service";
+
 import type { CreateProvinceDto } from "./dto/create-province.dto";
 import type { UpdateProvinceDto } from "./dto/update-province.dto";
+import type { AuthenticatedUser } from "../../common/types/auth.types";
 import type { AuditAction } from "@prisma/client";
 
 // province/office/position/employeeAssignment models require `prisma generate`

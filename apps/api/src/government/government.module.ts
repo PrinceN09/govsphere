@@ -1,11 +1,11 @@
 import { Module } from "@nestjs/common";
 
-import { MinistriesModule } from "./ministries/ministries.module";
+import { AssignmentsModule } from "./assignments/assignments.module";
 import { DepartmentsModule } from "./departments/departments.module";
 import { DivisionsModule } from "./divisions/divisions.module";
-import { ProvincesModule } from "./provinces/provinces.module";
+import { MinistriesModule } from "./ministries/ministries.module";
 import { PositionsModule } from "./positions/positions.module";
-import { AssignmentsModule } from "./assignments/assignments.module";
+import { ProvincesModule } from "./provinces/provinces.module";
 
 /**
  * GovernmentModule

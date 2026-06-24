@@ -8,6 +8,7 @@ import {
   IsString,
   MaxLength,
 } from "class-validator";
+
 import { PositionLevel } from "./create-position.dto";
 
 export class UpdatePositionDto {

@@ -1,10 +1,11 @@
 import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 
-import { PrismaService } from "../../prisma/prisma.service";
 import { AuditService } from "../../identity/audit/audit.service";
-import type { AuthenticatedUser } from "../../common/types/auth.types";
+import { PrismaService } from "../../prisma/prisma.service";
+
 import type { CreateAssignmentDto } from "./dto/create-assignment.dto";
 import type { EndAssignmentDto } from "./dto/end-assignment.dto";
+import type { AuthenticatedUser } from "../../common/types/auth.types";
 import type { AuditAction } from "@prisma/client";
 
 // employeeAssignment/position models require `prisma generate`

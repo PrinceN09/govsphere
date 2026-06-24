@@ -11,16 +11,16 @@ import {
   Req,
 } from "@nestjs/common";
 
-import { PositionsService } from "./positions.service";
 import { CreatePositionDto } from "./dto/create-position.dto";
-import { UpdatePositionDto } from "./dto/update-position.dto";
 import { QueryPositionsDto } from "./dto/query-position.dto";
+import { UpdatePositionDto } from "./dto/update-position.dto";
+import { PositionsService } from "./positions.service";
 import { CurrentUser } from "../../common/decorators/current-user.decorator";
 import { RequirePermissions } from "../../common/decorators/permissions.decorator";
 
+import type { PositionsPage } from "./positions.service";
 import type { AuthenticatedUser } from "../../common/types/auth.types";
 import type { Request } from "express";
-import type { PositionsPage } from "./positions.service";
 
 const ip = (req: Request): string =>
   (req.headers["x-forwarded-for"] as string | undefined)?.split(",")[0]?.trim() ?? req.ip ?? "";

@@ -14,14 +14,14 @@ import {
 
 import { DivisionsService } from "./divisions.service";
 import { CreateDivisionDto } from "./dto/create-division.dto";
-import { UpdateDivisionDto } from "./dto/update-division.dto";
 import { QueryDivisionsDto } from "./dto/query-division.dto";
+import { UpdateDivisionDto } from "./dto/update-division.dto";
 import { CurrentUser } from "../../common/decorators/current-user.decorator";
 import { RequirePermissions } from "../../common/decorators/permissions.decorator";
 
+import type { DivisionsPage } from "./divisions.service";
 import type { AuthenticatedUser } from "../../common/types/auth.types";
 import type { Request } from "express";
-import type { DivisionsPage } from "./divisions.service";
 
 const ip = (req: Request): string =>
   (req.headers["x-forwarded-for"] as string | undefined)?.split(",")[0]?.trim() ?? req.ip ?? "";
