@@ -1,0 +1,234 @@
+{
+  "common": {
+    "appName": "GovSphere",
+    "loading": "Loading…",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "search": "Search",
+    "filter": "Filter",
+    "reset": "Reset",
+    "actions": "Actions",
+    "status": "Status",
+    "active": "Active",
+    "inactive": "Inactive",
+    "yes": "Yes",
+    "no": "No",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "close": "Close",
+    "submit": "Submit",
+    "total": "Total",
+    "of": "of",
+    "page": "Page",
+    "rowsPerPage": "Rows per page",
+    "noResults": "No results found",
+    "error": "An error occurred",
+    "required": "Required",
+    "optional": "Optional",
+    "name": "Name",
+    "code": "Code",
+    "description": "Description",
+    "createdAt": "Created",
+    "updatedAt": "Updated"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "provinces": "Provinces",
+    "ministries": "Ministries",
+    "departments": "Departments",
+    "divisions": "Divisions",
+    "positions": "Positions",
+    "employees": "Employees",
+    "settings": "Settings",
+    "profile": "Profile",
+    "logout": "Sign out"
+  },
+  "auth": {
+    "login": {
+      "title": "Sign in",
+      "subtitle": "Government Collaboration Platform — DRC",
+      "credential": "Matricule or email address",
+      "credentialPlaceholder": "1.641.558 or name@gov.cd",
+      "password": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "submit": "Sign in",
+      "forgotPassword": "Forgot password?",
+      "loggingIn": "Signing in…",
+      "errors": {
+        "invalidCredentials": "Invalid credential or password.",
+        "accountLocked": "Account temporarily locked. Try again in 30 minutes.",
+        "accountInactive": "This account is disabled. Contact your administrator.",
+        "networkError": "Cannot reach the server. Check your connection."
+      }
+    },
+    "mfa": {
+      "title": "Two-factor verification",
+      "subtitle": "Enter the code from your authenticator app",
+      "code": "6-digit code",
+      "codePlaceholder": "000000",
+      "backupCode": "Use a backup code",
+      "backupCodePlaceholder": "Backup code",
+      "submit": "Verify",
+      "verifying": "Verifying…",
+      "switchToBackup": "Use a backup code",
+      "switchToTotp": "Use the app",
+      "errors": {
+        "invalidCode": "Incorrect or expired code.",
+        "expiredChallenge": "Session expired. Please sign in again."
+      }
+    },
+    "forgotPassword": {
+      "title": "Reset password",
+      "subtitle": "Enter your matricule or email to receive a reset link",
+      "credential": "Matricule or email address",
+      "submit": "Send reset link",
+      "sending": "Sending…",
+      "successTitle": "Link sent",
+      "successMessage": "If an account exists with that credential, a reset email has been sent.",
+      "backToLogin": "Back to sign in"
+    },
+    "resetPassword": {
+      "title": "New password",
+      "subtitle": "Choose a new secure password",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm password",
+      "submit": "Reset password",
+      "resetting": "Resetting…",
+      "successTitle": "Password reset",
+      "successMessage": "Your password has been reset. You can now sign in.",
+      "backToLogin": "Back to sign in",
+      "errors": {
+        "passwordMismatch": "Passwords do not match.",
+        "invalidToken": "Invalid or expired reset link.",
+        "weakPassword": "Password does not meet security requirements."
+      }
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome, {name}",
+    "subtitle": "Government structure overview",
+    "stats": {
+      "provinces": "Provinces",
+      "ministries": "Ministries",
+      "departments": "Departments",
+      "divisions": "Divisions",
+      "positions": "Positions",
+      "employees": "Active employees"
+    }
+  },
+  "provinces": {
+    "title": "Provinces",
+    "subtitle": "The 26 provinces of the DRC",
+    "create": "New province",
+    "editTitle": "Edit province",
+    "createTitle": "Create province",
+    "fields": {
+      "name": "Province name",
+      "code": "Code",
+      "capital": "Capital",
+      "nameFr": "Name (French)",
+      "nameEn": "Name (English)"
+    },
+    "deleteConfirm": "Are you sure you want to deactivate this province?"
+  },
+  "ministries": {
+    "title": "Ministries",
+    "subtitle": "Government ministerial structure",
+    "create": "New ministry",
+    "editTitle": "Edit ministry",
+    "createTitle": "Create ministry",
+    "fields": {
+      "name": "Ministry name",
+      "code": "Code",
+      "description": "Description",
+      "nameFr": "Name (French)",
+      "nameEn": "Name (English)",
+      "logoUrl": "Logo URL"
+    },
+    "departments": "departments",
+    "deactivateConfirm": "Are you sure you want to deactivate this ministry?"
+  },
+  "departments": {
+    "title": "Departments",
+    "subtitle": "Ministry departments",
+    "create": "New department",
+    "editTitle": "Edit department",
+    "createTitle": "Create department",
+    "fields": {
+      "name": "Department name",
+      "code": "Code",
+      "ministry": "Ministry",
+      "description": "Description"
+    },
+    "deactivateConfirm": "Are you sure you want to deactivate this department?"
+  },
+  "divisions": {
+    "title": "Divisions",
+    "subtitle": "Department divisions",
+    "create": "New division",
+    "editTitle": "Edit division",
+    "createTitle": "Create division",
+    "fields": {
+      "name": "Division name",
+      "code": "Code",
+      "department": "Department",
+      "description": "Description"
+    },
+    "deactivateConfirm": "Are you sure you want to deactivate this division?"
+  },
+  "positions": {
+    "title": "Positions",
+    "subtitle": "Government positions and responsibilities",
+    "create": "New position",
+    "editTitle": "Edit position",
+    "createTitle": "Create position",
+    "fields": {
+      "title": "Position title",
+      "code": "Code",
+      "level": "Level",
+      "headcount": "Authorised headcount",
+      "ministry": "Ministry",
+      "department": "Department",
+      "division": "Division"
+    },
+    "levels": {
+      "EXECUTIVE": "Executive",
+      "DIRECTOR": "Director",
+      "MANAGER": "Manager",
+      "SPECIALIST": "Specialist",
+      "OFFICER": "Officer",
+      "SUPPORT": "Support"
+    },
+    "deactivateConfirm": "Are you sure you want to deactivate this position?"
+  },
+  "employees": {
+    "title": "Employees",
+    "subtitle": "Government personnel",
+    "fields": {
+      "displayName": "Full name",
+      "email": "Email address",
+      "matricule": "Matricule",
+      "role": "Role",
+      "ministry": "Ministry",
+      "status": "Status"
+    },
+    "statuses": {
+      "ACTIVE": "Active",
+      "INACTIVE": "Inactive",
+      "SUSPENDED": "Suspended",
+      "PENDING_ACTIVATION": "Pending"
+    }
+  },
+  "errors": {
+    "forbidden": "Access denied. You don't have the required permissions.",
+    "notFound": "The requested resource could not be found.",
+    "serverError": "A server error occurred. Please try again.",
+    "conflict": "A record with this code already exists."
+  }
+}

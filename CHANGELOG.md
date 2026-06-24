@@ -7,6 +7,79 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [0.4.0] — 2026-06-24
+
+**Administration Portal.** Full-stack administration portal for the DRC Government Structure with production-ready authentication, bilingual UI, and RBAC-protected admin pages.
+
+### Added
+
+**Authentication Layer (apps/web)**
+- NextAuth v4 with two CredentialsProviders: `credentials` (email/matricule login) and `mfa` (TOTP/backup-code MFA verification)
+- JWT callback for server-side access token refresh using stored refresh token
+- Session callback exposing `accessToken`, `permissions[]`, `role`, `ministryId` to all client components
+- `next-auth.d.ts` type augmentation for GovSphere-specific session fields
+- `middleware.ts` — App Router middleware protecting `/admin/*`, redirecting MFA-pending sessions, handling expired sessions
+- `lib/auth.ts` — Full NextAuth options with token refresh, MFA sentinel state, `exactOptionalPropertyTypes`-compliant types
+- `lib/api.ts` — Axios client with Authorization header injection and 401 handler
+
+**i18n (next-intl)**
+- `messages/fr.json` — Full French translation for all app sections
+- `messages/en.json` — Full English translation for all app sections
+- `src/i18n.ts` — next-intl configuration with fr/en locale support (French default)
+
+**UI Component Library (apps/web/src/components/ui)**
+- `Button` — primary / secondary / ghost / danger variants, sizes sm/md/lg, loading spinner
+- `Input` — label, error, hint, left/right addons, `exactOptionalPropertyTypes`-compliant
+- `Select` — dropdown with options array, placeholder, error display
+- `Badge` + `StatusBadge` — green/red/blue/yellow/gray/purple variants
+- `Spinner` + `PageSpinner` — accessible loading indicators
+- `Table`, `TableHead`, `TableBody`, `TableRow`, `TableHeaderCell`, `TableCell`, `TableEmpty` — enterprise data table
+- `Pagination` — smart page number display with ellipsis
+- `SearchInput` — debounce-ready search field with icon
+- `Dialog` + `ConfirmDialog` — native `<dialog>` element with backdrop click close
+- `StatCard` — stat card with icon, value, label, accent colour
+- `EmptyState` — empty state with icon, title, description, CTA
+
+**Layout Components (apps/web/src/components/layout)**
+- `AdminSidebar` — collapsible sidebar with DRC-brand accent, permission-gated nav items
+- `AdminTopBar` — page title/subtitle, user avatar menu, sign-out
+- `PermissionGate` — renders children only when session has required permission(s); supports `permission`, `allOf`, `anyOf`
+- `Providers` — SessionProvider + QueryClientProvider + TokenSync (keeps axios client in sync with NextAuth session)
+
+**Authentication Pages (apps/web/src/app/(auth))**
+- `/login` — credential + password form with error handling (locked, inactive, invalid)
+- `/login/mfa` — TOTP 6-digit code + backup code toggle
+- `/forgot-password` — sends reset link, shows success state
+- `/reset-password` — new password with confirm + strength rules
+
+**Administration Portal (apps/web/src/app/(admin))**
+- `/admin` — Dashboard with 6 stat cards (provinces, ministries, departments, divisions, positions, employees), welcome banner, DRC context
+- `/admin/provinces` — Data table, search, create/edit dialogs, status badge
+- `/admin/ministries` — Data table, search, create/edit/deactivate with RBAC gates
+- `/admin/departments` — Ministry-scoped data table, ministry selector, CRUD dialogs
+- `/admin/divisions` — Department-scoped data table, department selector, CRUD dialogs
+- `/admin/positions` — Level badges (Executive → Support), headcount, ministry selector, CRUD
+- `/admin/employees` — Read-only staff table with role/status badges
+
+**Shared lib utilities**
+- `lib/permissions.ts` — `hasPermission`, `hasAllPermissions`, `hasAnyPermission`, `PERMS` constants
+- `lib/use-list-query.ts` — Generic TanStack Query hook for paginated CRUD list pages
+
+### Changed
+- `apps/web/src/app/layout.tsx` — Added Providers wrapper, getServerSession, antialiased body
+- `apps/web/src/app/page.tsx` — Root `/` now redirects to `/admin`
+
+---
+
+## [0.3.1] — 2026-06-24
+
+**Type-check fixes.** Post-migration cleanup of Prisma stale-client workarounds.
+
+### Changed
+- `government/positions/positions.service.ts` — Replaced `PrismaExt` cast with direct `this.prisma.position`, `Prisma.QueryMode.insensitive`, `Prisma.PositionWhereInput`, `AuditAction` enum members, `Prisma.PositionGetPayload` typed return
+
+---
+
 ## [0.1.0-foundation] — 2026-06-23
 
 **Foundation release.** This release establishes the complete engineering foundation for GovSphere: monorepo structure, database schema, Identity Platform, CI pipeline, security hardening, documentation, and architectural decisions. No business features beyond authentication and identity are included.

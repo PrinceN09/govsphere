@@ -1,21 +1,26 @@
-import { Inter } from "next/font/google";
-
 import type { Metadata } from "next";
-
+import { Inter } from "next/font/google";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { Providers } from "@/components/layout/Providers";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"], display: "swap" });
 
 export const metadata: Metadata = {
-  title: "GovSphere — Plateforme de Collaboration Gouvernementale",
+  title: { default: "GovSphere", template: "%s · GovSphere" },
   description:
     "Plateforme sécurisée de collaboration interne pour le Gouvernement de la République Démocratique du Congo.",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const session = await getServerSession(authOptions);
+
   return (
-    <html lang="fr">
-      <body className={inter.className}>{children}</body>
+    <html lang="fr" className="h-full">
+      <body className={`${inter.className} h-full bg-gray-50 text-gray-900 antialiased`}>
+        <Providers session={session}>{children}</Providers>
+      </body>
     </html>
   );
 }

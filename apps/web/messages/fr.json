@@ -1,0 +1,234 @@
+{
+  "common": {
+    "appName": "GovSphere",
+    "loading": "Chargement…",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "create": "Créer",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "reset": "Réinitialiser",
+    "actions": "Actions",
+    "status": "Statut",
+    "active": "Actif",
+    "inactive": "Inactif",
+    "yes": "Oui",
+    "no": "Non",
+    "confirm": "Confirmer",
+    "back": "Retour",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "close": "Fermer",
+    "submit": "Soumettre",
+    "total": "Total",
+    "of": "sur",
+    "page": "Page",
+    "rowsPerPage": "Lignes par page",
+    "noResults": "Aucun résultat trouvé",
+    "error": "Une erreur est survenue",
+    "required": "Obligatoire",
+    "optional": "Optionnel",
+    "name": "Nom",
+    "code": "Code",
+    "description": "Description",
+    "createdAt": "Créé le",
+    "updatedAt": "Modifié le"
+  },
+  "nav": {
+    "dashboard": "Tableau de bord",
+    "provinces": "Provinces",
+    "ministries": "Ministères",
+    "departments": "Départements",
+    "divisions": "Divisions",
+    "positions": "Postes",
+    "employees": "Agents",
+    "settings": "Paramètres",
+    "profile": "Profil",
+    "logout": "Déconnexion"
+  },
+  "auth": {
+    "login": {
+      "title": "Connexion",
+      "subtitle": "Plateforme de Collaboration Gouvernementale — RDC",
+      "credential": "Matricule ou adresse e-mail",
+      "credentialPlaceholder": "1.641.558 ou nom@gouv.cd",
+      "password": "Mot de passe",
+      "passwordPlaceholder": "Entrez votre mot de passe",
+      "submit": "Se connecter",
+      "forgotPassword": "Mot de passe oublié ?",
+      "loggingIn": "Connexion en cours…",
+      "errors": {
+        "invalidCredentials": "Identifiant ou mot de passe incorrect.",
+        "accountLocked": "Compte temporairement verrouillé. Réessayez dans 30 minutes.",
+        "accountInactive": "Ce compte est désactivé. Contactez l'administrateur.",
+        "networkError": "Impossible de joindre le serveur. Vérifiez votre connexion."
+      }
+    },
+    "mfa": {
+      "title": "Vérification en deux étapes",
+      "subtitle": "Entrez le code de votre application d'authentification",
+      "code": "Code à 6 chiffres",
+      "codePlaceholder": "000000",
+      "backupCode": "Utiliser un code de secours",
+      "backupCodePlaceholder": "Code de secours",
+      "submit": "Vérifier",
+      "verifying": "Vérification…",
+      "switchToBackup": "Utiliser un code de secours",
+      "switchToTotp": "Utiliser l'application",
+      "errors": {
+        "invalidCode": "Code incorrect ou expiré.",
+        "expiredChallenge": "Session expirée. Veuillez vous reconnecter."
+      }
+    },
+    "forgotPassword": {
+      "title": "Réinitialiser le mot de passe",
+      "subtitle": "Entrez votre matricule ou adresse e-mail pour recevoir un lien de réinitialisation",
+      "credential": "Matricule ou adresse e-mail",
+      "submit": "Envoyer le lien",
+      "sending": "Envoi en cours…",
+      "successTitle": "Lien envoyé",
+      "successMessage": "Si un compte existe avec cet identifiant, un e-mail de réinitialisation a été envoyé.",
+      "backToLogin": "Retour à la connexion"
+    },
+    "resetPassword": {
+      "title": "Nouveau mot de passe",
+      "subtitle": "Choisissez un nouveau mot de passe sécurisé",
+      "newPassword": "Nouveau mot de passe",
+      "confirmPassword": "Confirmer le mot de passe",
+      "submit": "Réinitialiser",
+      "resetting": "Réinitialisation…",
+      "successTitle": "Mot de passe réinitialisé",
+      "successMessage": "Votre mot de passe a été réinitialisé. Vous pouvez maintenant vous connecter.",
+      "backToLogin": "Retour à la connexion",
+      "errors": {
+        "passwordMismatch": "Les mots de passe ne correspondent pas.",
+        "invalidToken": "Lien de réinitialisation invalide ou expiré.",
+        "weakPassword": "Le mot de passe ne respecte pas les exigences de sécurité."
+      }
+    }
+  },
+  "dashboard": {
+    "title": "Tableau de bord",
+    "welcome": "Bienvenue, {name}",
+    "subtitle": "Vue d'ensemble de la structure gouvernementale",
+    "stats": {
+      "provinces": "Provinces",
+      "ministries": "Ministères",
+      "departments": "Départements",
+      "divisions": "Divisions",
+      "positions": "Postes",
+      "employees": "Agents actifs"
+    }
+  },
+  "provinces": {
+    "title": "Provinces",
+    "subtitle": "Les 26 provinces de la RDC",
+    "create": "Nouvelle province",
+    "editTitle": "Modifier la province",
+    "createTitle": "Créer une province",
+    "fields": {
+      "name": "Nom de la province",
+      "code": "Code",
+      "capital": "Chef-lieu",
+      "nameFr": "Nom (Français)",
+      "nameEn": "Nom (Anglais)"
+    },
+    "deleteConfirm": "Êtes-vous sûr de vouloir désactiver cette province ?"
+  },
+  "ministries": {
+    "title": "Ministères",
+    "subtitle": "Structure ministérielle du gouvernement",
+    "create": "Nouveau ministère",
+    "editTitle": "Modifier le ministère",
+    "createTitle": "Créer un ministère",
+    "fields": {
+      "name": "Nom du ministère",
+      "code": "Code",
+      "description": "Description",
+      "nameFr": "Nom (Français)",
+      "nameEn": "Nom (Anglais)",
+      "logoUrl": "URL du logo"
+    },
+    "departments": "départements",
+    "deactivateConfirm": "Êtes-vous sûr de vouloir désactiver ce ministère ?"
+  },
+  "departments": {
+    "title": "Départements",
+    "subtitle": "Départements des ministères",
+    "create": "Nouveau département",
+    "editTitle": "Modifier le département",
+    "createTitle": "Créer un département",
+    "fields": {
+      "name": "Nom du département",
+      "code": "Code",
+      "ministry": "Ministère",
+      "description": "Description"
+    },
+    "deactivateConfirm": "Êtes-vous sûr de vouloir désactiver ce département ?"
+  },
+  "divisions": {
+    "title": "Divisions",
+    "subtitle": "Divisions des départements",
+    "create": "Nouvelle division",
+    "editTitle": "Modifier la division",
+    "createTitle": "Créer une division",
+    "fields": {
+      "name": "Nom de la division",
+      "code": "Code",
+      "department": "Département",
+      "description": "Description"
+    },
+    "deactivateConfirm": "Êtes-vous sûr de vouloir désactiver cette division ?"
+  },
+  "positions": {
+    "title": "Postes",
+    "subtitle": "Postes et responsabilités",
+    "create": "Nouveau poste",
+    "editTitle": "Modifier le poste",
+    "createTitle": "Créer un poste",
+    "fields": {
+      "title": "Intitulé du poste",
+      "code": "Code",
+      "level": "Niveau",
+      "headcount": "Effectif autorisé",
+      "ministry": "Ministère",
+      "department": "Département",
+      "division": "Division"
+    },
+    "levels": {
+      "EXECUTIVE": "Direction Exécutive",
+      "DIRECTOR": "Directeur",
+      "MANAGER": "Manager",
+      "SPECIALIST": "Spécialiste",
+      "OFFICER": "Agent",
+      "SUPPORT": "Support"
+    },
+    "deactivateConfirm": "Êtes-vous sûr de vouloir désactiver ce poste ?"
+  },
+  "employees": {
+    "title": "Agents",
+    "subtitle": "Personnel gouvernemental",
+    "fields": {
+      "displayName": "Nom complet",
+      "email": "Adresse e-mail",
+      "matricule": "Matricule",
+      "role": "Rôle",
+      "ministry": "Ministère",
+      "status": "Statut"
+    },
+    "statuses": {
+      "ACTIVE": "Actif",
+      "INACTIVE": "Inactif",
+      "SUSPENDED": "Suspendu",
+      "PENDING_ACTIVATION": "En attente"
+    }
+  },
+  "errors": {
+    "forbidden": "Accès refusé. Vous n'avez pas les permissions nécessaires.",
+    "notFound": "La ressource demandée est introuvable.",
+    "serverError": "Une erreur serveur est survenue. Veuillez réessayer.",
+    "conflict": "Un enregistrement avec ce code existe déjà."
+  }
+}
