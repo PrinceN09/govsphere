@@ -15,10 +15,11 @@
  * - jwt() callback refreshes the access token server-side before it expires.
  */
 
-import CredentialsProvider from "next-auth/providers/credentials";
+import Credentials from "next-auth/providers/credentials";
+
+import type { UserRole } from "@govsphere/types";
 import type { AuthOptions, User } from "next-auth";
 import type { JWT } from "next-auth/jwt";
-import type { UserRole } from "@govsphere/types";
 
 const API_URL = process.env["API_URL"] ?? "http://localhost:3001";
 
@@ -133,7 +134,7 @@ async function fetchPermissions(accessToken: string): Promise<string[]> {
 export const authOptions: AuthOptions = {
   providers: [
     // ── 1. Standard credential login ─────────────────────────────────────────
-    CredentialsProvider({
+    Credentials({
       id: "credentials",
       name: "GovSphere",
       credentials: {
@@ -196,7 +197,7 @@ export const authOptions: AuthOptions = {
     }),
 
     // ── 2. MFA verification ───────────────────────────────────────────────────
-    CredentialsProvider({
+    Credentials({
       id: "mfa",
       name: "GovSphere MFA",
       credentials: {
@@ -284,7 +285,7 @@ export const authOptions: AuthOptions = {
     },
 
     // ── session: expose fields to client ─────────────────────────────────────
-    async session({ session, token }) {
+    session({ session, token }) {
       session.accessToken = token.accessToken;
       if (token.error !== undefined) {
         session.error = token.error;

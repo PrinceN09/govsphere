@@ -8,8 +8,9 @@
  */
 
 import axios from "axios";
-import type { AxiosError, AxiosInstance, InternalAxiosRequestConfig } from "axios";
 import { getSession, signOut } from "next-auth/react";
+
+import type { AxiosError, AxiosInstance, InternalAxiosRequestConfig } from "axios";
 
 const API_BASE_URL = process.env["NEXT_PUBLIC_API_URL"] ?? "http://localhost:3001";
 

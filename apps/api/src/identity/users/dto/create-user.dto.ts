@@ -52,6 +52,23 @@ export class CreateUserDto {
   divisionId?: string;
 
   @IsOptional()
+  @IsString()
+  officeId?: string;
+
+  @IsOptional()
+  @IsString()
+  positionId?: string;
+
+  @IsOptional()
+  @IsString()
+  managerId?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(50)
+  phone?: string;
+
+  @IsOptional()
   @IsEnum(SupportedLanguage)
   preferredLanguage?: SupportedLanguage;
 

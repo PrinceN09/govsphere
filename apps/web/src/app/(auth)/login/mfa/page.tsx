@@ -1,13 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Input } from "@/components/ui/Input";
+
+import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
 
 const totpSchema = z.object({
   code: z
@@ -73,9 +75,11 @@ export default function MfaPage() {
 
   return (
     <div>
-      <div className="mb-6 text-center">
-        <h1 className="text-xl font-bold text-gray-900">Vérification en deux étapes</h1>
-        <p className="mt-1 text-sm text-gray-500">
+      <div className="mb-6">
+        <h1 className="text-xl font-bold tracking-tight text-slate-900">
+          Vérification en deux étapes
+        </h1>
+        <p className="mt-1 text-sm text-slate-500">
           {useBackup
             ? "Entrez un code de secours"
             : "Entrez le code de votre application d'authentification"}
@@ -83,13 +87,19 @@ export default function MfaPage() {
       </div>
 
       {serverError && (
-        <div className="mb-4 rounded-lg bg-danger-50 border border-danger-200 px-4 py-3 text-sm text-danger-700">
-          {serverError}
+        <div className="mb-5">
+          <Alert variant="danger">{serverError}</Alert>
         </div>
       )}
 
       {!useBackup ? (
-        <form onSubmit={totpForm.handleSubmit(onTotpSubmit)} noValidate className="space-y-4">
+        <form
+          onSubmit={(e) => {
+            void totpForm.handleSubmit(onTotpSubmit)(e);
+          }}
+          noValidate
+          className="space-y-4"
+        >
           <Input
             label="Code à 6 chiffres"
             placeholder="000000"
@@ -102,24 +112,29 @@ export default function MfaPage() {
             {...totpForm.register("code")}
           />
 
-          <Button
-            type="submit"
-            className="w-full"
-            loading={totpForm.formState.isSubmitting}
-          >
+          <Button type="submit" className="w-full" loading={totpForm.formState.isSubmitting}>
             {totpForm.formState.isSubmitting ? "Vérification…" : "Vérifier"}
           </Button>
 
           <button
             type="button"
-            onClick={() => { setUseBackup(true); setServerError(null); }}
+            onClick={() => {
+              setUseBackup(true);
+              setServerError(null);
+            }}
             className="w-full text-center text-sm text-primary-600 hover:underline"
           >
             Utiliser un code de secours
           </button>
         </form>
       ) : (
-        <form onSubmit={backupForm.handleSubmit(onBackupSubmit)} noValidate className="space-y-4">
+        <form
+          onSubmit={(e) => {
+            void backupForm.handleSubmit(onBackupSubmit)(e);
+          }}
+          noValidate
+          className="space-y-4"
+        >
           <Input
             label="Code de secours"
             placeholder="xxxxxxxx"
@@ -129,17 +144,16 @@ export default function MfaPage() {
             {...backupForm.register("backupCode")}
           />
 
-          <Button
-            type="submit"
-            className="w-full"
-            loading={backupForm.formState.isSubmitting}
-          >
+          <Button type="submit" className="w-full" loading={backupForm.formState.isSubmitting}>
             {backupForm.formState.isSubmitting ? "Vérification…" : "Vérifier"}
           </Button>
 
           <button
             type="button"
-            onClick={() => { setUseBackup(false); setServerError(null); }}
+            onClick={() => {
+              setUseBackup(false);
+              setServerError(null);
+            }}
             className="w-full text-center text-sm text-primary-600 hover:underline"
           >
             Utiliser l&apos;application

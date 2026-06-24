@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState, useCallback } from "react";
+
 import { apiGet, apiPost, apiPatch, apiDelete } from "./api";
+
 import type { PaginatedResponse } from "./api";
 
 interface UseListQueryOptions {
@@ -38,18 +40,24 @@ export function useListQuery<T>({ endpoint, queryKey, defaultLimit = 20 }: UseLi
 
   const createMutation = useMutation({
     mutationFn: (body: unknown) => apiPost<T>(endpoint, body),
-    onSuccess: () => { void invalidate(); },
+    onSuccess: () => {
+      void invalidate();
+    },
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, body }: { id: string; body: unknown }) =>
       apiPatch<T>(`${endpoint}/${id}`, body),
-    onSuccess: () => { void invalidate(); },
+    onSuccess: () => {
+      void invalidate();
+    },
   });
 
   const deactivateMutation = useMutation({
     mutationFn: (id: string) => apiDelete(`${endpoint}/${id}`),
-    onSuccess: () => { void invalidate(); },
+    onSuccess: () => {
+      void invalidate();
+    },
   });
 
   const handleSearch = useCallback((value: string) => {

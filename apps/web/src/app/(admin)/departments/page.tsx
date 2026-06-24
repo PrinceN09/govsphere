@@ -1,27 +1,41 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useQuery } from "@tanstack/react-query";
+
 import { AdminTopBar } from "@/components/layout/AdminTopBar";
 import { PermissionGate } from "@/components/layout/PermissionGate";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
-import { Select } from "@/components/ui/Select";
 import { Badge, StatusBadge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
 import { Dialog, ConfirmDialog } from "@/components/ui/Dialog";
-import { SearchInput } from "@/components/ui/SearchInput";
-import { Table, TableHead, TableBody, TableRow, TableHeaderCell, TableCell, TableEmpty } from "@/components/ui/Table";
+import { Input } from "@/components/ui/Input";
 import { Pagination } from "@/components/ui/Pagination";
+import { SearchInput } from "@/components/ui/SearchInput";
+import { Select } from "@/components/ui/Select";
 import { PageSpinner } from "@/components/ui/Spinner";
-import { useListQuery } from "@/lib/use-list-query";
+import {
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableHeaderCell,
+  TableCell,
+  TableEmpty,
+} from "@/components/ui/Table";
 import { apiGet } from "@/lib/api";
 import { PERMS } from "@/lib/permissions";
+import { useListQuery } from "@/lib/use-list-query";
+
 import type { PaginatedResponse } from "@/lib/api";
 
-interface Ministry { id: string; name: string; code: string; }
+interface Ministry {
+  id: string;
+  name: string;
+  code: string;
+}
 interface Department {
   id: string;
   name: string;
@@ -105,12 +119,20 @@ export default function DepartmentsPage() {
 
       <div className="p-6 space-y-4">
         <div className="flex items-center gap-3">
-          <SearchInput value={list.search} onChange={list.handleSearch}
-            placeholder="Rechercher un département…" className="w-72" />
-          <Badge variant="blue">{list.total} département{list.total !== 1 ? "s" : ""}</Badge>
+          <SearchInput
+            value={list.search}
+            onChange={list.handleSearch}
+            placeholder="Rechercher un département…"
+            className="w-72"
+          />
+          <Badge variant="blue">
+            {list.total} département{list.total !== 1 ? "s" : ""}
+          </Badge>
         </div>
 
-        {list.isLoading ? <PageSpinner /> : (
+        {list.isLoading ? (
+          <PageSpinner />
+        ) : (
           <>
             <Table>
               <TableHead>
@@ -125,25 +147,40 @@ export default function DepartmentsPage() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {list.data.length === 0 ? <TableEmpty message="Aucun département trouvé" /> : (
+                {list.data.length === 0 ? (
+                  <TableEmpty message="Aucun département trouvé" />
+                ) : (
                   list.data.map((d) => (
                     <TableRow key={d.id}>
                       <TableCell className="font-medium text-gray-900">{d.name}</TableCell>
-                      <TableCell><Badge variant="gray">{d.code}</Badge></TableCell>
+                      <TableCell>
+                        <Badge variant="gray">{d.code}</Badge>
+                      </TableCell>
                       <TableCell className="text-gray-500 text-xs">{d.ministry.name}</TableCell>
                       <TableCell>
-                        <StatusBadge active={d.isActive} labelActive="Actif" labelInactive="Inactif" />
+                        <StatusBadge
+                          active={d.isActive}
+                          labelActive="Actif"
+                          labelInactive="Inactif"
+                        />
                       </TableCell>
-                      <PermissionGate anyOf={[PERMS.DEPARTMENT_UPDATE, PERMS.DEPARTMENT_DEACTIVATE]}>
+                      <PermissionGate
+                        anyOf={[PERMS.DEPARTMENT_UPDATE, PERMS.DEPARTMENT_DEACTIVATE]}
+                      >
                         <TableCell className="text-right space-x-2">
                           <PermissionGate permission={PERMS.DEPARTMENT_UPDATE}>
-                            <Button variant="ghost" size="sm" onClick={() => openEdit(d)}>Modifier</Button>
+                            <Button variant="ghost" size="sm" onClick={() => openEdit(d)}>
+                              Modifier
+                            </Button>
                           </PermissionGate>
                           <PermissionGate permission={PERMS.DEPARTMENT_DEACTIVATE}>
                             {d.isActive && (
-                              <Button variant="ghost" size="sm"
+                              <Button
+                                variant="ghost"
+                                size="sm"
                                 className="text-danger-600 hover:text-danger-700"
-                                onClick={() => setDeactivateTarget(d)}>
+                                onClick={() => setDeactivateTarget(d)}
+                              >
                                 Désactiver
                               </Button>
                             )}
@@ -155,49 +192,110 @@ export default function DepartmentsPage() {
                 )}
               </TableBody>
             </Table>
-            <Pagination page={list.page} totalPages={list.totalPages} total={list.total}
-              limit={20} onPageChange={list.setPage} labelOf="sur" labelPage="Page" />
+            <Pagination
+              page={list.page}
+              totalPages={list.totalPages}
+              total={list.total}
+              limit={20}
+              onPageChange={list.setPage}
+              labelOf="sur"
+              labelPage="Page"
+            />
           </>
         )}
       </div>
 
       {/* Create */}
-      <Dialog open={createOpen} onClose={() => { setCreateOpen(false); createForm.reset(); }} title="Créer un département">
-        <form onSubmit={createForm.handleSubmit(onCreateSubmit)} className="space-y-4">
-          <Select label="Ministère" required options={ministryOptions}
+      <Dialog
+        open={createOpen}
+        onClose={() => {
+          setCreateOpen(false);
+          createForm.reset();
+        }}
+        title="Créer un département"
+      >
+        <form
+          onSubmit={(e) => {
+            void createForm.handleSubmit(onCreateSubmit)(e);
+          }}
+          className="space-y-4"
+        >
+          <Select
+            label="Ministère"
+            required
+            options={ministryOptions}
             placeholder="Sélectionner un ministère"
             error={createForm.formState.errors.ministryId?.message}
-            {...createForm.register("ministryId")} />
-          <Input label="Nom du département" required
-            error={createForm.formState.errors.name?.message} {...createForm.register("name")} />
-          <Input label="Code" placeholder="ex. DAF" required
-            error={createForm.formState.errors.code?.message} {...createForm.register("code")} />
-          <Input label="Description"
-            error={createForm.formState.errors.description?.message} {...createForm.register("description")} />
+            {...createForm.register("ministryId")}
+          />
+          <Input
+            label="Nom du département"
+            required
+            error={createForm.formState.errors.name?.message}
+            {...createForm.register("name")}
+          />
+          <Input
+            label="Code"
+            placeholder="ex. DAF"
+            required
+            error={createForm.formState.errors.code?.message}
+            {...createForm.register("code")}
+          />
+          <Input
+            label="Description"
+            error={createForm.formState.errors.description?.message}
+            {...createForm.register("description")}
+          />
           <div className="flex justify-end gap-3 pt-2">
-            <Button variant="secondary" type="button" onClick={() => setCreateOpen(false)}>Annuler</Button>
-            <Button type="submit" loading={list.createMutation.isPending}>Créer</Button>
+            <Button variant="secondary" type="button" onClick={() => setCreateOpen(false)}>
+              Annuler
+            </Button>
+            <Button type="submit" loading={list.createMutation.isPending}>
+              Créer
+            </Button>
           </div>
         </form>
       </Dialog>
 
       {/* Edit */}
-      <Dialog open={editTarget !== null} onClose={() => setEditTarget(null)} title="Modifier le département">
-        <form onSubmit={editForm.handleSubmit(onEditSubmit)} className="space-y-4">
-          <Input label="Nom du département" required
-            error={editForm.formState.errors.name?.message} {...editForm.register("name")} />
+      <Dialog
+        open={editTarget !== null}
+        onClose={() => setEditTarget(null)}
+        title="Modifier le département"
+      >
+        <form
+          onSubmit={(e) => {
+            void editForm.handleSubmit(onEditSubmit)(e);
+          }}
+          className="space-y-4"
+        >
+          <Input
+            label="Nom du département"
+            required
+            error={editForm.formState.errors.name?.message}
+            {...editForm.register("name")}
+          />
           <Input label="Code" disabled {...editForm.register("code")} />
-          <Input label="Description"
-            error={editForm.formState.errors.description?.message} {...editForm.register("description")} />
+          <Input
+            label="Description"
+            error={editForm.formState.errors.description?.message}
+            {...editForm.register("description")}
+          />
           <div className="flex justify-end gap-3 pt-2">
-            <Button variant="secondary" type="button" onClick={() => setEditTarget(null)}>Annuler</Button>
-            <Button type="submit" loading={list.updateMutation.isPending}>Enregistrer</Button>
+            <Button variant="secondary" type="button" onClick={() => setEditTarget(null)}>
+              Annuler
+            </Button>
+            <Button type="submit" loading={list.updateMutation.isPending}>
+              Enregistrer
+            </Button>
           </div>
         </form>
       </Dialog>
 
       {/* Deactivate */}
-      <ConfirmDialog open={deactivateTarget !== null} onClose={() => setDeactivateTarget(null)}
+      <ConfirmDialog
+        open={deactivateTarget !== null}
+        onClose={() => setDeactivateTarget(null)}
         onConfirm={async () => {
           if (!deactivateTarget) return;
           await list.deactivateMutation.mutateAsync(deactivateTarget.id);
@@ -205,7 +303,9 @@ export default function DepartmentsPage() {
         }}
         title="Désactiver le département"
         message={`Êtes-vous sûr de vouloir désactiver « ${deactivateTarget?.name} » ?`}
-        confirmLabel="Désactiver" loading={list.deactivateMutation.isPending} />
+        confirmLabel="Désactiver"
+        loading={list.deactivateMutation.isPending}
+      />
     </div>
   );
 }

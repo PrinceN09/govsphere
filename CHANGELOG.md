@@ -7,6 +7,65 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [0.5.0] — 2026-06-24
+
+**Design System & UI Polish.** Premium GovSphere design system with DRC national identity, dark navy sidebar, authority-gold active indicator, sharp corners throughout, and a fully rebuilt component library.
+
+### Added
+
+**Design Tokens (`apps/web`)**
+- `tailwind.config.ts` — Complete token override: `navy-*` scale (sidebar surfaces), `primary-*` (government blue #1550C8), `gold-*` (authority accent #D4A012), `danger/success/warning` scales, sharp `borderRadius` override (0–4px), `shadow-authority`, `shadow-card`, `shadow-dialog`, `tracking-label`, `fontSize-2xs`
+- `src/app/globals.css` — CSS custom properties: `--drc-blue/gold/red`, `--authority-gold`, `--sidebar-bg`, `--surface-page`, DRC stripe utility classes, `authority-bar` inset shadow
+- `src/lib/design-tokens.ts` — TypeScript constants for raw token values (charts, canvas use)
+
+**New UI Components**
+- `Card` + `CardHeader` + `CardBody` — sharp-corner card with optional authority left-border variant
+- `Alert` — info / success / warning / danger variants with icon, title, dismiss button
+- `Tabs` + `TabList` + `Tab` + `TabPanel` — context-based tab system with blue underline indicator
+
+**Rebuilt UI Components** (same API, new visual language)
+- `Button` — zero border-radius, tighter tracking, all four variants recalibrated
+- `Input` — uppercase tracking-label labels, sharp border, blue focus ring with opacity
+- `Select` — matching Input label system, sharp corners
+- `Badge` — ring-inset treatment, added `gold` variant, sharper corners
+- `Table` / `TableHead` / `TableBody` / `TableRow` / `TableHeaderCell` / `TableCell` / `TableEmpty` — slate colour scale, 11px uppercase tracking headers, no rounded corners
+- `Dialog` / `ConfirmDialog` — sharp corners, `shadow-dialog`, slide-up animation on open
+- `Spinner` / `PageSpinner` — thinner stroke, slate label colour
+- `StatCard` — 2px accent bar at top (per-card colour), sharp corners, tight tracking on value
+- `EmptyState` — square icon container (border + bg-slate-50), sharper presentation
+- `Pagination` — border-t separator, icon chevrons, sharp page buttons
+- `SearchInput` — slate border system, matching focus ring
+
+**Layout Components**
+- `AdminSidebar` — Dark navy (`#07101D`) background, DRC tri-colour stripe at top, grouped nav sections (Main / Structure gouvernementale / Ressources humaines), gold `authority-bar` active indicator (3px inset shadow — the signature element), gold icon on active item, mobile overlay with backdrop
+- `AdminTopBar` — Reads mobile-open trigger from `MobileSidebarContext`, square avatar, role label in uppercase, slide-down dropdown animation
+- `MobileSidebarContext` — React context so any page's `AdminTopBar` can trigger the sidebar without prop threading
+
+**Auth Pages**
+- `(auth)/layout.tsx` — Dark navy (`bg-navy-900`) background replaces blue gradient; DRC stripe at card top; card is sharp-cornered white panel
+- `(auth)/login/page.tsx` — Uses new `Alert` component for errors, sharp typography
+- `(auth)/login/mfa/page.tsx` — Alert component for errors
+- `(auth)/forgot-password/page.tsx` — Alert + success state restyled
+- `(auth)/reset-password/page.tsx` — Alert component for errors
+
+**Admin Pages**
+- `(admin)/layout.tsx` — Wraps children in `MobileSidebarContext.Provider`; no longer passes sidebar open state as props
+- `(admin)/page.tsx` (Dashboard) — Removed gradient welcome banner; replaced with authority-card (gold top stripe); stat cards in gap-px grid creating unified bordered panel; removed `PageSpinner` import
+
+### Design System Decisions
+
+- **Signature element:** Gold authority bar (`box-shadow: inset 3px 0 0 #D4A012`) on active sidebar nav items — the single most characteristic visual element, used nowhere else
+- **DRC brand stripe:** 3px horizontal blue/gold/red stripe used only at sidebar top and auth card top — identity marker, never button fill
+- **Sharp corners:** `borderRadius` Tailwind override caps all radii at 0–4px globally — aesthetic risk taken on purpose for government/official feel
+- **Page background:** `#E8EDF5` — cool blue-tinted off-white (not pure gray) giving documents-on-paper feel
+- **Gold usage:** Strictly accent-only — active nav indicator and stat card accent bars; never backgrounds, never buttons
+
+### Changed
+- `tailwind.config.ts` — Complete rewrite (see above)
+- `src/app/globals.css` — Complete rewrite (see above)
+
+---
+
 ## [0.4.0] — 2026-06-24
 
 **Administration Portal.** Full-stack administration portal for the DRC Government Structure with production-ready authentication, bilingual UI, and RBAC-protected admin pages.

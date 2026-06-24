@@ -8,8 +8,9 @@
  * 4. Handles locale routing via next-intl (future — currently a no-op wrapper).
  */
 
-import { withAuth } from "next-auth/middleware";
 import { NextResponse } from "next/server";
+import { withAuth } from "next-auth/middleware";
+
 import type { NextRequest } from "next/server";
 import type { JWT } from "next-auth/jwt";
 

@@ -1,4 +1,5 @@
 import { getRequestConfig } from "next-intl/server";
+
 import type { AbstractIntlMessages } from "next-intl";
 
 export const locales = ["fr", "en"] as const;

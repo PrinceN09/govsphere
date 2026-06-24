@@ -4,22 +4,18 @@ import { cn } from "./cn";
 
 export function Table({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={cn("w-full overflow-x-auto rounded-lg border border-gray-200 bg-white", className)}>
-      <table className="w-full text-sm">{children}</table>
+    <div className={cn("w-full overflow-x-auto border border-slate-200 bg-white", className)}>
+      <table className="w-full border-collapse text-sm">{children}</table>
     </div>
   );
 }
 
 export function TableHead({ children }: { children: React.ReactNode }) {
-  return (
-    <thead className="border-b border-gray-200 bg-gray-50">
-      {children}
-    </thead>
-  );
+  return <thead className="border-b border-slate-200 bg-slate-50">{children}</thead>;
 }
 
 export function TableBody({ children }: { children: React.ReactNode }) {
-  return <tbody className="divide-y divide-gray-100">{children}</tbody>;
+  return <tbody className="divide-y divide-slate-100">{children}</tbody>;
 }
 
 export function TableRow({
@@ -33,7 +29,11 @@ export function TableRow({
 }) {
   return (
     <tr
-      className={cn("transition-colors", onClick && "cursor-pointer hover:bg-gray-50", className)}
+      className={cn(
+        "transition-colors",
+        onClick && "cursor-pointer hover:bg-slate-50/70",
+        className,
+      )}
       onClick={onClick}
     >
       {children}
@@ -52,7 +52,8 @@ export function TableHeaderCell({
     <th
       scope="col"
       className={cn(
-        "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500",
+        "px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-label text-slate-500",
+        "whitespace-nowrap",
         className,
       )}
     >
@@ -68,17 +69,15 @@ export function TableCell({
   children?: React.ReactNode;
   className?: string;
 }) {
-  return (
-    <td className={cn("px-4 py-3 text-gray-700", className)}>{children}</td>
-  );
+  return <td className={cn("px-4 py-3 text-slate-700", className)}>{children}</td>;
 }
 
-// ─── Empty state ──────────────────────────────────────────────────────────────
+// ─── Empty row ────────────────────────────────────────────────────────────────
 
 export function TableEmpty({ message }: { message: string }) {
   return (
     <tr>
-      <td colSpan={99} className="py-16 text-center text-sm text-gray-400">
+      <td colSpan={99} className="py-16 text-center text-sm text-slate-400">
         {message}
       </td>
     </tr>

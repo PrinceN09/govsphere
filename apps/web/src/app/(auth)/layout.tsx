@@ -1,28 +1,31 @@
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-full flex-col items-center justify-center bg-gradient-to-br from-primary-900 via-primary-800 to-primary-700 px-4 py-12">
-      {/* DRC colours accent line */}
-      <div className="mb-8 flex w-full max-w-md overflow-hidden rounded-t-xl">
-        <div className="h-1 flex-1 bg-[#007FFF]" />
-        <div className="h-1 w-10 bg-[#F7D918]" />
-        <div className="h-1 flex-1 bg-[#CE1020]" />
-      </div>
+    <div className="flex min-h-full flex-col items-center justify-center bg-navy-900 px-4 py-12">
+      {/* Auth card */}
+      <div className="w-full max-w-[420px] bg-white shadow-dialog">
+        {/* DRC brand stripe — identity marker at top of card */}
+        <div className="drc-stripe">
+          <div className="stripe-blue" />
+          <div className="stripe-gold" />
+          <div className="stripe-red" />
+        </div>
 
-      <div className="w-full max-w-md rounded-xl bg-white shadow-2xl">
-        {/* Logo */}
-        <div className="flex flex-col items-center border-b border-gray-100 px-8 py-6">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary-600 shadow-md">
-            <span className="text-xl font-black text-white">G</span>
+        {/* Logo block */}
+        <div className="flex flex-col items-center border-b border-slate-100 px-8 py-6">
+          <div className="flex h-10 w-10 items-center justify-center bg-primary-600">
+            <span className="text-lg font-black text-white leading-none">G</span>
           </div>
-          <p className="mt-2 text-xs font-semibold uppercase tracking-widest text-gray-400">
+          <p className="mt-3 text-[11px] font-bold uppercase tracking-widest text-slate-400">
             GovSphere
           </p>
         </div>
 
-        <div className="px-8 py-6">{children}</div>
+        {/* Page content */}
+        <div className="px-8 py-7">{children}</div>
       </div>
 
-      <p className="mt-6 text-center text-xs text-primary-300">
+      {/* Footer */}
+      <p className="mt-6 text-center text-xs text-navy-500">
         République Démocratique du Congo · Usage gouvernemental exclusif
       </p>
     </div>

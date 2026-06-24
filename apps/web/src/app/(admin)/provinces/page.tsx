@@ -1,21 +1,30 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+
 import { AdminTopBar } from "@/components/layout/AdminTopBar";
 import { PermissionGate } from "@/components/layout/PermissionGate";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
 import { Badge, StatusBadge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
 import { Dialog, ConfirmDialog } from "@/components/ui/Dialog";
-import { SearchInput } from "@/components/ui/SearchInput";
-import { Table, TableHead, TableBody, TableRow, TableHeaderCell, TableCell, TableEmpty } from "@/components/ui/Table";
+import { Input } from "@/components/ui/Input";
 import { Pagination } from "@/components/ui/Pagination";
+import { SearchInput } from "@/components/ui/SearchInput";
 import { PageSpinner } from "@/components/ui/Spinner";
-import { useListQuery } from "@/lib/use-list-query";
+import {
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableHeaderCell,
+  TableCell,
+  TableEmpty,
+} from "@/components/ui/Table";
 import { PERMS } from "@/lib/permissions";
+import { useListQuery } from "@/lib/use-list-query";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -108,7 +117,9 @@ export default function ProvincesPage() {
             placeholder="Rechercher une province…"
             className="w-72"
           />
-          <Badge variant="blue">{list.total} province{list.total !== 1 ? "s" : ""}</Badge>
+          <Badge variant="blue">
+            {list.total} province{list.total !== 1 ? "s" : ""}
+          </Badge>
         </div>
 
         {/* Table */}
@@ -148,11 +159,7 @@ export default function ProvincesPage() {
                       </TableCell>
                       <PermissionGate permission={PERMS.PROVINCE_UPDATE}>
                         <TableCell className="text-right">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => openEdit(province)}
-                          >
+                          <Button variant="ghost" size="sm" onClick={() => openEdit(province)}>
                             Modifier
                           </Button>
                         </TableCell>
@@ -179,10 +186,18 @@ export default function ProvincesPage() {
       {/* Create dialog */}
       <Dialog
         open={createOpen}
-        onClose={() => { setCreateOpen(false); createForm.reset(); }}
+        onClose={() => {
+          setCreateOpen(false);
+          createForm.reset();
+        }}
         title="Créer une province"
       >
-        <form onSubmit={createForm.handleSubmit(onCreateSubmit)} className="space-y-4">
+        <form
+          onSubmit={(e) => {
+            void createForm.handleSubmit(onCreateSubmit)(e);
+          }}
+          className="space-y-4"
+        >
           <Input
             label="Nom de la province"
             placeholder="ex. Kinshasa"
@@ -228,7 +243,12 @@ export default function ProvincesPage() {
         onClose={() => setEditTarget(null)}
         title="Modifier la province"
       >
-        <form onSubmit={editForm.handleSubmit(onEditSubmit)} className="space-y-4">
+        <form
+          onSubmit={(e) => {
+            void editForm.handleSubmit(onEditSubmit)(e);
+          }}
+          className="space-y-4"
+        >
           <Input
             label="Nom de la province"
             required

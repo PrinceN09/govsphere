@@ -4,22 +4,34 @@ interface StatCardProps {
   label: string;
   value: number | string;
   icon: React.ReactNode;
-  trend?: { value: number; label: string };
-  className?: string;
   accentColor?: string;
+  className?: string;
 }
 
-export function StatCard({ label, value, icon, className, accentColor = "bg-primary-600" }: StatCardProps) {
+export function StatCard({
+  label,
+  value,
+  icon,
+  accentColor = "bg-primary-600",
+  className,
+}: StatCardProps) {
   return (
-    <div className={cn("rounded-xl border border-gray-100 bg-white p-5 shadow-sm", className)}>
-      <div className="flex items-start justify-between">
+    <div className={cn("border border-slate-200 bg-white", className)}>
+      {/* Top accent bar — 2px, uses the card's own colour */}
+      <div className={cn("h-0.5 w-full", accentColor)} />
+      <div className="flex items-start justify-between p-5">
         <div>
-          <p className="text-sm font-medium text-gray-500">{label}</p>
-          <p className="mt-1 text-3xl font-bold text-gray-900">
+          <p className="text-xs font-semibold uppercase tracking-label text-slate-500">{label}</p>
+          <p className="mt-2 text-3xl font-bold tracking-tighter text-slate-900">
             {typeof value === "number" ? value.toLocaleString("fr-CD") : value}
           </p>
         </div>
-        <div className={cn("flex h-11 w-11 items-center justify-center rounded-lg text-white", accentColor)}>
+        <div
+          className={cn(
+            "flex h-10 w-10 flex-shrink-0 items-center justify-center text-white",
+            accentColor,
+          )}
+        >
           {icon}
         </div>
       </div>

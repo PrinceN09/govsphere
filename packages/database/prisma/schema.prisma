@@ -1,4 +1,4 @@
-// GovSphere — Prisma Schema v3
+// GovSphere — Prisma Schema v4 (v0.6.0 — User Lifecycle)
 // Database: PostgreSQL 17
 // ORM: Prisma 5
 //
@@ -148,6 +148,11 @@ enum AuditAction {
   POSITION_DEACTIVATED
   EMPLOYEE_ASSIGNED
   EMPLOYEE_ASSIGNMENT_ENDED
+  // Employee Lifecycle (v0.6.0)
+  EMPLOYEE_INVITED
+  EMPLOYEE_ACTIVATED
+  EMPLOYEE_ARCHIVED
+  EMPLOYEE_INVITATION_RESENT
 }
 
 enum SupportedLanguage {
@@ -263,6 +268,7 @@ model Office {
   address     String?    @db.Text
   isActive    Boolean    @default(true)
   positions   Position[]
+  users       User[]
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 
@@ -360,6 +366,8 @@ model User {
   passwordChangedAt   DateTime?
   lastLoginAt         DateTime?
   lastLoginIp         String?           @db.VarChar(50)
+  // Contact
+  phone               String?           @db.VarChar(50)
   // Government structure
   ministryId          String?
   ministry            Ministry?         @relation(fields: [ministryId], references: [id])
@@ -367,6 +375,12 @@ model User {
   department          Department?       @relation(fields: [departmentId], references: [id])
   divisionId          String?
   division            Division?         @relation(fields: [divisionId], references: [id])
+  officeId            String?
+  office              Office?           @relation(fields: [officeId], references: [id])
+  // Manager (self-relation)
+  managerId           String?
+  manager             User?             @relation("Subordinates", fields: [managerId], references: [id])
+  subordinates        User[]            @relation("Subordinates")
   // Identity relations
   roleAssignments     UserRoleAssignment[]
   sessions            UserSession[]
@@ -376,6 +390,7 @@ model User {
   passwordHistory     PasswordHistory[]
   mfaDevices          MfaDevice[]
   mfaBackupCodes      MfaBackupCode[]
+  invitations         EmployeeInvitation[]
   // Government structure
   employeeAssignments EmployeeAssignment[]
   // Content relations
@@ -392,9 +407,31 @@ model User {
   @@index([matriculeNumber])
   @@index([ministryId])
   @@index([departmentId])
+  @@index([officeId])
+  @@index([managerId])
   @@index([role])
   @@index([status])
   @@map("users")
+}
+
+// =============================================================================
+// EMPLOYEE INVITATIONS (v0.6.0)
+// =============================================================================
+
+model EmployeeInvitation {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // SHA-256 hash of the raw invitation token (raw token is in the email only)
+  tokenHash   String    @unique @db.VarChar(255)
+  expiresAt   DateTime
+  used        Boolean   @default(false)
+  usedAt      DateTime?
+  invitedById String
+  createdAt   DateTime  @default(now())
+
+  @@index([userId])
+  @@map("employee_invitations")
 }
 
 // =============================================================================

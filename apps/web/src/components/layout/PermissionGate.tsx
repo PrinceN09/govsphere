@@ -1,6 +1,7 @@
 "use client";
 
 import { useSession } from "next-auth/react";
+
 import { hasPermission, hasAnyPermission, hasAllPermissions } from "@/lib/permissions";
 
 interface PermissionGateProps {

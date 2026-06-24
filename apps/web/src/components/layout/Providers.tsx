@@ -1,10 +1,12 @@
 "use client";
 
-import { SessionProvider, useSession } from "next-auth/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import type { Session } from "next-auth";
+import { SessionProvider, useSession } from "next-auth/react";
+import { useEffect } from "react";
+
 import { setAccessToken } from "@/lib/api";
+
+import type { Session } from "next-auth";
 
 const queryClient = new QueryClient({
   defaultOptions: {

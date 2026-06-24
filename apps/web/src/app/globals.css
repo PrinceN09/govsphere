@@ -2,13 +2,114 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ─── GovSphere Design Tokens ─────────────────────────────────────────────── */
+
 :root {
-  --background: #ffffff;
-  --foreground: #111827;
+  /* DRC national brand stripe — blue / gold / red */
+  --drc-blue: #007fff;
+  --drc-gold: #f7d918;
+  --drc-red: #ce1020;
+
+  /* Authority accent — gold left border on active nav items */
+  --authority-gold: #d4a012;
+
+  /* Sidebar */
+  --sidebar-bg: #07101d;
+  --sidebar-border: #0f1f35;
+
+  /* Page surface — cool blue-tinted off-white */
+  --surface-page: #e8edf5;
+  --surface-card: #ffffff;
+}
+
+/* ─── Base ────────────────────────────────────────────────────────────────── */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
 body {
-  background-color: var(--background);
-  color: var(--foreground);
-  font-family: system-ui, sans-serif;
+  background-color: var(--surface-page);
+  color: #0f172a;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ─── DRC brand stripe ────────────────────────────────────────────────────── */
+
+.drc-stripe {
+  display: flex;
+  height: 3px;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.drc-stripe > .stripe-blue {
+  flex: 1;
+  background-color: var(--drc-blue);
+}
+
+.drc-stripe > .stripe-gold {
+  width: 28px;
+  background-color: var(--drc-gold);
+}
+
+.drc-stripe > .stripe-red {
+  flex: 1;
+  background-color: var(--drc-red);
+}
+
+/* ─── Dialog backdrop ─────────────────────────────────────────────────────── */
+
+dialog::backdrop {
+  background-color: rgb(7 16 29 / 0.65);
+  backdrop-filter: blur(2px);
+}
+
+/* ─── Focus ring ──────────────────────────────────────────────────────────── */
+
+:focus-visible {
+  outline: 2px solid #1550c8;
+  outline-offset: 2px;
+}
+
+/* ─── Scrollbar (webkit) ──────────────────────────────────────────────────── */
+
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #94a3b8;
+}
+
+/* ─── Sidebar scrollbar ───────────────────────────────────────────────────── */
+
+.sidebar-scroll::-webkit-scrollbar-thumb {
+  background-color: #1e3558;
+}
+
+.sidebar-scroll::-webkit-scrollbar-thumb:hover {
+  background-color: #2b4a76;
+}
+
+/* ─── Authority bar utility ───────────────────────────────────────────────── */
+
+.authority-bar {
+  box-shadow: inset 3px 0 0 var(--authority-gold);
 }

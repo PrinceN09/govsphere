@@ -1,6 +1,5 @@
 "use client";
 
-import { useRef } from "react";
 import { cn } from "./cn";
 
 interface SearchInputProps {
@@ -10,13 +9,16 @@ interface SearchInputProps {
   className?: string;
 }
 
-export function SearchInput({ value, onChange, placeholder = "Search…", className }: SearchInputProps) {
-  const ref = useRef<HTMLInputElement>(null);
-
+export function SearchInput({
+  value,
+  onChange,
+  placeholder = "Rechercher…",
+  className,
+}: SearchInputProps) {
   return (
     <div className={cn("relative", className)}>
       <svg
-        className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400"
+        className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
         viewBox="0 0 20 20"
         fill="currentColor"
         aria-hidden="true"
@@ -28,12 +30,15 @@ export function SearchInput({ value, onChange, placeholder = "Search…", classN
         />
       </svg>
       <input
-        ref={ref}
         type="search"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="h-9 w-full rounded-md border border-gray-300 bg-white pl-9 pr-3 text-sm text-gray-900 placeholder-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
+        className={cn(
+          "h-9 w-full rounded-none border border-slate-300 bg-white pl-9 pr-3 text-sm text-slate-900",
+          "placeholder-slate-400 transition-colors",
+          "focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20",
+        )}
       />
     </div>
   );

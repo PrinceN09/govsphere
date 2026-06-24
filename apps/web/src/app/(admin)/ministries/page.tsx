@@ -1,21 +1,30 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+
 import { AdminTopBar } from "@/components/layout/AdminTopBar";
 import { PermissionGate } from "@/components/layout/PermissionGate";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
 import { Badge, StatusBadge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
 import { Dialog, ConfirmDialog } from "@/components/ui/Dialog";
-import { SearchInput } from "@/components/ui/SearchInput";
-import { Table, TableHead, TableBody, TableRow, TableHeaderCell, TableCell, TableEmpty } from "@/components/ui/Table";
+import { Input } from "@/components/ui/Input";
 import { Pagination } from "@/components/ui/Pagination";
+import { SearchInput } from "@/components/ui/SearchInput";
 import { PageSpinner } from "@/components/ui/Spinner";
-import { useListQuery } from "@/lib/use-list-query";
+import {
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableHeaderCell,
+  TableCell,
+  TableEmpty,
+} from "@/components/ui/Table";
 import { PERMS } from "@/lib/permissions";
+import { useListQuery } from "@/lib/use-list-query";
 
 interface Ministry {
   id: string;
@@ -100,7 +109,9 @@ export default function MinistriesPage() {
             placeholder="Rechercher un ministère…"
             className="w-72"
           />
-          <Badge variant="blue">{list.total} ministère{list.total !== 1 ? "s" : ""}</Badge>
+          <Badge variant="blue">
+            {list.total} ministère{list.total !== 1 ? "s" : ""}
+          </Badge>
         </div>
 
         {list.isLoading ? (
@@ -138,7 +149,11 @@ export default function MinistriesPage() {
                         {m._count?.departments ?? "—"}
                       </TableCell>
                       <TableCell>
-                        <StatusBadge active={m.isActive} labelActive="Actif" labelInactive="Inactif" />
+                        <StatusBadge
+                          active={m.isActive}
+                          labelActive="Actif"
+                          labelInactive="Inactif"
+                        />
                       </TableCell>
                       <PermissionGate anyOf={[PERMS.MINISTRY_UPDATE, PERMS.MINISTRY_DEACTIVATE]}>
                         <TableCell className="text-right space-x-2">
@@ -180,40 +195,97 @@ export default function MinistriesPage() {
       </div>
 
       {/* Create */}
-      <Dialog open={createOpen} onClose={() => { setCreateOpen(false); createForm.reset(); }} title="Créer un ministère">
-        <form onSubmit={createForm.handleSubmit(onCreateSubmit)} className="space-y-4">
-          <Input label="Nom du ministère" placeholder="ex. Ministère des Finances" required
-            error={createForm.formState.errors.name?.message} {...createForm.register("name")} />
+      <Dialog
+        open={createOpen}
+        onClose={() => {
+          setCreateOpen(false);
+          createForm.reset();
+        }}
+        title="Créer un ministère"
+      >
+        <form
+          onSubmit={(e) => {
+            void createForm.handleSubmit(onCreateSubmit)(e);
+          }}
+          className="space-y-4"
+        >
+          <Input
+            label="Nom du ministère"
+            placeholder="ex. Ministère des Finances"
+            required
+            error={createForm.formState.errors.name?.message}
+            {...createForm.register("name")}
+          />
           <div className="grid grid-cols-2 gap-4">
-            <Input label="Code" placeholder="MFIN" required
-              error={createForm.formState.errors.code?.message} {...createForm.register("code")} />
-            <Input label="Nom en anglais" placeholder="Ministry of Finance"
-              error={createForm.formState.errors.nameEn?.message} {...createForm.register("nameEn")} />
+            <Input
+              label="Code"
+              placeholder="MFIN"
+              required
+              error={createForm.formState.errors.code?.message}
+              {...createForm.register("code")}
+            />
+            <Input
+              label="Nom en anglais"
+              placeholder="Ministry of Finance"
+              error={createForm.formState.errors.nameEn?.message}
+              {...createForm.register("nameEn")}
+            />
           </div>
-          <Input label="Description" placeholder="Description du ministère"
-            error={createForm.formState.errors.description?.message} {...createForm.register("description")} />
+          <Input
+            label="Description"
+            placeholder="Description du ministère"
+            error={createForm.formState.errors.description?.message}
+            {...createForm.register("description")}
+          />
           <div className="flex justify-end gap-3 pt-2">
-            <Button variant="secondary" type="button" onClick={() => setCreateOpen(false)}>Annuler</Button>
-            <Button type="submit" loading={list.createMutation.isPending}>Créer</Button>
+            <Button variant="secondary" type="button" onClick={() => setCreateOpen(false)}>
+              Annuler
+            </Button>
+            <Button type="submit" loading={list.createMutation.isPending}>
+              Créer
+            </Button>
           </div>
         </form>
       </Dialog>
 
       {/* Edit */}
-      <Dialog open={editTarget !== null} onClose={() => setEditTarget(null)} title="Modifier le ministère">
-        <form onSubmit={editForm.handleSubmit(onEditSubmit)} className="space-y-4">
-          <Input label="Nom du ministère" required
-            error={editForm.formState.errors.name?.message} {...editForm.register("name")} />
+      <Dialog
+        open={editTarget !== null}
+        onClose={() => setEditTarget(null)}
+        title="Modifier le ministère"
+      >
+        <form
+          onSubmit={(e) => {
+            void editForm.handleSubmit(onEditSubmit)(e);
+          }}
+          className="space-y-4"
+        >
+          <Input
+            label="Nom du ministère"
+            required
+            error={editForm.formState.errors.name?.message}
+            {...editForm.register("name")}
+          />
           <div className="grid grid-cols-2 gap-4">
             <Input label="Code" disabled {...editForm.register("code")} />
-            <Input label="Nom en anglais"
-              error={editForm.formState.errors.nameEn?.message} {...editForm.register("nameEn")} />
+            <Input
+              label="Nom en anglais"
+              error={editForm.formState.errors.nameEn?.message}
+              {...editForm.register("nameEn")}
+            />
           </div>
-          <Input label="Description"
-            error={editForm.formState.errors.description?.message} {...editForm.register("description")} />
+          <Input
+            label="Description"
+            error={editForm.formState.errors.description?.message}
+            {...editForm.register("description")}
+          />
           <div className="flex justify-end gap-3 pt-2">
-            <Button variant="secondary" type="button" onClick={() => setEditTarget(null)}>Annuler</Button>
-            <Button type="submit" loading={list.updateMutation.isPending}>Enregistrer</Button>
+            <Button variant="secondary" type="button" onClick={() => setEditTarget(null)}>
+              Annuler
+            </Button>
+            <Button type="submit" loading={list.updateMutation.isPending}>
+              Enregistrer
+            </Button>
           </div>
         </form>
       </Dialog>

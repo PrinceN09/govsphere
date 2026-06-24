@@ -1,6 +1,7 @@
 "use client";
 
 import { forwardRef } from "react";
+
 import { cn } from "./cn";
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -18,39 +19,40 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
   const inputId = id ?? label?.toLowerCase().replace(/\s+/g, "-");
 
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-1.5">
       {label && (
-        <label htmlFor={inputId} className="text-sm font-medium text-gray-700">
+        <label
+          htmlFor={inputId}
+          className="text-xs font-semibold uppercase tracking-label text-slate-500"
+        >
           {label}
           {props.required && <span className="ml-1 text-danger-600">*</span>}
         </label>
       )}
       <div className="relative flex items-center">
         {leftAddon && (
-          <div className="pointer-events-none absolute left-3 text-gray-400">{leftAddon}</div>
+          <div className="pointer-events-none absolute left-3 text-slate-400">{leftAddon}</div>
         )}
         <input
           ref={ref}
           id={inputId}
           className={cn(
-            "w-full rounded-md border bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400",
-            "transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-0",
-            "disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500",
+            "w-full rounded-none border bg-white px-3 py-2 text-sm text-slate-900 placeholder-slate-400",
+            "transition-colors focus:outline-none focus:ring-2 focus:ring-offset-0",
+            "disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400",
             error
-              ? "border-danger-500 focus:border-danger-500 focus:ring-danger-500"
-              : "border-gray-300 focus:border-primary-500",
+              ? "border-danger-500 focus:border-danger-500 focus:ring-danger-500/20"
+              : "border-slate-300 focus:border-primary-500 focus:ring-primary-500/20",
             leftAddon && "pl-9",
             rightAddon && "pr-9",
             className,
           )}
           {...props}
         />
-        {rightAddon && (
-          <div className="absolute right-3 text-gray-400">{rightAddon}</div>
-        )}
+        {rightAddon && <div className="absolute right-3 text-slate-400">{rightAddon}</div>}
       </div>
       {error && <p className="text-xs text-danger-600">{error}</p>}
-      {hint && !error && <p className="text-xs text-gray-500">{hint}</p>}
+      {hint && !error && <p className="text-xs text-slate-500">{hint}</p>}
     </div>
   );
 });

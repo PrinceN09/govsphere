@@ -1,14 +1,17 @@
 "use client";
 
-import { useState } from "react";
-import { useSearchParams } from "next/navigation";
-import Link from "next/link";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Input } from "@/components/ui/Input";
+
+import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
 import { apiClient } from "@/lib/api";
+
 import type { AxiosError } from "axios";
 
 const schema = z
@@ -64,7 +67,10 @@ export default function ResetPasswordPage() {
     return (
       <div className="text-center">
         <p className="text-sm text-danger-600">Lien invalide. Veuillez demander un nouveau lien.</p>
-        <Link href="/forgot-password" className="mt-4 inline-block text-sm text-primary-600 hover:underline">
+        <Link
+          href="/forgot-password"
+          className="mt-4 inline-block text-sm text-primary-600 hover:underline"
+        >
           Demander un nouveau lien
         </Link>
       </div>
@@ -74,13 +80,24 @@ export default function ResetPasswordPage() {
   if (done) {
     return (
       <div className="text-center">
-        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
-          <svg className="h-6 w-6 text-green-600" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-            <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clipRule="evenodd" />
+        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center border border-success-200 bg-success-50">
+          <svg
+            className="h-6 w-6 text-success-600"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            aria-hidden="true"
+          >
+            <path
+              fillRule="evenodd"
+              d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z"
+              clipRule="evenodd"
+            />
           </svg>
         </div>
-        <h2 className="text-lg font-semibold text-gray-900">Mot de passe réinitialisé</h2>
-        <p className="mt-2 text-sm text-gray-500">
+        <h2 className="text-lg font-bold tracking-tight text-slate-900">
+          Mot de passe réinitialisé
+        </h2>
+        <p className="mt-2 text-sm text-slate-500">
           Votre mot de passe a été mis à jour. Vous pouvez maintenant vous connecter.
         </p>
         <Link href="/login" className="mt-6 inline-block text-sm text-primary-600 hover:underline">
@@ -93,17 +110,23 @@ export default function ResetPasswordPage() {
   return (
     <div>
       <div className="mb-6 text-center">
-        <h1 className="text-xl font-bold text-gray-900">Nouveau mot de passe</h1>
-        <p className="mt-1 text-sm text-gray-500">Choisissez un nouveau mot de passe sécurisé</p>
+        <h1 className="text-xl font-bold tracking-tight text-slate-900">Nouveau mot de passe</h1>
+        <p className="mt-1 text-sm text-slate-500">Choisissez un nouveau mot de passe sécurisé</p>
       </div>
 
       {serverError && (
-        <div className="mb-4 rounded-lg bg-danger-50 border border-danger-200 px-4 py-3 text-sm text-danger-700">
-          {serverError}
+        <div className="mb-5">
+          <Alert variant="danger">{serverError}</Alert>
         </div>
       )}
 
-      <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
+      <form
+        onSubmit={(e) => {
+          void handleSubmit(onSubmit)(e);
+        }}
+        noValidate
+        className="space-y-4"
+      >
         <Input
           label="Nouveau mot de passe"
           type="password"
