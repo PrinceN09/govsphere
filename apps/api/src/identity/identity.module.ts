@@ -7,6 +7,7 @@ import { PermissionsModule } from "./permissions/permissions.module";
 import { RolesModule } from "./roles/roles.module";
 import { SessionsModule } from "./sessions/sessions.module";
 import { UsersModule } from "./users/users.module";
+import { WorkforceModule } from "./workforce/workforce.module";
 
 /**
  * Identity Platform — the security foundation of GovSphere.
@@ -25,6 +26,7 @@ import { UsersModule } from "./users/users.module";
     RolesModule,
     AuthModule,
     MfaModule,
+    WorkforceModule,
   ],
   exports: [
     AuthModule,
@@ -34,6 +36,7 @@ import { UsersModule } from "./users/users.module";
     SessionsModule,
     MfaModule,
     AuditModule,
+    WorkforceModule,
   ],
 })
 export class IdentityModule {}

@@ -153,6 +153,55 @@ export class RolesService {
     return assignment;
   }
 
+  // ---------------------------------------------------------------------------
+  // GET USER ROLE HISTORY (active + inactive, ordered by grantedAt desc)
+  // ---------------------------------------------------------------------------
+
+  async getUserRoleHistory(userId: string): Promise<unknown[]> {
+    return this.prisma.userRoleAssignment.findMany({
+      where: { userId },
+      include: {
+        role: { select: { id: true, name: true, displayName: true, weight: true } },
+        ministry: { select: { id: true, name: true, code: true } },
+        department: { select: { id: true, name: true, code: true } },
+        division: { select: { id: true, name: true, code: true } },
+      },
+      orderBy: { grantedAt: "desc" },
+    });
+  }
+
+  // ---------------------------------------------------------------------------
+  // GET EFFECTIVE PERMISSIONS (grouped by resource)
+  // ---------------------------------------------------------------------------
+
+  async getEffectivePermissions(
+    userId: string,
+  ): Promise<
+    { resource: string; permissions: { key: string; displayName: string; action: string }[] }[]
+  > {
+    const raw = await this.permissionsService.resolvePermissionsForUser(userId);
+
+    // Fetch full permission details
+    const perms = await this.prisma.permission.findMany({
+      where: { key: { in: raw } },
+      select: { key: true, displayName: true, resource: true, action: true },
+      orderBy: [{ resource: "asc" }, { action: "asc" }],
+    });
+
+    // Group by resource
+    const grouped = new Map<string, { key: string; displayName: string; action: string }[]>();
+    for (const p of perms) {
+      const list = grouped.get(p.resource) ?? [];
+      list.push({ key: p.key, displayName: p.displayName, action: p.action });
+      grouped.set(p.resource, list);
+    }
+
+    return Array.from(grouped.entries()).map(([resource, permissions]) => ({
+      resource,
+      permissions,
+    }));
+  }
+
   async revokeRoleFromUser(
     targetUserId: string,
     assignmentId: string,

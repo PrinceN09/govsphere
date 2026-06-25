@@ -26,6 +26,24 @@ export class RolesController {
     return this.rolesService.findById(id);
   }
 
+  // ── Per-user role management ──────────────────────────────────────────────
+
+  @Get("users/:userId/roles")
+  @RequirePermissions("USER:READ_MINISTRY")
+  getUserRoles(@Param("userId") userId: string): Promise<unknown[]> {
+    return this.rolesService.getUserRoleHistory(userId);
+  }
+
+  @Get("users/:userId/permissions")
+  @RequirePermissions("USER:READ_MINISTRY")
+  getUserPermissions(
+    @Param("userId") userId: string,
+  ): Promise<
+    { resource: string; permissions: { key: string; displayName: string; action: string }[] }[]
+  > {
+    return this.rolesService.getEffectivePermissions(userId);
+  }
+
   @Post("users/:userId/roles")
   @RequirePermissions("USER:UPDATE_ROLE")
   assignRole(

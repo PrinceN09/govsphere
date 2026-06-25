@@ -153,6 +153,10 @@ enum AuditAction {
   EMPLOYEE_ACTIVATED
   EMPLOYEE_ARCHIVED
   EMPLOYEE_INVITATION_RESENT
+  // Workforce Management (v0.6.1)
+  EMPLOYEE_TRANSFERRED
+  EMPLOYEE_MANAGER_CHANGED
+  EMPLOYEE_POSITION_CHANGED
 }
 
 enum SupportedLanguage {
@@ -393,6 +397,7 @@ model User {
   invitations         EmployeeInvitation[]
   // Government structure
   employeeAssignments EmployeeAssignment[]
+  workforceTransfers  WorkforceTransfer[]
   // Content relations
   sentMessages        Message[]         @relation("SentMessages")
   channelMemberships  ChannelMember[]
@@ -432,6 +437,38 @@ model EmployeeInvitation {
 
   @@index([userId])
   @@map("employee_invitations")
+}
+
+// =============================================================================
+// WORKFORCE TRANSFERS (v0.6.1)
+// =============================================================================
+
+model WorkforceTransfer {
+  id               String   @id @default(cuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transferredById  String
+  // Organizational "from" snapshot (null = unchanged / no prior value)
+  fromMinistryId   String?
+  fromDepartmentId String?
+  fromDivisionId   String?
+  fromOfficeId     String?
+  fromManagerId    String?
+  fromPositionId   String?
+  // Organizational "to" values
+  toMinistryId     String?
+  toDepartmentId   String?
+  toDivisionId     String?
+  toOfficeId       String?
+  toManagerId      String?
+  toPositionId     String?
+  reason           String?  @db.Text
+  effectiveDate    DateTime @default(now())
+  createdAt        DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("workforce_transfers")
 }
 
 // =============================================================================

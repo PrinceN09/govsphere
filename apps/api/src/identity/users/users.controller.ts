@@ -8,6 +8,7 @@ import { CurrentUser } from "../../common/decorators/current-user.decorator";
 import { RequirePermissions } from "../../common/decorators/permissions.decorator";
 import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard";
 import { PermissionsGuard } from "../../common/guards/permissions.guard";
+import { AuditService } from "../audit/audit.service";
 
 import type { AuthenticatedUser } from "../../common/types/auth.types";
 import type { Request } from "express";
@@ -18,7 +19,10 @@ const ip = (req: Request): string =>
 @Controller("v1/users")
 @UseGuards(JwtAuthGuard, PermissionsGuard)
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly auditService: AuditService,
+  ) {}
 
   // ── List ─────────────────────────────────────────────────────────────────
 
@@ -133,5 +137,13 @@ export class UsersController {
     @Req() req: Request,
   ): Promise<unknown> {
     return this.usersService.unlockAccount(id, user, ip(req));
+  }
+
+  // ── Timeline ──────────────────────────────────────────────────────────────
+
+  @Get(":id/timeline")
+  @RequirePermissions("USER:READ_MINISTRY")
+  getTimeline(@Param("id") id: string, @Query("limit") limit?: string): Promise<unknown[]> {
+    return this.auditService.getTimelineForUser(id, limit ? parseInt(limit, 10) : 100);
   }
 }

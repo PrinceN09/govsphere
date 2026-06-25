@@ -4,6 +4,92 @@ import { PrismaService } from "../../prisma/prisma.service";
 
 import type { AuditAction } from "@prisma/client";
 
+// ─── Timeline helpers ─────────────────────────────────────────────────────────
+
+const ACTION_CATEGORIES: Partial<Record<AuditAction, string>> = {
+  USER_CREATED: "lifecycle",
+  USER_UPDATED: "lifecycle",
+  USER_DEACTIVATED: "lifecycle",
+  USER_SUSPENDED: "lifecycle",
+  USER_REACTIVATED: "lifecycle",
+  USER_UNLOCKED: "lifecycle",
+  ACCOUNT_LOCKED: "lifecycle",
+  EMPLOYEE_INVITED: "lifecycle",
+  EMPLOYEE_ACTIVATED: "lifecycle",
+  EMPLOYEE_ARCHIVED: "lifecycle",
+  EMPLOYEE_INVITATION_RESENT: "lifecycle",
+  ROLE_ASSIGNED: "roles",
+  ROLE_REMOVED: "roles",
+  PERMISSION_CHANGED: "roles",
+  EMPLOYEE_TRANSFERRED: "workforce",
+  EMPLOYEE_MANAGER_CHANGED: "workforce",
+  EMPLOYEE_POSITION_CHANGED: "workforce",
+  EMPLOYEE_ASSIGNED: "workforce",
+  EMPLOYEE_ASSIGNMENT_ENDED: "workforce",
+  LOGIN_SUCCESS: "security",
+  LOGIN_FAILED: "security",
+  LOGOUT: "security",
+  LOGOUT_ALL: "security",
+  TOKEN_REFRESH: "security",
+  TOKEN_INVALID: "security",
+  MFA_ENABLED: "security",
+  MFA_DISABLED: "security",
+  MFA_CHALLENGE_SUCCESS: "security",
+  MFA_CHALLENGE_FAILED: "security",
+  MFA_BACKUP_CODE_USED: "security",
+  PASSWORD_CHANGED: "security",
+  PASSWORD_CHANGED_BY_ADMIN: "security",
+  PASSWORD_RESET_REQUESTED: "security",
+  PASSWORD_RESET: "security",
+  SESSION_CREATED: "session",
+  SESSION_REVOKED: "session",
+};
+
+const ACTION_LABELS: Partial<Record<AuditAction, string>> = {
+  USER_CREATED: "Account created",
+  USER_UPDATED: "Profile updated",
+  USER_DEACTIVATED: "Account deactivated",
+  USER_SUSPENDED: "Account suspended",
+  USER_REACTIVATED: "Account reactivated",
+  USER_UNLOCKED: "Account unlocked",
+  ACCOUNT_LOCKED: "Account locked",
+  EMPLOYEE_INVITED: "Invitation sent",
+  EMPLOYEE_ACTIVATED: "Account activated",
+  EMPLOYEE_ARCHIVED: "Account archived",
+  EMPLOYEE_INVITATION_RESENT: "Invitation resent",
+  ROLE_ASSIGNED: "Role assigned",
+  ROLE_REMOVED: "Role removed",
+  PERMISSION_CHANGED: "Permissions changed",
+  EMPLOYEE_TRANSFERRED: "Transferred to new unit",
+  EMPLOYEE_MANAGER_CHANGED: "Manager changed",
+  EMPLOYEE_POSITION_CHANGED: "Position changed",
+  EMPLOYEE_ASSIGNED: "Assigned to position",
+  EMPLOYEE_ASSIGNMENT_ENDED: "Position assignment ended",
+  LOGIN_SUCCESS: "Signed in",
+  LOGIN_FAILED: "Sign-in attempt failed",
+  LOGOUT: "Signed out",
+  LOGOUT_ALL: "Signed out of all devices",
+  MFA_ENABLED: "MFA enabled",
+  MFA_DISABLED: "MFA disabled",
+  MFA_CHALLENGE_SUCCESS: "MFA verified",
+  MFA_CHALLENGE_FAILED: "MFA failed",
+  MFA_BACKUP_CODE_USED: "MFA backup code used",
+  PASSWORD_CHANGED: "Password changed",
+  PASSWORD_CHANGED_BY_ADMIN: "Password reset by admin",
+  PASSWORD_RESET_REQUESTED: "Password reset requested",
+  PASSWORD_RESET: "Password reset",
+  SESSION_CREATED: "Session started",
+  SESSION_REVOKED: "Session revoked",
+};
+
+function categoriseAction(action: AuditAction): string {
+  return ACTION_CATEGORIES[action] ?? "other";
+}
+
+function labelForAction(action: AuditAction): string {
+  return ACTION_LABELS[action] ?? action.replace(/_/g, " ").toLowerCase();
+}
+
 export interface AuditLogInput {
   userId?: string;
   action: AuditAction;
@@ -47,6 +133,49 @@ export class AuditService {
         userAgent: input.userAgent ?? null,
       },
     });
+  }
+
+  /**
+   * Return a rich chronological timeline for a single employee:
+   * audit log entries where entityType=USER and entityId=userId,
+   * enriched with display labels.
+   */
+  async getTimelineForUser(
+    userId: string,
+    limit = 100,
+  ): Promise<
+    {
+      id: string;
+      action: string;
+      category: string;
+      label: string;
+      metadata: Record<string, unknown>;
+      ipAddress: string | null;
+      createdAt: Date;
+    }[]
+  > {
+    const logs = await this.prisma.auditLog.findMany({
+      where: { entityType: "USER", entityId: userId },
+      orderBy: { createdAt: "desc" },
+      take: limit,
+      select: {
+        id: true,
+        action: true,
+        metadata: true,
+        ipAddress: true,
+        createdAt: true,
+      },
+    });
+
+    return logs.map((log) => ({
+      id: log.id,
+      action: log.action,
+      category: categoriseAction(log.action),
+      label: labelForAction(log.action),
+      metadata: (log.metadata as Record<string, unknown> | null) ?? {},
+      ipAddress: log.ipAddress,
+      createdAt: log.createdAt,
+    }));
   }
 
   /**
