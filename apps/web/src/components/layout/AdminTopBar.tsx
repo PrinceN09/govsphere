@@ -3,9 +3,9 @@
 import { signOut, useSession } from "next-auth/react";
 import { useState } from "react";
 
-import { useMobileSidebar } from "./MobileSidebarContext";
-
 import { cn } from "@/components/ui/cn";
+
+import { useMobileSidebar } from "./MobileSidebarContext";
 
 interface AdminTopBarProps {
   title: string;

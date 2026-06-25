@@ -4,8 +4,6 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import type { WorkflowDefinition, WorkflowInstance } from "@/lib/workflow-types";
-
 import { AdminTopBar } from "@/components/layout/AdminTopBar";
 import { Button } from "@/components/ui/Button";
 import { Card, CardBody } from "@/components/ui/Card";
@@ -13,6 +11,8 @@ import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { PageSpinner } from "@/components/ui/Spinner";
 import { apiGet, apiPost } from "@/lib/api";
+
+import type { WorkflowDefinition, WorkflowInstance } from "@/lib/workflow-types";
 
 export default function NewWorkflowPage() {
   const router = useRouter();

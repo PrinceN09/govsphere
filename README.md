@@ -6,7 +6,7 @@
 
 **The Digital Operating System for Government**
 
-*République Démocratique du Congo*
+_République Démocratique du Congo_
 
 [![License: Proprietary](https://img.shields.io/badge/License-Proprietary-red.svg)](./LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.5-blue.svg)](https://www.typescriptlang.org/)
@@ -14,7 +14,8 @@
 [![Next.js](https://img.shields.io/badge/Next.js-15-black.svg)](https://nextjs.org/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-blue.svg)](https://www.postgresql.org/)
 
-[Documentation](./docs/) · [Architecture](./docs/03_System_Architecture.md) · [Security](./docs/07_Security_Architecture.md) · [Roadmap](./docs/10_Roadmap.md)
+[Documentation](./docs/) · [Architecture](./docs/03_System_Architecture.md) ·
+[Security](./docs/07_Security_Architecture.md) · [Roadmap](./docs/10_Roadmap.md)
 
 </div>
 
@@ -22,35 +23,48 @@
 
 ## Overview
 
-GovSphere is a secure, auditable, multilingual digital workspace built exclusively for the Government of the Democratic Republic of Congo. It replaces fragmented, insecure communication tools (WhatsApp, personal email) with a unified platform that enforces role-based access control, organizational hierarchy, and immutable audit logging across all government ministries, departments, and divisions.
+GovSphere is a secure, auditable, multilingual digital workspace built exclusively for the
+Government of the Democratic Republic of Congo. It replaces fragmented, insecure communication tools
+(WhatsApp, personal email) with a unified platform that enforces role-based access control,
+organizational hierarchy, and immutable audit logging across all government ministries, departments,
+and divisions.
 
-GovSphere is not a generic SaaS product. It is purpose-built for the DRC government's organizational structure — from the central administration down to field divisions — with full support for five national languages and compliance with government data sovereignty requirements.
+GovSphere is not a generic SaaS product. It is purpose-built for the DRC government's organizational
+structure — from the central administration down to field divisions — with full support for five
+national languages and compliance with government data sovereignty requirements.
 
 ## Vision
 
-Every government worker in the DRC — from a ministry director to a field division employee — operates within a single, secure, auditable digital environment. Communication is structured, access is scoped to organizational level, every sensitive action is logged, and no data ever leaves sovereign infrastructure.
+Every government worker in the DRC — from a ministry director to a field division employee —
+operates within a single, secure, auditable digital environment. Communication is structured, access
+is scoped to organizational level, every sensitive action is logged, and no data ever leaves
+sovereign infrastructure.
 
 ## Core Features
 
 **Identity & Security**
+
 - Matricule number authentication (format: `1.641.558`) alongside email login
 - Multi-factor authentication (TOTP) — mandatory for senior roles
 - RS256 JWT with 15-minute access tokens and rotating refresh tokens
 - Organizational RBAC: 8 role levels from `SUPER_ADMIN` (100) to `GUEST` (0)
 - Account lockout, password history enforcement, and immutable audit logs
 
-**Collaboration** *(Sprint 2+)*
+**Collaboration** _(Sprint 2+)_
+
 - Structured channels scoped to ministry, department, or division
 - Real-time messaging via Socket.IO with Redis pub/sub
 - Threaded discussions, reactions, message pinning
 - Direct messages and presence indicators
 
-**Document Management** *(Sprint 3+)*
+**Document Management** _(Sprint 3+)_
+
 - Files stored in MinIO (S3-compatible) — never in PostgreSQL
 - Versioning, permissions, and audit trail per file
 - Virus scanning pipeline before storage
 
 **Administration**
+
 - Cross-ministry user management with delegation controls
 - Organizational hierarchy editor
 - Session management and device tracking
@@ -58,21 +72,21 @@ Every government worker in the DRC — from a ministry director to a field divis
 
 ## Tech Stack
 
-| Layer | Technology | Version | Rationale |
-|-------|-----------|---------|-----------|
-| API | NestJS | 10 | Structured, decorator-based, enterprise DDD |
-| Web App | Next.js | 15 | App Router, SSR, i18n, React Server Components |
-| Desktop | Tauri | 2 | Lightweight native shell around web app |
-| Mobile | React Native | 0.74 | Shared business logic with web |
-| Database | PostgreSQL | 17 | ACID, relational, full-text search, sovereignty |
-| ORM | Prisma | 5 | Type-safe queries, schema-first migrations |
-| Cache / Queue | Redis + BullMQ | 7 / 5 | Session store, job queues, Socket.IO adapter |
-| File Storage | MinIO (S3) | AGPL | On-premise S3-compatible object storage |
-| Real-time | Socket.IO | 4 | WebSocket messaging, presence, typing events |
-| Auth | JWT RS256 | — | Asymmetric signing; private key signs, public verifies |
-| Logging | Pino | 9 | Structured JSON, Loki-compatible, low overhead |
-| Monorepo | Turborepo | 2 | Incremental builds, shared config, task graph |
-| Language | TypeScript | 5.5 | Strict mode, full type-safety across the stack |
+| Layer         | Technology     | Version | Rationale                                              |
+| ------------- | -------------- | ------- | ------------------------------------------------------ |
+| API           | NestJS         | 10      | Structured, decorator-based, enterprise DDD            |
+| Web App       | Next.js        | 15      | App Router, SSR, i18n, React Server Components         |
+| Desktop       | Tauri          | 2       | Lightweight native shell around web app                |
+| Mobile        | React Native   | 0.74    | Shared business logic with web                         |
+| Database      | PostgreSQL     | 17      | ACID, relational, full-text search, sovereignty        |
+| ORM           | Prisma         | 5       | Type-safe queries, schema-first migrations             |
+| Cache / Queue | Redis + BullMQ | 7 / 5   | Session store, job queues, Socket.IO adapter           |
+| File Storage  | MinIO (S3)     | AGPL    | On-premise S3-compatible object storage                |
+| Real-time     | Socket.IO      | 4       | WebSocket messaging, presence, typing events           |
+| Auth          | JWT RS256      | —       | Asymmetric signing; private key signs, public verifies |
+| Logging       | Pino           | 9       | Structured JSON, Loki-compatible, low overhead         |
+| Monorepo      | Turborepo      | 2       | Incremental builds, shared config, task graph          |
+| Language      | TypeScript     | 5.5     | Strict mode, full type-safety across the stack         |
 
 ## Architecture
 
@@ -114,7 +128,9 @@ Government of the DRC (Central)
                                 └── Users
 ```
 
-Access to resources is always scoped to organizational level. A Ministry Admin can only see their ministry. A Department Admin only sees their department. No horizontal access across sibling organizations.
+Access to resources is always scoped to organizational level. A Ministry Admin can only see their
+ministry. A Department Admin only sees their department. No horizontal access across sibling
+organizations.
 
 ## Folder Structure
 
@@ -193,21 +209,21 @@ npm run dev
 
 Copy `.env.example` to `.env` and configure the following required variables:
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `DATABASE_URL` | ✅ | PostgreSQL connection string |
-| `REDIS_HOST` | ✅ | Redis host (default: `127.0.0.1`) |
-| `REDIS_PORT` | ✅ | Redis port (default: `6379`) |
-| `REDIS_PASSWORD` | — | Redis password (required in production) |
-| `REDIS_DB` | — | Redis DB index for app cache (default: `0`) |
-| `BULLMQ_REDIS_DB` | — | Redis DB index for Bull queues (default: `1`) |
-| `JWT_PRIVATE_KEY` | ✅ | RS256 private key (PEM, base64-encoded) |
-| `JWT_PUBLIC_KEY` | ✅ | RS256 public key (PEM, base64-encoded) |
-| `MFA_ENCRYPTION_KEY` | ✅ | 32-byte hex key for AES-256-GCM TOTP encryption |
-| `MINIO_ENDPOINT` | ✅ | MinIO server host |
-| `MINIO_ACCESS_KEY` | ✅ | MinIO access key |
-| `MINIO_SECRET_KEY` | ✅ | MinIO secret key |
-| `SMTP_HOST` | ✅ | SMTP server host |
+| Variable             | Required | Description                                     |
+| -------------------- | -------- | ----------------------------------------------- |
+| `DATABASE_URL`       | ✅       | PostgreSQL connection string                    |
+| `REDIS_HOST`         | ✅       | Redis host (default: `127.0.0.1`)               |
+| `REDIS_PORT`         | ✅       | Redis port (default: `6379`)                    |
+| `REDIS_PASSWORD`     | —        | Redis password (required in production)         |
+| `REDIS_DB`           | —        | Redis DB index for app cache (default: `0`)     |
+| `BULLMQ_REDIS_DB`    | —        | Redis DB index for Bull queues (default: `1`)   |
+| `JWT_PRIVATE_KEY`    | ✅       | RS256 private key (PEM, base64-encoded)         |
+| `JWT_PUBLIC_KEY`     | ✅       | RS256 public key (PEM, base64-encoded)          |
+| `MFA_ENCRYPTION_KEY` | ✅       | 32-byte hex key for AES-256-GCM TOTP encryption |
+| `MINIO_ENDPOINT`     | ✅       | MinIO server host                               |
+| `MINIO_ACCESS_KEY`   | ✅       | MinIO access key                                |
+| `MINIO_SECRET_KEY`   | ✅       | MinIO secret key                                |
+| `SMTP_HOST`          | ✅       | SMTP server host                                |
 
 See [`.env.example`](./.env.example) for the full variable reference with descriptions.
 
@@ -227,16 +243,16 @@ base64 -i jwt-public.pem  | tr -d '\n'   # → JWT_PUBLIC_KEY
 
 ### Local Service URLs
 
-| Service | URL | Default Credentials |
-|---------|-----|---------------------|
-| Web App | http://localhost:3000 | — |
-| API | http://localhost:4000 | — |
-| Swagger Docs | http://localhost:4000/docs | — |
-| Health Check | http://localhost:4000/health | — |
-| pgAdmin | http://localhost:5050 | admin@govsphere.local / admin |
-| MinIO Console | http://localhost:9001 | govsphere_minio_key / govsphere_minio_secret |
-| MailHog | http://localhost:8025 | — |
-| Redis | localhost:6379 | — |
+| Service       | URL                          | Default Credentials                          |
+| ------------- | ---------------------------- | -------------------------------------------- |
+| Web App       | http://localhost:3000        | —                                            |
+| API           | http://localhost:4000        | —                                            |
+| Swagger Docs  | http://localhost:4000/docs   | —                                            |
+| Health Check  | http://localhost:4000/health | —                                            |
+| pgAdmin       | http://localhost:5050        | admin@govsphere.local / admin                |
+| MinIO Console | http://localhost:9001        | govsphere_minio_key / govsphere_minio_secret |
+| MailHog       | http://localhost:8025        | —                                            |
+| Redis         | localhost:6379               | —                                            |
 
 ### Database Setup
 
@@ -261,7 +277,8 @@ npm run db:reset
 
 ## Production Deployment (Docker)
 
-v0.6.3 ships multi-stage Dockerfiles for both `apps/api` and `apps/web`, plus a production-grade `docker-compose.prod.yml`.
+v0.6.3 ships multi-stage Dockerfiles for both `apps/api` and `apps/web`, plus a production-grade
+`docker-compose.prod.yml`.
 
 ```bash
 # Copy and fill in production secrets
@@ -277,15 +294,16 @@ docker compose -f docker-compose.prod.yml exec api npx prisma migrate deploy
 
 Services started by `docker-compose.prod.yml`:
 
-| Service | Port | Notes |
-|---------|------|-------|
-| `api` | 4000 | NestJS — non-root `govsphere` user, dumb-init PID 1 |
-| `web` | 3000 | Next.js standalone output |
-| `postgres` | 5432 (internal) | Named volume, healthcheck |
-| `redis` | 6379 (internal) | 512 MB maxmemory, allkeys-lru eviction |
-| `minio` | 9000 (internal) | S3-compatible object storage |
+| Service    | Port            | Notes                                               |
+| ---------- | --------------- | --------------------------------------------------- |
+| `api`      | 4000            | NestJS — non-root `govsphere` user, dumb-init PID 1 |
+| `web`      | 3000            | Next.js standalone output                           |
+| `postgres` | 5432 (internal) | Named volume, healthcheck                           |
+| `redis`    | 6379 (internal) | 512 MB maxmemory, allkeys-lru eviction              |
+| `minio`    | 9000 (internal) | S3-compatible object storage                        |
 
-All services run on the internal `govsphere_prod_network`; only `api` and `web` should be exposed via a reverse proxy (nginx/Caddy).
+All services run on the internal `govsphere_prod_network`; only `api` and `web` should be exposed
+via a reverse proxy (nginx/Caddy).
 
 ## Running the Project
 
@@ -340,12 +358,12 @@ npm run docker:reset  # Destroy volumes and restart services
 
 GovSphere targets the following coverage thresholds:
 
-| Metric | Target |
-|--------|--------|
-| Branches | 80% |
-| Functions | 85% |
-| Lines | 85% |
-| Statements | 85% |
+| Metric     | Target |
+| ---------- | ------ |
+| Branches   | 80%    |
+| Functions  | 85%    |
+| Lines      | 85%    |
+| Statements | 85%    |
 
 ```bash
 # Run tests
@@ -368,73 +386,76 @@ Test files are co-located with their source files (`*.spec.ts`).
 GovSphere uses two authentication methods:
 
 **Government employees** log in with:
+
 - Matricule number (format: `1.641.558` — the DRC's government employee identifier)
 - Government email address + password
 
 **External partners** (future):
+
 - Google or Microsoft OAuth — invitation-only, `GUEST` role only, cannot escalate
 
 **Token architecture:**
+
 - Access token: RS256 JWT, 15-minute TTL, stored in memory (never `localStorage`)
 - Refresh token: RS256 JWT, 7-day TTL, `HttpOnly SameSite=Strict Secure` cookie
 
 ## User Roles
 
-| Role | Weight | Description |
-|------|--------|-------------|
-| `SUPER_ADMIN` | 100 | Full system access — DRC IT authority |
-| `GOVERNMENT_ADMIN` | 90 | Cross-ministry administration |
-| `MINISTRY_ADMIN` | 70 | Manages one ministry |
-| `DEPARTMENT_ADMIN` | 50 | Manages one department |
-| `DIVISION_ADMIN` | 40 | Manages one division |
-| `TEAM_MANAGER` | 30 | Manages a team |
-| `EMPLOYEE` | 10 | Standard government worker |
-| `GUEST` | 0 | External partner (invitation-only) |
+| Role               | Weight | Description                           |
+| ------------------ | ------ | ------------------------------------- |
+| `SUPER_ADMIN`      | 100    | Full system access — DRC IT authority |
+| `GOVERNMENT_ADMIN` | 90     | Cross-ministry administration         |
+| `MINISTRY_ADMIN`   | 70     | Manages one ministry                  |
+| `DEPARTMENT_ADMIN` | 50     | Manages one department                |
+| `DIVISION_ADMIN`   | 40     | Manages one division                  |
+| `TEAM_MANAGER`     | 30     | Manages a team                        |
+| `EMPLOYEE`         | 10     | Standard government worker            |
+| `GUEST`            | 0      | External partner (invitation-only)    |
 
 Roles are weight-based. You can only assign roles with a weight strictly lower than your own.
 
 ## Supported Languages
 
-| Code | Language | Region |
-|------|----------|--------|
-| `fr` | Français | Default — official administrative language |
-| `en` | English | International communications |
-| `ln` | Lingala | Kinshasa and western DRC |
-| `sw` | Kiswahili | Eastern DRC |
-| `lua` | Tshiluba | Kasai region |
+| Code  | Language  | Region                                     |
+| ----- | --------- | ------------------------------------------ |
+| `fr`  | Français  | Default — official administrative language |
+| `en`  | English   | International communications               |
+| `ln`  | Lingala   | Kinshasa and western DRC                   |
+| `sw`  | Kiswahili | Eastern DRC                                |
+| `lua` | Tshiluba  | Kasai region                               |
 
 ## Documentation
 
 Full engineering documentation is in [`docs/`](./docs/):
 
-| Document | Description |
-|----------|-------------|
-| [01 — Product Vision](./docs/01_Product_Vision.md) | Mission, goals, stakeholders |
-| [02 — Product Requirements](./docs/02_Product_Requirements.md) | Functional and non-functional requirements |
-| [03 — System Architecture](./docs/03_System_Architecture.md) | High-level system design |
-| [04 — Database Architecture](./docs/04_Database_Architecture.md) | Schema design, entity relationships |
-| [05 — API Architecture](./docs/05_API_Architecture.md) | REST API design, versioning, conventions |
-| [06 — UI Design System](./docs/06_UI_Design_System.md) | Component library, design tokens |
-| [07 — Security Architecture](./docs/07_Security_Architecture.md) | Auth, RBAC, encryption, audit |
-| [08 — Engineering Standards](./docs/08_Engineering_Standards.md) | Code conventions, PR process, DoD |
-| [09 — DevOps Architecture](./docs/09_DevOps_Architecture.md) | CI/CD, Docker, Terraform, observability |
-| [10 — Roadmap](./docs/10_Roadmap.md) | Sprint plan, milestones, version targets |
-| [11 — Identity Platform](./docs/11_Identity_Platform_Architecture.md) | Identity service deep-dive |
-| [ADRs](./docs/adr/) | Architecture Decision Records |
+| Document                                                              | Description                                |
+| --------------------------------------------------------------------- | ------------------------------------------ |
+| [01 — Product Vision](./docs/01_Product_Vision.md)                    | Mission, goals, stakeholders               |
+| [02 — Product Requirements](./docs/02_Product_Requirements.md)        | Functional and non-functional requirements |
+| [03 — System Architecture](./docs/03_System_Architecture.md)          | High-level system design                   |
+| [04 — Database Architecture](./docs/04_Database_Architecture.md)      | Schema design, entity relationships        |
+| [05 — API Architecture](./docs/05_API_Architecture.md)                | REST API design, versioning, conventions   |
+| [06 — UI Design System](./docs/06_UI_Design_System.md)                | Component library, design tokens           |
+| [07 — Security Architecture](./docs/07_Security_Architecture.md)      | Auth, RBAC, encryption, audit              |
+| [08 — Engineering Standards](./docs/08_Engineering_Standards.md)      | Code conventions, PR process, DoD          |
+| [09 — DevOps Architecture](./docs/09_DevOps_Architecture.md)          | CI/CD, Docker, Terraform, observability    |
+| [10 — Roadmap](./docs/10_Roadmap.md)                                  | Sprint plan, milestones, version targets   |
+| [11 — Identity Platform](./docs/11_Identity_Platform_Architecture.md) | Identity service deep-dive                 |
+| [ADRs](./docs/adr/)                                                   | Architecture Decision Records              |
 
 ## Roadmap
 
-| Version | Focus | Status |
-|---------|-------|--------|
-| v0.1.0 | Foundation — monorepo, tooling, Identity Platform | ✅ Complete |
-| v0.5.0 | Design System & UI Polish | ✅ Complete |
-| v0.6.0 | Employee Lifecycle & Invitation Flow | ✅ Complete |
-| v0.6.1 | Workforce Management & Org Chart | ✅ Complete |
-| v0.6.2 | Security Operations Center | ✅ Complete |
-| v0.6.3 | Production Hardening (Redis, Queues, Docker, CSP) | ✅ Complete |
-| v0.7.0 | Channels & Messaging (Socket.IO) | 🔜 Next |
-| v0.8.0 | File Management (MinIO) | Planned |
-| v1.0.0 | Production Release | Planned |
+| Version | Focus                                             | Status      |
+| ------- | ------------------------------------------------- | ----------- |
+| v0.1.0  | Foundation — monorepo, tooling, Identity Platform | ✅ Complete |
+| v0.5.0  | Design System & UI Polish                         | ✅ Complete |
+| v0.6.0  | Employee Lifecycle & Invitation Flow              | ✅ Complete |
+| v0.6.1  | Workforce Management & Org Chart                  | ✅ Complete |
+| v0.6.2  | Security Operations Center                        | ✅ Complete |
+| v0.6.3  | Production Hardening (Redis, Queues, Docker, CSP) | ✅ Complete |
+| v0.7.0  | Channels & Messaging (Socket.IO)                  | 🔜 Next     |
+| v0.8.0  | File Management (MinIO)                           | Planned     |
+| v1.0.0  | Production Release                                | Planned     |
 
 See [10_Roadmap.md](./docs/10_Roadmap.md) for the complete roadmap.
 
@@ -448,6 +469,7 @@ GovSphere is an internal government platform. All contributors must:
 4. Pass all CI checks before requesting review
 
 **Core rules:**
+
 - Never store files in PostgreSQL — always use MinIO
 - Never commit secrets or credentials
 - Write audit logs for all sensitive operations
@@ -458,9 +480,11 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) for the full contribution guide.
 
 ## Security
 
-Security vulnerabilities must be reported privately. See [SECURITY.md](./SECURITY.md) for the responsible disclosure policy.
+Security vulnerabilities must be reported privately. See [SECURITY.md](./SECURITY.md) for the
+responsible disclosure policy.
 
 **Security highlights:**
+
 - Zero Trust architecture — every request is authenticated and authorized
 - RS256 asymmetric JWT — private key never leaves the API server
 - AES-256-GCM encryption for all TOTP secrets at rest

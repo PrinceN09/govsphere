@@ -3,6 +3,7 @@
 Next.js 15 web application — the primary interface for GovSphere.
 
 ## Stack
+
 - Next.js 15 (App Router, Server Components)
 - TypeScript
 - Tailwind CSS
@@ -13,12 +14,14 @@ Next.js 15 web application — the primary interface for GovSphere.
 - Socket.IO client (real-time)
 
 ## Dev
+
 ```bash
 cd apps/web
 npm run dev    # http://localhost:3000
 ```
 
 ## Structure (to be built)
+
 ```
 src/
 ├── app/              Next.js App Router pages

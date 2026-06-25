@@ -3,14 +3,15 @@ name: Feature Request
 about: Propose a new feature or enhancement for GovSphere
 title: "[FEATURE] "
 labels: enhancement, needs-triage
-assignees: ''
+assignees: ""
 ---
 
 ## Problem Statement
 
 What problem does this feature solve? Who is affected?
 
-Example: *Ministry Admins currently cannot bulk-deactivate users when an employee leaves the ministry. This requires manual individual deactivation which is slow and error-prone.*
+Example: _Ministry Admins currently cannot bulk-deactivate users when an employee leaves the
+ministry. This requires manual individual deactivation which is slow and error-prone._
 
 ## Proposed Solution
 
@@ -38,6 +39,7 @@ Which user roles does this feature affect?
 ## Security Considerations
 
 Does this feature involve:
+
 - [ ] Changes to authentication or authorization
 - [ ] Access to sensitive data
 - [ ] File upload or download

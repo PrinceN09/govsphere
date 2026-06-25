@@ -78,8 +78,8 @@ services:
       MINIO_ROOT_USER: govsphere_minio_key
       MINIO_ROOT_PASSWORD: govsphere_minio_secret
     ports:
-      - "9000:9000"   # S3 API
-      - "9001:9001"   # Web console
+      - "9000:9000" # S3 API
+      - "9001:9001" # Web console
     volumes:
       - minio_data:/data
     healthcheck:
@@ -156,8 +156,8 @@ services:
     container_name: govsphere_mailhog
     restart: unless-stopped
     ports:
-      - "1025:1025"   # SMTP
-      - "8025:8025"   # Web UI
+      - "1025:1025" # SMTP
+      - "8025:8025" # Web UI
     networks:
       - govsphere_network
 

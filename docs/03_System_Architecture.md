@@ -9,12 +9,17 @@
 
 ## 1. Architecture Overview
 
-GovSphere follows a **layered, service-oriented monorepo architecture** designed for high availability, horizontal scalability, and security. The system is built as a single Turborepo monorepo containing multiple apps and shared packages, deployable as independently scalable services in production via Docker/Kubernetes.
+GovSphere follows a **layered, service-oriented monorepo architecture** designed for high
+availability, horizontal scalability, and security. The system is built as a single Turborepo
+monorepo containing multiple apps and shared packages, deployable as independently scalable services
+in production via Docker/Kubernetes.
 
 The architecture is designed to be:
+
 - **Deployable today** on a single server with Docker Compose (development and early production)
 - **Scalable tomorrow** to a full Kubernetes cluster with microservices (production at scale)
-- **Sovereign always** — no external cloud services required; runs entirely on government infrastructure
+- **Sovereign always** — no external cloud services required; runs entirely on government
+  infrastructure
 
 ---
 
@@ -105,9 +110,11 @@ The architecture is designed to be:
 ### 3.1 Web Application (Next.js 15)
 
 **Technology:** Next.js 15 with App Router  
-**Rendering Strategy:** Hybrid — Server-Side Rendering (SSR) for initial load, Client-Side Rendering (CSR) for real-time messaging
+**Rendering Strategy:** Hybrid — Server-Side Rendering (SSR) for initial load, Client-Side Rendering
+(CSR) for real-time messaging
 
 **Why Next.js:**
+
 - App Router enables server components for fast initial renders without JavaScript
 - Built-in image optimization reduces bandwidth for low-connectivity users
 - File-based routing simplifies code organization
@@ -116,6 +123,7 @@ The architecture is designed to be:
 - Active, enterprise-grade ecosystem
 
 **Key Responsibilities:**
+
 - Authentication flows (login, MFA, password reset)
 - Channel and message rendering
 - File upload and preview
@@ -129,6 +137,7 @@ The architecture is designed to be:
 **Platforms:** Windows 10/11, macOS 12+
 
 **Why Tauri over Electron:**
+
 - Binary size: ~5MB vs 150MB for Electron — critical for government machines with limited disk space
 - Memory usage: ~30MB vs 150MB+ for Electron — more efficient on older government hardware
 - Security: Rust backend is memory-safe; no Node.js process exposed to the web layer
@@ -136,6 +145,7 @@ The architecture is designed to be:
 - Built-in updater for silent background updates
 
 **Key Responsibilities:**
+
 - All web app features, embedded in native shell
 - Native push notifications (OS notification system)
 - System tray presence indicator
@@ -149,6 +159,7 @@ The architecture is designed to be:
 **Platforms:** Android 9+, iOS 15+
 
 **Why React Native:**
+
 - Maximum code sharing with the web codebase (shared types, API client, business logic)
 - Strong Android support — critical for the DRC where Android dominates
 - Expo simplifies build pipeline and OTA updates
@@ -156,6 +167,7 @@ The architecture is designed to be:
 - React Native New Architecture (Fabric + JSI) provides near-native performance
 
 **Key Responsibilities:**
+
 - All core messaging features
 - Offline message queue with SQLite local storage
 - Push notifications (FCM for Android, APNs for iOS)
@@ -179,6 +191,7 @@ Client → NGINX → Next.js (port 3000)
 ```
 
 **Configuration:**
+
 - TLS 1.3 termination with HSTS
 - HTTP/2 for multiplexed connections
 - WebSocket upgrade proxying
@@ -249,17 +262,18 @@ Client ─── WebSocket ──→ Socket.IO Gateway (NestJS)
 
 ### 6.2 Room Strategy
 
-| Room Type | Room Name Pattern | Members |
-|---|---|---|
-| Channel | `channel:{channelId}` | Channel members |
-| Direct Message | `dm:{userId1}:{userId2}` | Two users (sorted IDs) |
-| Group DM | `gdm:{groupId}` | Group members |
-| User Presence | `presence:{userId}` | All users tracking this user |
-| Ministry | `ministry:{ministryId}` | Ministry admins only |
+| Room Type      | Room Name Pattern        | Members                      |
+| -------------- | ------------------------ | ---------------------------- |
+| Channel        | `channel:{channelId}`    | Channel members              |
+| Direct Message | `dm:{userId1}:{userId2}` | Two users (sorted IDs)       |
+| Group DM       | `gdm:{groupId}`          | Group members                |
+| User Presence  | `presence:{userId}`      | All users tracking this user |
+| Ministry       | `ministry:{ministryId}`  | Ministry admins only         |
 
 ### 6.3 Events
 
 **Server → Client:**
+
 - `message:new` — new message received
 - `message:updated` — message edited
 - `message:deleted` — message deleted
@@ -270,6 +284,7 @@ Client ─── WebSocket ──→ Socket.IO Gateway (NestJS)
 - `typing:start` / `typing:stop` — typing indicators
 
 **Client → Server:**
+
 - `message:send` — send a message
 - `typing:start` / `typing:stop` — typing status
 - `channel:join` — join a channel room
@@ -286,6 +301,7 @@ Client ─── WebSocket ──→ Socket.IO Gateway (NestJS)
 **ORM:** Prisma 5
 
 **Why PostgreSQL:**
+
 - ACID compliance for financial-grade data integrity
 - Row-level security for future multi-tenant isolation
 - Native full-text search with `tsvector` (pre-OpenSearch)
@@ -295,6 +311,7 @@ Client ─── WebSocket ──→ Socket.IO Gateway (NestJS)
 - Extensions: `uuid-ossp`, `pg_trgm` (fuzzy search), `unaccent` (accent-insensitive search)
 
 **Scaling Strategy:**
+
 - Phase 1: Single primary with nightly backups
 - Phase 2: Primary + read replica (reporting and search)
 - Phase 3: PgBouncer connection pooling
@@ -307,16 +324,16 @@ Client ─── WebSocket ──→ Socket.IO Gateway (NestJS)
 
 **Use Cases:**
 
-| Use Case | Key Pattern | TTL |
-|---|---|---|
-| Access token blacklist | `blacklist:{jti}` | Token expiry |
-| Refresh token store | `refresh:{userId}:{tokenId}` | 7 days |
-| Rate limiting | `ratelimit:{ip}:{endpoint}` | 15 minutes |
-| Session data | `session:{sessionId}` | 30 days |
-| User presence | `presence:{userId}` | 5 minutes (heartbeat) |
-| Typing indicators | `typing:{channelId}:{userId}` | 5 seconds |
-| Socket.IO adapter | Internal — managed by socket.io-redis | N/A |
-| BullMQ job queues | Managed by BullMQ | N/A |
+| Use Case               | Key Pattern                           | TTL                   |
+| ---------------------- | ------------------------------------- | --------------------- |
+| Access token blacklist | `blacklist:{jti}`                     | Token expiry          |
+| Refresh token store    | `refresh:{userId}:{tokenId}`          | 7 days                |
+| Rate limiting          | `ratelimit:{ip}:{endpoint}`           | 15 minutes            |
+| Session data           | `session:{sessionId}`                 | 30 days               |
+| User presence          | `presence:{userId}`                   | 5 minutes (heartbeat) |
+| Typing indicators      | `typing:{channelId}:{userId}`         | 5 seconds             |
+| Socket.IO adapter      | Internal — managed by socket.io-redis | N/A                   |
+| BullMQ job queues      | Managed by BullMQ                     | N/A                   |
 
 ---
 
@@ -326,13 +343,14 @@ Client ─── WebSocket ──→ Socket.IO Gateway (NestJS)
 
 **Buckets:**
 
-| Bucket | Purpose | Access |
-|---|---|---|
-| `govsphere-files` | Channel file attachments | Private, pre-signed URLs |
-| `govsphere-avatars` | User profile photos | Private, pre-signed URLs |
+| Bucket                | Purpose                     | Access                   |
+| --------------------- | --------------------------- | ------------------------ |
+| `govsphere-files`     | Channel file attachments    | Private, pre-signed URLs |
+| `govsphere-avatars`   | User profile photos         | Private, pre-signed URLs |
 | `govsphere-documents` | Ministry official documents | Private, pre-signed URLs |
 
 **Upload Flow:**
+
 ```
 Client ──→ API: Request pre-signed upload URL
 API    ──→ MinIO: Generate pre-signed PUT URL (15-minute expiry)
@@ -345,20 +363,22 @@ Queue  ──→ ClamAV: Scan file
 Queue  ──→ DB: Update file status (READY or REJECTED)
 ```
 
-**Why pre-signed URLs:** Large file uploads bypass the API server entirely, eliminating API as a bottleneck and reducing server load.
+**Why pre-signed URLs:** Large file uploads bypass the API server entirely, eliminating API as a
+bottleneck and reducing server load.
 
 ### 8.2 OpenSearch (Full-Text Search)
 
 **Indexes:**
 
-| Index | Documents | Updated |
-|---|---|---|
-| `govsphere_messages` | All messages | Real-time via BullMQ |
-| `govsphere_files` | File metadata + extracted text | On upload confirmed |
-| `govsphere_users` | User profiles | On profile update |
-| `govsphere_channels` | Channel names/descriptions | On channel update |
+| Index                | Documents                      | Updated              |
+| -------------------- | ------------------------------ | -------------------- |
+| `govsphere_messages` | All messages                   | Real-time via BullMQ |
+| `govsphere_files`    | File metadata + extracted text | On upload confirmed  |
+| `govsphere_users`    | User profiles                  | On profile update    |
+| `govsphere_channels` | Channel names/descriptions     | On channel update    |
 
 **Search Pipeline:**
+
 ```
 User types query
       │
@@ -377,15 +397,16 @@ Return ranked results
 
 **Queues:**
 
-| Queue | Jobs | Workers |
-|---|---|---|
-| `file-processing` | Virus scan, thumbnail generation, text extraction | 2-4 |
-| `notifications` | Push notifications, email digests | 2-4 |
-| `search-indexing` | Index messages, files, users to OpenSearch | 2-4 |
-| `audit` | Async audit log writes | 1-2 |
-| `cleanup` | Expired sessions, soft-deleted file purge | 1 (scheduled) |
+| Queue             | Jobs                                              | Workers       |
+| ----------------- | ------------------------------------------------- | ------------- |
+| `file-processing` | Virus scan, thumbnail generation, text extraction | 2-4           |
+| `notifications`   | Push notifications, email digests                 | 2-4           |
+| `search-indexing` | Index messages, files, users to OpenSearch        | 2-4           |
+| `audit`           | Async audit log writes                            | 1-2           |
+| `cleanup`         | Expired sessions, soft-deleted file purge         | 1 (scheduled) |
 
 **Why BullMQ:**
+
 - Redis-backed, works with existing Redis infrastructure
 - Built-in retry logic, backoff, and dead-letter queues
 - Dashboard via Bull Board for monitoring
@@ -397,12 +418,14 @@ Return ranked results
 ## 10. Observability Layer
 
 ### 10.1 Logging
+
 - **Structured logging:** `pino` (NestJS) — JSON output for machine parsing
 - **Log aggregation:** Loki (Grafana stack)
 - **Log levels:** error, warn, info, debug (configurable per environment)
 - **Sensitive data:** Passwords, tokens, and PII are never logged
 
 ### 10.2 Metrics
+
 - **Collection:** Prometheus via `@willsoto/nestjs-prometheus`
 - **Visualization:** Grafana dashboards
 - **Key metrics:**
@@ -415,9 +438,11 @@ Return ranked results
   - Error rate by endpoint
 
 ### 10.3 Tracing
+
 - **Future:** OpenTelemetry for distributed tracing across API and background jobs
 
 ### 10.4 Alerting
+
 - **Grafana Alerting** for threshold-based alerts:
   - Error rate > 1% for 5 minutes
   - P99 latency > 2 seconds
@@ -468,21 +493,21 @@ Return ranked results
 
 ## 12. Technology Selection Summary
 
-| Component | Technology | Alternatives Considered | Decision Rationale |
-|---|---|---|---|
-| Web framework | Next.js 15 | Nuxt, SvelteKit, Remix | Best SSR + React ecosystem, government-grade maturity |
-| API framework | NestJS 10 | Express, Fastify, Hono | DI container, decorators, modular structure for large teams |
-| Desktop | Tauri 2 | Electron | 30x smaller binary, Rust security model, lower memory |
-| Mobile | React Native + Expo | Flutter, Ionic | Max code reuse with web, Android-first strength |
-| Database | PostgreSQL 17 | MySQL, MongoDB | ACID, JSONB, full-text search, row-level security |
-| ORM | Prisma 5 | TypeORM, Drizzle | Type safety, migrations, schema-first design |
-| Cache | Redis 7 | Memcached, Dragonfly | Pub/Sub for WebSockets, BullMQ compatibility |
-| Object Storage | MinIO | AWS S3, Azure Blob | On-premise sovereign, S3-compatible API |
-| Search | OpenSearch | Elasticsearch, pg_trgm | Open source, powerful for documents, no license cost |
-| Queue | BullMQ | Bull, RabbitMQ, Kafka | Redis-backed, TypeScript-first, proven at scale |
-| WebSockets | Socket.IO | WS, Ably | Redis adapter for horizontal scaling, mobile support |
-| Container | Docker + Compose | Podman | Industry standard, team familiarity |
-| Orchestration | Kubernetes | Docker Swarm | Industry standard for production at scale |
-| Reverse Proxy | NGINX | Traefik, Caddy | Performance, stability, government-grade deployments |
-| Monitoring | Prometheus + Grafana | Datadog, New Relic | Self-hosted, sovereign, no external data transmission |
-| Language | TypeScript 5 | JavaScript, Go | Type safety across full stack, single language team |
+| Component      | Technology           | Alternatives Considered | Decision Rationale                                          |
+| -------------- | -------------------- | ----------------------- | ----------------------------------------------------------- |
+| Web framework  | Next.js 15           | Nuxt, SvelteKit, Remix  | Best SSR + React ecosystem, government-grade maturity       |
+| API framework  | NestJS 10            | Express, Fastify, Hono  | DI container, decorators, modular structure for large teams |
+| Desktop        | Tauri 2              | Electron                | 30x smaller binary, Rust security model, lower memory       |
+| Mobile         | React Native + Expo  | Flutter, Ionic          | Max code reuse with web, Android-first strength             |
+| Database       | PostgreSQL 17        | MySQL, MongoDB          | ACID, JSONB, full-text search, row-level security           |
+| ORM            | Prisma 5             | TypeORM, Drizzle        | Type safety, migrations, schema-first design                |
+| Cache          | Redis 7              | Memcached, Dragonfly    | Pub/Sub for WebSockets, BullMQ compatibility                |
+| Object Storage | MinIO                | AWS S3, Azure Blob      | On-premise sovereign, S3-compatible API                     |
+| Search         | OpenSearch           | Elasticsearch, pg_trgm  | Open source, powerful for documents, no license cost        |
+| Queue          | BullMQ               | Bull, RabbitMQ, Kafka   | Redis-backed, TypeScript-first, proven at scale             |
+| WebSockets     | Socket.IO            | WS, Ably                | Redis adapter for horizontal scaling, mobile support        |
+| Container      | Docker + Compose     | Podman                  | Industry standard, team familiarity                         |
+| Orchestration  | Kubernetes           | Docker Swarm            | Industry standard for production at scale                   |
+| Reverse Proxy  | NGINX                | Traefik, Caddy          | Performance, stability, government-grade deployments        |
+| Monitoring     | Prometheus + Grafana | Datadog, New Relic      | Self-hosted, sovereign, no external data transmission       |
+| Language       | TypeScript 5         | JavaScript, Go          | Type safety across full stack, single language team         |

@@ -223,6 +223,29 @@ enum AuditAction {
   MEETING_ACTION_ITEM_CREATED
   ROOM_BOOKED
   ROOM_BOOKING_CANCELLED
+  // Executive Office (v1.0.0)
+  EXECUTIVE_OFFICE_CREATED
+  EXECUTIVE_OFFICE_UPDATED
+  CABINET_SESSION_CREATED
+  CABINET_SESSION_UPDATED
+  CABINET_SESSION_COMPLETED
+  CABINET_SESSION_CANCELLED
+  CABINET_DECISION_CREATED
+  CABINET_DECISION_ADOPTED
+  CABINET_DECISION_REJECTED
+  CABINET_DECISION_DEFERRED
+  DECISION_IMPLEMENTATION_STARTED
+  DECISION_IMPLEMENTATION_UPDATED
+  DECISION_IMPLEMENTATION_COMPLETED
+  BRIEFING_CREATED
+  BRIEFING_UPDATED
+  BRIEFING_APPROVED
+  BRIEFING_PUBLISHED
+  CORRESPONDENCE_CREATED
+  CORRESPONDENCE_UPDATED
+  CORRESPONDENCE_SENT
+  EXECUTIVE_ANNOUNCEMENT_CREATED
+  EXECUTIVE_ANNOUNCEMENT_PUBLISHED
 }
 
 enum PresenceStatus {
@@ -310,28 +333,33 @@ enum FileStatus {
 // =============================================================================
 
 model Ministry {
-  id                  String               @id @default(cuid())
-  name                String               @db.VarChar(255)
-  nameTranslations    Json                 @default("{}")
-  code                String               @unique @db.VarChar(50)
-  description         String?              @db.Text
-  logoUrl             String?              @db.VarChar(500)
-  isActive            Boolean              @default(true)
-  departments         Department[]
-  positions           Position[]
-  offices             Office[]
-  users               User[]
-  channels            Channel[]
-  userRoles           UserRoleAssignment[]
-  documents           Document[]
-  documentShares      DocumentShare[]
-  documentTemplates   DocumentTemplate[]
-  workflowTemplates   WorkflowTemplate[]
-  workflowDefinitions WorkflowDefinition[]
-  calendarEvents      CalendarEvent[]
-  rooms               Room[]
-  createdAt           DateTime             @default(now())
-  updatedAt           DateTime             @updatedAt
+  id                     String                    @id @default(cuid())
+  name                   String                    @db.VarChar(255)
+  nameTranslations       Json                      @default("{}")
+  code                   String                    @unique @db.VarChar(50)
+  description            String?                   @db.Text
+  logoUrl                String?                   @db.VarChar(500)
+  isActive               Boolean                   @default(true)
+  departments            Department[]
+  positions              Position[]
+  offices                Office[]
+  users                  User[]
+  channels               Channel[]
+  userRoles              UserRoleAssignment[]
+  documents              Document[]
+  documentShares         DocumentShare[]
+  documentTemplates      DocumentTemplate[]
+  workflowTemplates      WorkflowTemplate[]
+  workflowDefinitions    WorkflowDefinition[]
+  calendarEvents         CalendarEvent[]
+  rooms                  Room[]
+  executiveOffices       ExecutiveOffice[]
+  responsibleDecisions   CabinetDecision[]
+  implementationMinistry DecisionImplementation[]
+  correspondenceSent     ExecutiveCorrespondence[]
+  targetAnnouncements    ExecutiveAnnouncement[]
+  createdAt              DateTime                  @default(now())
+  updatedAt              DateTime                  @updatedAt
 
   @@index([code])
   @@map("ministries")
@@ -487,46 +515,46 @@ model EmployeeAssignment {
 // =============================================================================
 
 model User {
-  id                         String                 @id @default(cuid())
+  id                         String                    @id @default(cuid())
   // Matricule — government-issued ID (e.g. "1.641.558", "478.432", "424.55")
   // MUST be stored as string: dots, varying formats, leading zeros must be preserved
-  matriculeNumber            String?                @unique @db.VarChar(50)
-  email                      String                 @unique @db.VarChar(255)
-  passwordHash               String                 @db.VarChar(255)
-  firstName                  String                 @db.VarChar(100)
-  lastName                   String                 @db.VarChar(100)
-  displayName                String                 @db.VarChar(200)
-  avatarUrl                  String?                @db.VarChar(500)
-  userType                   UserType               @default(GOVERNMENT_EMPLOYEE)
+  matriculeNumber            String?                   @unique @db.VarChar(50)
+  email                      String                    @unique @db.VarChar(255)
+  passwordHash               String                    @db.VarChar(255)
+  firstName                  String                    @db.VarChar(100)
+  lastName                   String                    @db.VarChar(100)
+  displayName                String                    @db.VarChar(200)
+  avatarUrl                  String?                   @db.VarChar(500)
+  userType                   UserType                  @default(GOVERNMENT_EMPLOYEE)
   // Legacy single-role field — kept for quick permission checks.
   // Source of truth is UserRoleAssignment join table.
-  role                       UserRole               @default(EMPLOYEE)
-  status                     UserStatus             @default(PENDING)
-  preferredLanguage          SupportedLanguage      @default(fr)
+  role                       UserRole                  @default(EMPLOYEE)
+  status                     UserStatus                @default(PENDING)
+  preferredLanguage          SupportedLanguage         @default(fr)
   // MFA
-  mfaEnabled                 Boolean                @default(false)
-  mfaSecret                  String?                @db.VarChar(512) // AES-256-GCM encrypted
+  mfaEnabled                 Boolean                   @default(false)
+  mfaSecret                  String?                   @db.VarChar(512) // AES-256-GCM encrypted
   // Security tracking
-  failedLoginCount           Int                    @default(0)
+  failedLoginCount           Int                       @default(0)
   lockedUntil                DateTime?
   passwordChangedAt          DateTime?
   lastLoginAt                DateTime?
-  lastLoginIp                String?                @db.VarChar(50)
+  lastLoginIp                String?                   @db.VarChar(50)
   // Contact
-  phone                      String?                @db.VarChar(50)
+  phone                      String?                   @db.VarChar(50)
   // Government structure
   ministryId                 String?
-  ministry                   Ministry?              @relation(fields: [ministryId], references: [id])
+  ministry                   Ministry?                 @relation(fields: [ministryId], references: [id])
   departmentId               String?
-  department                 Department?            @relation(fields: [departmentId], references: [id])
+  department                 Department?               @relation(fields: [departmentId], references: [id])
   divisionId                 String?
-  division                   Division?              @relation(fields: [divisionId], references: [id])
+  division                   Division?                 @relation(fields: [divisionId], references: [id])
   officeId                   String?
-  office                     Office?                @relation(fields: [officeId], references: [id])
+  office                     Office?                   @relation(fields: [officeId], references: [id])
   // Manager (self-relation)
   managerId                  String?
-  manager                    User?                  @relation("Subordinates", fields: [managerId], references: [id])
-  subordinates               User[]                 @relation("Subordinates")
+  manager                    User?                     @relation("Subordinates", fields: [managerId], references: [id])
+  subordinates               User[]                    @relation("Subordinates")
   // Identity relations
   roleAssignments            UserRoleAssignment[]
   sessions                   UserSession[]
@@ -541,57 +569,74 @@ model User {
   employeeAssignments        EmployeeAssignment[]
   workforceTransfers         WorkforceTransfer[]
   // Collaboration relations (v0.7.0)
-  sentMessages               Message[]              @relation("SentMessages")
+  sentMessages               Message[]                 @relation("SentMessages")
   channelMemberships         ChannelMember[]
-  receivedMentions           Mention[]              @relation("ReceivedMentions")
-  readReceipts               ReadReceipt[]          @relation("ReadReceipts")
-  conversationMemberships    ConversationMember[]   @relation("ConversationMemberships")
-  sentDirectMessages         DirectMessage[]        @relation("SentDirectMessages")
-  dmReactions                DMReaction[]           @relation("DMReactions")
-  conversationSettings       ConversationSettings[] @relation("ConversationSettings")
+  receivedMentions           Mention[]                 @relation("ReceivedMentions")
+  readReceipts               ReadReceipt[]             @relation("ReadReceipts")
+  conversationMemberships    ConversationMember[]      @relation("ConversationMemberships")
+  sentDirectMessages         DirectMessage[]           @relation("SentDirectMessages")
+  dmReactions                DMReaction[]              @relation("DMReactions")
+  conversationSettings       ConversationSettings[]    @relation("ConversationSettings")
   notifications              Notification[]
   auditLogs                  AuditLog[]
   uploadedFiles              File[]
   // Document relations (v0.8.0)
-  authoredDocuments          Document[]             @relation("AuthoredDocuments")
-  savedVersions              DocumentVersion[]      @relation("SavedVersions")
-  documentShares             DocumentShare[]        @relation("SharingUser")
-  receivedShares             DocumentShare[]        @relation("SharedWithUser")
-  documentComments           DocumentComment[]      @relation("DocumentComments")
-  createdTemplates           DocumentTemplate[]     @relation("CreatedTemplates")
-  documentExports            DocumentExport[]       @relation("DocumentExports")
-  approvalRequests           DocumentApproval[]     @relation("ApprovalRequests")
-  approvalReviews            DocumentApproval[]     @relation("DocumentApprovals")
+  authoredDocuments          Document[]                @relation("AuthoredDocuments")
+  savedVersions              DocumentVersion[]         @relation("SavedVersions")
+  documentShares             DocumentShare[]           @relation("SharingUser")
+  receivedShares             DocumentShare[]           @relation("SharedWithUser")
+  documentComments           DocumentComment[]         @relation("DocumentComments")
+  createdTemplates           DocumentTemplate[]        @relation("CreatedTemplates")
+  documentExports            DocumentExport[]          @relation("DocumentExports")
+  approvalRequests           DocumentApproval[]        @relation("ApprovalRequests")
+  approvalReviews            DocumentApproval[]        @relation("DocumentApprovals")
   // Workflow relations (v0.8.1)
-  createdWorkflowTemplates   WorkflowTemplate[]     @relation("CreatedWorkflowTemplates")
-  createdWorkflowDefinitions WorkflowDefinition[]   @relation("CreatedWorkflowDefinitions")
-  assignedWorkflowSteps      WorkflowStep[]         @relation("WorkflowStepAssignees")
-  initiatedWorkflows         WorkflowInstance[]     @relation("InitiatedWorkflows")
-  cancelledWorkflows         WorkflowInstance[]     @relation("CancelledWorkflows")
-  workflowAssignments        WorkflowAssignment[]   @relation("WorkflowAssignments")
-  workflowApprovals          WorkflowApproval[]     @relation("WorkflowApprovals")
-  delegatedApprovals         WorkflowApproval[]     @relation("DelegatedApprovals")
-  workflowComments           WorkflowComment[]      @relation("WorkflowComments")
-  workflowHistory            WorkflowHistory[]      @relation("WorkflowHistory")
-  digitalSignatures          DigitalSignature[]     @relation("DigitalSignatures")
-  revokedSignatures          DigitalSignature[]     @relation("RevokedSignatures")
-  assignedTasks              Task[]                 @relation("AssignedTasks")
-  createdTasks               Task[]                 @relation("CreatedTasks")
-  taskComments               TaskComment[]          @relation("TaskComments")
-  taskAttachments            TaskAttachment[]       @relation("TaskAttachments")
+  createdWorkflowTemplates   WorkflowTemplate[]        @relation("CreatedWorkflowTemplates")
+  createdWorkflowDefinitions WorkflowDefinition[]      @relation("CreatedWorkflowDefinitions")
+  assignedWorkflowSteps      WorkflowStep[]            @relation("WorkflowStepAssignees")
+  initiatedWorkflows         WorkflowInstance[]        @relation("InitiatedWorkflows")
+  cancelledWorkflows         WorkflowInstance[]        @relation("CancelledWorkflows")
+  workflowAssignments        WorkflowAssignment[]      @relation("WorkflowAssignments")
+  workflowApprovals          WorkflowApproval[]        @relation("WorkflowApprovals")
+  delegatedApprovals         WorkflowApproval[]        @relation("DelegatedApprovals")
+  workflowComments           WorkflowComment[]         @relation("WorkflowComments")
+  workflowHistory            WorkflowHistory[]         @relation("WorkflowHistory")
+  digitalSignatures          DigitalSignature[]        @relation("DigitalSignatures")
+  revokedSignatures          DigitalSignature[]        @relation("RevokedSignatures")
+  assignedTasks              Task[]                    @relation("AssignedTasks")
+  createdTasks               Task[]                    @relation("CreatedTasks")
+  taskComments               TaskComment[]             @relation("TaskComments")
+  taskAttachments            TaskAttachment[]          @relation("TaskAttachments")
+  // Executive Office (v1.0.0)
+  headedOffices              ExecutiveOffice[]         @relation("ExecutiveOfficeHead")
+  executiveOfficeStaff       ExecutiveOfficeStaff[]    @relation("ExecutiveOfficeStaff")
+  chairedSessions            CabinetSession[]          @relation("CabinetChair")
+  secretariatSessions        CabinetSession[]          @relation("CabinetSecretary")
+  createdCabinetSessions     CabinetSession[]          @relation("CabinetSessionCreator")
+  cabinetAgendaPresentations CabinetAgendaItem[]       @relation("CabinetAgendaPresenters")
+  ownedDecisions             CabinetDecision[]         @relation("DecisionOwners")
+  adoptedDecisions           CabinetDecision[]         @relation("DecisionAdoptedBy")
+  createdDecisions           CabinetDecision[]         @relation("DecisionCreators")
+  implementationAssignments  DecisionImplementation[]  @relation("ImplementationAssignees")
+  createdImplementations     DecisionImplementation[]  @relation("ImplementationCreators")
+  authoredBriefings          ExecutiveBriefing[]       @relation("BriefingAuthors")
+  approvedBriefings          ExecutiveBriefing[]       @relation("BriefingApprovers")
+  sentCorrespondence         ExecutiveCorrespondence[] @relation("CorrespondenceSenders")
+  receivedCorrespondence     ExecutiveCorrespondence[] @relation("CorrespondenceRecipients")
+  authoredAnnouncements      ExecutiveAnnouncement[]   @relation("AnnouncementAuthors")
   // Calendar & Meetings (v0.9.0)
-  createdEvents              CalendarEvent[]        @relation("CreatedEvents")
-  eventReminders             EventReminder[]        @relation("EventReminders")
-  organizedMeetings          Meeting[]              @relation("OrganizedMeetings")
-  meetingParticipations      MeetingParticipant[]   @relation("MeetingParticipations")
-  delegatedParticipations    MeetingParticipant[]   @relation("DelegatedParticipations")
-  agendaPresentations        MeetingAgendaItem[]    @relation("AgendaPresenters")
-  meetingMinutesAuthored     MeetingMinutes[]       @relation("MeetingMinutesAuthor")
-  meetingMinutesPublished    MeetingMinutes[]       @relation("MeetingMinutesPublisher")
-  meetingAttachments         MeetingAttachment[]    @relation("MeetingAttachments")
-  roomBookings               RoomBooking[]          @relation("RoomBookings")
-  createdAt                  DateTime               @default(now())
-  updatedAt                  DateTime               @updatedAt
+  createdEvents              CalendarEvent[]           @relation("CreatedEvents")
+  eventReminders             EventReminder[]           @relation("EventReminders")
+  organizedMeetings          Meeting[]                 @relation("OrganizedMeetings")
+  meetingParticipations      MeetingParticipant[]      @relation("MeetingParticipations")
+  delegatedParticipations    MeetingParticipant[]      @relation("DelegatedParticipations")
+  agendaPresentations        MeetingAgendaItem[]       @relation("AgendaPresenters")
+  meetingMinutesAuthored     MeetingMinutes[]          @relation("MeetingMinutesAuthor")
+  meetingMinutesPublished    MeetingMinutes[]          @relation("MeetingMinutesPublisher")
+  meetingAttachments         MeetingAttachment[]       @relation("MeetingAttachments")
+  roomBookings               RoomBooking[]             @relation("RoomBookings")
+  createdAt                  DateTime                  @default(now())
+  updatedAt                  DateTime                  @updatedAt
   deletedAt                  DateTime?
 
   @@index([email])
@@ -1665,28 +1710,29 @@ model DigitalSignature {
 // ─── Tasks ────────────────────────────────────────────────────────────────────
 
 model Task {
-  id                String             @id @default(cuid())
-  title             String             @db.VarChar(500)
-  description       String?            @db.Text
-  status            TaskStatus         @default(TODO)
-  priority          TaskPriority       @default(MEDIUM)
-  assigneeId        String?
-  assignee          User?              @relation("AssignedTasks", fields: [assigneeId], references: [id])
-  createdById       String
-  createdBy         User               @relation("CreatedTasks", fields: [createdById], references: [id])
-  instanceId        String?
-  instance          WorkflowInstance?  @relation(fields: [instanceId], references: [id])
-  documentId        String?
-  dueAt             DateTime?
-  completedAt       DateTime?
-  cancelledAt       DateTime?
-  deletedAt         DateTime?
-  tags              String[]           @default([])
-  comments          TaskComment[]
-  attachments       TaskAttachment[]
-  meetingActionItem MeetingActionItem?
-  createdAt         DateTime           @default(now())
-  updatedAt         DateTime           @updatedAt
+  id                     String                  @id @default(cuid())
+  title                  String                  @db.VarChar(500)
+  description            String?                 @db.Text
+  status                 TaskStatus              @default(TODO)
+  priority               TaskPriority            @default(MEDIUM)
+  assigneeId             String?
+  assignee               User?                   @relation("AssignedTasks", fields: [assigneeId], references: [id])
+  createdById            String
+  createdBy              User                    @relation("CreatedTasks", fields: [createdById], references: [id])
+  instanceId             String?
+  instance               WorkflowInstance?       @relation(fields: [instanceId], references: [id])
+  documentId             String?
+  dueAt                  DateTime?
+  completedAt            DateTime?
+  cancelledAt            DateTime?
+  deletedAt              DateTime?
+  tags                   String[]                @default([])
+  comments               TaskComment[]
+  attachments            TaskAttachment[]
+  meetingActionItem      MeetingActionItem?
+  decisionImplementation DecisionImplementation?
+  createdAt              DateTime                @default(now())
+  updatedAt              DateTime                @updatedAt
 
   @@index([assigneeId])
   @@index([status])
@@ -1964,6 +2010,9 @@ model Meeting {
   // Workflow for approval (e.g. minutes approval)
   workflowInstanceId String?
 
+  // Cabinet session link (v1.0.0)
+  cabinetSession CabinetSession?
+
   metadata     Json      @default("{}")
   cancelledAt  DateTime?
   cancelReason String?   @db.Text
@@ -2128,4 +2177,449 @@ model RoomBooking {
   @@index([roomId, startAt, endAt])
   @@index([bookedById])
   @@map("room_bookings")
+}
+
+// =============================================================================
+// EXECUTIVE OFFICE & CABINET MANAGEMENT (v1.0.0)
+// =============================================================================
+
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
+enum ExecutiveOfficeType {
+  PRESIDENCY
+  PRIME_MINISTER_OFFICE
+  CABINET_SECRETARIAT
+  MINISTERIAL
+  DEPUTY_MINISTERIAL
+  PERMANENT_SECRETARY_OFFICE
+  CHIEF_OF_STAFF_OFFICE
+  EXECUTIVE_ASSISTANT_OFFICE
+}
+
+enum CabinetSessionStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum DecisionStatus {
+  DRAFT
+  UNDER_REVIEW
+  ADOPTED
+  REJECTED
+  DEFERRED
+  WITHDRAWN
+}
+
+enum DecisionPriority {
+  URGENT
+  HIGH
+  NORMAL
+  LOW
+}
+
+enum ImplementationStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  ON_HOLD
+  COMPLETED
+  OVERDUE
+}
+
+enum BriefingType {
+  DAILY
+  WEEKLY
+  CABINET
+  EMERGENCY
+  SPECIAL
+}
+
+enum BriefingStatus {
+  DRAFT
+  REVIEW
+  APPROVED
+  DISTRIBUTED
+}
+
+enum CorrespondenceType {
+  OFFICIAL_LETTER
+  PRESIDENTIAL_DIRECTIVE
+  MINISTERIAL_MEMO
+  CABINET_CIRCULAR
+  EXECUTIVE_NOTE
+  COMMUNIQUE
+}
+
+enum CorrespondenceClassification {
+  PUBLIC
+  INTERNAL
+  CONFIDENTIAL
+  SECRET
+  TOP_SECRET
+}
+
+enum AnnouncementAudience {
+  ALL_STAFF
+  MINISTERS
+  DIRECTORS
+  CABINET_MEMBERS
+  SPECIFIC_MINISTRY
+  PUBLIC
+}
+
+// ─── Executive Office ─────────────────────────────────────────────────────────
+
+model ExecutiveOffice {
+  id          String              @id @default(cuid())
+  name        String              @db.VarChar(255)
+  officeType  ExecutiveOfficeType
+  code        String              @unique @db.VarChar(50)
+  description String?             @db.Text
+  location    String?             @db.VarChar(500)
+  isActive    Boolean             @default(true)
+
+  // Head of office
+  headId String?
+  head   User?   @relation("ExecutiveOfficeHead", fields: [headId], references: [id])
+
+  // Linked to ministry (for ministerial offices)
+  ministryId String?
+  ministry   Ministry? @relation(fields: [ministryId], references: [id])
+
+  // Relations
+  staff          ExecutiveOfficeStaff[]
+  briefings      ExecutiveBriefing[]
+  correspondence ExecutiveCorrespondence[]
+  announcements  ExecutiveAnnouncement[]
+
+  metadata  Json     @default("{}")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([officeType])
+  @@index([headId])
+  @@index([ministryId])
+  @@map("executive_offices")
+}
+
+model ExecutiveOfficeStaff {
+  id        String          @id @default(cuid())
+  officeId  String
+  office    ExecutiveOffice @relation(fields: [officeId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User            @relation("ExecutiveOfficeStaff", fields: [userId], references: [id])
+  title     String?         @db.VarChar(255)
+  isPrimary Boolean         @default(false)
+  startDate DateTime        @default(now())
+  endDate   DateTime?
+  createdAt DateTime        @default(now())
+
+  @@unique([officeId, userId])
+  @@index([officeId])
+  @@index([userId])
+  @@map("executive_office_staff")
+}
+
+// ─── Cabinet Session ──────────────────────────────────────────────────────────
+
+model CabinetSession {
+  id            String               @id @default(cuid())
+  sessionNumber Int
+  title         String               @db.VarChar(500)
+  description   String?              @db.Text
+  status        CabinetSessionStatus @default(SCHEDULED)
+  location      String?              @db.VarChar(500)
+  scheduledAt   DateTime
+  startedAt     DateTime?
+  completedAt   DateTime?
+  cancelledAt   DateTime?
+  cancelReason  String?              @db.Text
+
+  // Chaired by
+  chairId String
+  chair   User   @relation("CabinetChair", fields: [chairId], references: [id])
+
+  // Secretary
+  secretaryId String?
+  secretary   User?   @relation("CabinetSecretary", fields: [secretaryId], references: [id])
+
+  // Linked meeting (for scheduling + attendance)
+  meetingId String?  @unique
+  meeting   Meeting? @relation(fields: [meetingId], references: [id])
+
+  // Sub-relations
+  agendaItems CabinetAgendaItem[]
+  decisions   CabinetDecision[]
+
+  // Minutes document
+  minutesDocumentId String?
+
+  metadata    Json     @default("{}")
+  createdById String
+  createdBy   User     @relation("CabinetSessionCreator", fields: [createdById], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([status])
+  @@index([scheduledAt])
+  @@index([chairId])
+  @@map("cabinet_sessions")
+}
+
+// ─── Cabinet Agenda Item ──────────────────────────────────────────────────────
+
+model CabinetAgendaItem {
+  id              String            @id @default(cuid())
+  sessionId       String
+  session         CabinetSession    @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  order           Int
+  title           String            @db.VarChar(500)
+  description     String?           @db.Text
+  presentedById   String?
+  presentedBy     User?             @relation("CabinetAgendaPresenters", fields: [presentedById], references: [id])
+  durationMinutes Int?
+  supportingDocs  String[]          @default([]) // document IDs
+  completed       Boolean           @default(false)
+  notes           String?           @db.Text
+  decisions       CabinetDecision[]
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@index([sessionId])
+  @@map("cabinet_agenda_items")
+}
+
+// ─── Cabinet Decision ─────────────────────────────────────────────────────────
+
+model CabinetDecision {
+  id             String             @id @default(cuid())
+  decisionNumber String             @unique @db.VarChar(100) // e.g. "DEC-2026-001"
+  sessionId      String
+  session        CabinetSession     @relation(fields: [sessionId], references: [id])
+  agendaItemId   String?
+  agendaItem     CabinetAgendaItem? @relation(fields: [agendaItemId], references: [id])
+  title          String             @db.VarChar(500)
+  content        String             @db.Text
+  status         DecisionStatus     @default(DRAFT)
+  priority       DecisionPriority   @default(NORMAL)
+
+  // Voting
+  votesFor     Int     @default(0)
+  votesAgainst Int     @default(0)
+  abstentions  Int     @default(0)
+  votingNotes  String? @db.Text
+
+  // Responsible ministry
+  responsibleMinistryId String?
+  responsibleMinistry   Ministry? @relation(fields: [responsibleMinistryId], references: [id])
+
+  // Owner
+  ownerId String?
+  owner   User?   @relation("DecisionOwners", fields: [ownerId], references: [id])
+
+  // Deadlines
+  dueDate     DateTime?
+  adoptedAt   DateTime?
+  adoptedById String?
+  adoptedBy   User?     @relation("DecisionAdoptedBy", fields: [adoptedById], references: [id])
+
+  // Linked document (official decision record)
+  documentId String?
+
+  // Linked workflow for implementation
+  workflowInstanceId String?
+
+  // Implementation tracking
+  implementations DecisionImplementation[]
+
+  // Tags
+  tags String[] @default([])
+
+  metadata    Json     @default("{}")
+  createdById String
+  createdBy   User     @relation("DecisionCreators", fields: [createdById], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([sessionId])
+  @@index([status])
+  @@index([priority])
+  @@index([responsibleMinistryId])
+  @@index([dueDate])
+  @@map("cabinet_decisions")
+}
+
+// ─── Decision Implementation ──────────────────────────────────────────────────
+
+model DecisionImplementation {
+  id           String               @id @default(cuid())
+  decisionId   String
+  decision     CabinetDecision      @relation(fields: [decisionId], references: [id], onDelete: Cascade)
+  title        String               @db.VarChar(500)
+  description  String?              @db.Text
+  status       ImplementationStatus @default(NOT_STARTED)
+  progressPct  Int                  @default(0) // 0-100
+  assignedToId String?
+  assignedTo   User?                @relation("ImplementationAssignees", fields: [assignedToId], references: [id])
+  ministryId   String?
+  ministry     Ministry?            @relation(fields: [ministryId], references: [id])
+  dueDate      DateTime?
+  completedAt  DateTime?
+  evidence     String?              @db.Text
+  notes        String?              @db.Text
+
+  // Linked task
+  taskId String? @unique
+  task   Task?   @relation(fields: [taskId], references: [id])
+
+  // Linked workflow
+  workflowInstanceId String?
+
+  createdById String
+  createdBy   User     @relation("ImplementationCreators", fields: [createdById], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([decisionId])
+  @@index([status])
+  @@index([assignedToId])
+  @@index([ministryId])
+  @@map("decision_implementations")
+}
+
+// ─── Executive Briefing ───────────────────────────────────────────────────────
+
+model ExecutiveBriefing {
+  id           String         @id @default(cuid())
+  title        String         @db.VarChar(500)
+  briefingType BriefingType
+  status       BriefingStatus @default(DRAFT)
+  content      Json           @default("{}") // rich text (TipTap JSON)
+  summary      String?        @db.Text
+  scheduledFor DateTime?
+  publishedAt  DateTime?
+  approvedAt   DateTime?
+
+  // Office that creates/owns the briefing
+  officeId String?
+  office   ExecutiveOffice? @relation(fields: [officeId], references: [id])
+
+  // Author
+  authorId String
+  author   User   @relation("BriefingAuthors", fields: [authorId], references: [id])
+
+  // Approver
+  approvedById String?
+  approvedBy   User?   @relation("BriefingApprovers", fields: [approvedById], references: [id])
+
+  // Linked documents
+  attachments String[] @default([]) // document IDs
+  // Linked meetings
+  meetingRefs String[] @default([]) // meeting IDs
+
+  // Workflow for approval
+  workflowInstanceId String?
+
+  // Version history
+  versionHistory Json @default("[]")
+
+  metadata  Json     @default("{}")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([briefingType])
+  @@index([status])
+  @@index([scheduledFor])
+  @@index([authorId])
+  @@map("executive_briefings")
+}
+
+// ─── Executive Correspondence ─────────────────────────────────────────────────
+
+model ExecutiveCorrespondence {
+  id                 String                       @id @default(cuid())
+  referenceNumber    String                       @unique @db.VarChar(100) // e.g. "REF-2026-001"
+  subject            String                       @db.VarChar(500)
+  correspondenceType CorrespondenceType
+  classification     CorrespondenceClassification @default(INTERNAL)
+  content            Json                         @default("{}") // rich text
+  summary            String?                      @db.Text
+
+  // Sender
+  fromOfficeId String?
+  fromOffice   ExecutiveOffice? @relation(fields: [fromOfficeId], references: [id])
+  fromUserId   String
+  fromUser     User             @relation("CorrespondenceSenders", fields: [fromUserId], references: [id])
+
+  // Recipient
+  toMinistryId String?
+  toMinistry   Ministry? @relation(fields: [toMinistryId], references: [id])
+  toUserId     String?
+  toUser       User?     @relation("CorrespondenceRecipients", fields: [toUserId], references: [id])
+  toExternal   String?   @db.VarChar(500) // external recipient name/email
+
+  // Status tracking
+  sentAt         DateTime?
+  receivedAt     DateTime?
+  acknowledgedAt DateTime?
+
+  // Linked document
+  documentId String?
+
+  // Attachments
+  attachments String[] @default([]) // document IDs
+
+  // Workflow
+  workflowInstanceId String?
+
+  // Reply chain
+  parentCorrespondenceId String?
+  parentCorrespondence   ExecutiveCorrespondence?  @relation("CorrespondenceReplies", fields: [parentCorrespondenceId], references: [id])
+  replies                ExecutiveCorrespondence[] @relation("CorrespondenceReplies")
+
+  metadata  Json     @default("{}")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([correspondenceType])
+  @@index([classification])
+  @@index([fromUserId])
+  @@index([toMinistryId])
+  @@index([sentAt])
+  @@map("executive_correspondence")
+}
+
+// ─── Executive Announcement ───────────────────────────────────────────────────
+
+model ExecutiveAnnouncement {
+  id          String               @id @default(cuid())
+  title       String               @db.VarChar(500)
+  content     String               @db.Text
+  audience    AnnouncementAudience @default(ALL_STAFF)
+  isPublished Boolean              @default(false)
+  publishedAt DateTime?
+  expiresAt   DateTime?
+
+  // Publishing office
+  officeId String?
+  office   ExecutiveOffice? @relation(fields: [officeId], references: [id])
+
+  // Author
+  authorId String
+  author   User   @relation("AnnouncementAuthors", fields: [authorId], references: [id])
+
+  // Target ministry (when audience = SPECIFIC_MINISTRY)
+  targetMinistryId String?
+  targetMinistry   Ministry? @relation(fields: [targetMinistryId], references: [id])
+
+  metadata  Json     @default("{}")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([audience])
+  @@index([isPublished])
+  @@index([publishedAt])
+  @@index([officeId])
+  @@map("executive_announcements")
 }

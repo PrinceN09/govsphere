@@ -1,6 +1,7 @@
 # GovSphere — Engineering Task List
 
 ## Phase 1 — Foundation (Current)
+
 - [x] Monorepo structure (Turborepo)
 - [x] Root configuration (TypeScript, ESLint, Prettier)
 - [x] Package scaffolds (ui, types, i18n, database, config, auth, utils)
@@ -10,6 +11,7 @@
 - [x] Environment variable schema and validation
 
 ## Phase 2 — Authentication
+
 - [ ] NestJS Auth module (JWT strategy, local strategy)
 - [ ] Matricule + Email login endpoints
 - [ ] Password hashing (bcrypt)
@@ -20,6 +22,7 @@
 - [ ] Audit log: LOGIN, LOGOUT, LOGIN_FAILED
 
 ## Phase 2 — Identity Platform (v0.2.0) ✅ COMPLETE
+
 - [x] NestJS Auth module (JWT RS256 strategy, matricule + email login)
 - [x] Password hashing (bcrypt cost 12), account lockout (5 soft / 10 hard)
 - [x] Refresh token rotation with family-based reuse detection
@@ -30,6 +33,7 @@
 - [x] 33 unit tests (Auth, Permissions, Roles)
 
 ## Phase 3 — Government Structure (v0.3.0) ✅ COMPLETE
+
 - [x] Prisma: Province, Office, Position, EmployeeAssignment models
 - [x] Migration: `20260624172831_add_government_structure`
 - [x] MinistriesModule: CRUD API at `/v1/ministries`
@@ -49,6 +53,7 @@
 - [ ] User profile page
 
 ## Phase 4 — Channels & Messaging
+
 - [ ] Channel creation (public, private, announcement)
 - [ ] Channel membership management
 - [ ] Message send / receive (REST + Socket.IO)
@@ -62,6 +67,7 @@
 - [ ] Presence (online/offline)
 
 ## Phase 5 — Files
+
 - [ ] File upload endpoint (MinIO integration)
 - [ ] File download (signed URL via API)
 - [ ] File listing per channel
@@ -69,6 +75,7 @@
 - [ ] File permission checks
 
 ## Phase 6 — UI
+
 - [ ] Main layout (3-column: nav + sidebar + content)
 - [ ] Left vertical navigation
 - [ ] Channel sidebar
@@ -80,6 +87,7 @@
 - [ ] Ministry/Department switcher
 
 ## Phase 7 — Search & Notifications
+
 - [ ] Full-text message search (PostgreSQL pg_trgm → later OpenSearch)
 - [ ] File search
 - [ ] People search
@@ -87,6 +95,7 @@
 - [ ] Email notifications (MailHog → SMTP in prod)
 
 ## Phase 8 — Admin
+
 - [ ] Super admin dashboard
 - [ ] User activation / deactivation
 - [ ] Audit log viewer

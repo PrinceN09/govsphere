@@ -18,6 +18,7 @@ import {
   validateEnv,
 } from "./config";
 import { CalendarModule } from "./calendar/calendar.module";
+import { ExecutiveModule } from "./executive/executive.module";
 import { CollaborationModule } from "./collaboration/collaboration.module";
 import { DocumentsModule } from "./documents/documents.module";
 import { WorkflowsModule } from "./workflows/workflows.module";
@@ -74,6 +75,7 @@ import { PrismaModule } from "./prisma/prisma.module";
     DocumentsModule, // Documents & Writer Platform (v0.8.0)
     WorkflowsModule, // Workflow & Digital Approvals Platform (v0.8.1)
     CalendarModule, // Calendar, Meetings & Events Platform (v0.9.0)
+    ExecutiveModule, // Executive Office & Cabinet Management (v1.0.0)
 
     // ── Health ───────────────────────────────────────────────────────────────
     HealthModule, // GET /health, /health/live, /health/ready, /health/db

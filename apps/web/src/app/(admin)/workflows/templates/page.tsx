@@ -2,13 +2,13 @@
 
 import { useQuery } from "@tanstack/react-query";
 
-import type { WorkflowTemplate } from "@/lib/workflow-types";
-
 import { AdminTopBar } from "@/components/layout/AdminTopBar";
 import { Card, CardBody } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { PageSpinner } from "@/components/ui/Spinner";
 import { apiGet } from "@/lib/api";
+
+import type { WorkflowTemplate } from "@/lib/workflow-types";
 
 const TRIGGER_LABELS: Record<string, string> = {
   MANUAL: "Manuel",

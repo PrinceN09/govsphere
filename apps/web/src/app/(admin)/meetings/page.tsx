@@ -4,13 +4,13 @@ import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useState } from "react";
 
-import type { Meeting, MeetingStatus } from "@/lib/calendar-types";
-
 import { MeetingCard } from "@/components/calendar/MeetingCard";
 import { MeetingTimeline } from "@/components/calendar/MeetingTimeline";
 import { AdminTopBar } from "@/components/layout/AdminTopBar";
 import { PageSpinner } from "@/components/ui/Spinner";
 import { apiGet } from "@/lib/api";
+
+import type { Meeting, MeetingStatus } from "@/lib/calendar-types";
 
 const STATUS_FILTERS: { value: MeetingStatus | "ALL"; label: string }[] = [
   { value: "ALL", label: "Toutes" },

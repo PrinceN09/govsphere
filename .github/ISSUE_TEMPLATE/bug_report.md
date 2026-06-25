@@ -3,7 +3,7 @@ name: Bug Report
 about: Report a defect or unexpected behavior in GovSphere
 title: "[BUG] "
 labels: bug, needs-triage
-assignees: ''
+assignees: ""
 ---
 
 ## Description
@@ -27,14 +27,15 @@ What actually happened.
 ## Environment
 
 - **GovSphere Version**: (e.g., v0.1.0)
-- **App**: [ ] Web  [ ] API  [ ] Desktop  [ ] Mobile
+- **App**: [ ] Web [ ] API [ ] Desktop [ ] Mobile
 - **Browser / OS** (if applicable):
 - **Node.js version**:
 - **Role**: (e.g., Ministry Admin, Employee)
 
 ## Request ID
 
-If you received an API error, include the `X-Request-ID` header value from the response. This helps correlate the error in server logs.
+If you received an API error, include the `X-Request-ID` header value from the response. This helps
+correlate the error in server logs.
 
 `X-Request-ID: `
 
@@ -48,5 +49,5 @@ Any other context about the problem.
 
 ---
 
-> **Security issues must NOT be reported here.**
-> See [SECURITY.md](../../SECURITY.md) for responsible disclosure.
+> **Security issues must NOT be reported here.** See [SECURITY.md](../../SECURITY.md) for
+> responsible disclosure.

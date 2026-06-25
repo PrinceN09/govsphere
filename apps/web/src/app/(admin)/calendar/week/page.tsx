@@ -4,12 +4,12 @@ import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useState } from "react";
 
-import type { CalendarEvent } from "@/lib/calendar-types";
-
 import { CalendarNav, WeekGrid } from "@/components/calendar/CalendarGrid";
 import { MiniCalendarWidget } from "@/components/calendar/MiniCalendarWidget";
 import { AdminTopBar } from "@/components/layout/AdminTopBar";
 import { apiGet } from "@/lib/api";
+
+import type { CalendarEvent } from "@/lib/calendar-types";
 
 function getMondayOf(date: Date): Date {
   const d = new Date(date);

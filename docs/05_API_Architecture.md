@@ -12,10 +12,13 @@
 The GovSphere API follows **REST principles with pragmatic extensions**. The API is:
 
 - **Versioned** — breaking changes are never made to existing versions
-- **Consistent** — every endpoint follows the same patterns for pagination, filtering, errors, and responses
-- **Documented** — every endpoint is documented in OpenAPI/Swagger, auto-generated from NestJS decorators
+- **Consistent** — every endpoint follows the same patterns for pagination, filtering, errors, and
+  responses
+- **Documented** — every endpoint is documented in OpenAPI/Swagger, auto-generated from NestJS
+  decorators
 - **Secure** — every endpoint requires authentication; access is enforced by role guards
-- **Typed** — all request and response shapes are TypeScript-typed DTOs with class-validator decorators
+- **Typed** — all request and response shapes are TypeScript-typed DTOs with class-validator
+  decorators
 
 ---
 
@@ -31,42 +34,43 @@ Full URL:      https://api.govsphere.gouv.cd/v1/{resource}
 
 ### 2.2 Resource Naming
 
-| Convention | Example |
-|---|---|
-| Plural nouns for collections | `/v1/users`, `/v1/channels` |
-| Kebab-case for multi-word resources | `/v1/refresh-tokens`, `/v1/audit-logs` |
-| Nested resources for owned sub-resources | `/v1/channels/{channelId}/messages` |
-| Avoid deep nesting (max 2 levels) | `/v1/messages/{messageId}/reactions` (not `/v1/channels/{id}/messages/{id}/reactions`) |
-| Actions as POST sub-routes | `/v1/messages/{messageId}/reactions` POST, not `/v1/messages/{messageId}/add-reaction` |
+| Convention                               | Example                                                                                |
+| ---------------------------------------- | -------------------------------------------------------------------------------------- |
+| Plural nouns for collections             | `/v1/users`, `/v1/channels`                                                            |
+| Kebab-case for multi-word resources      | `/v1/refresh-tokens`, `/v1/audit-logs`                                                 |
+| Nested resources for owned sub-resources | `/v1/channels/{channelId}/messages`                                                    |
+| Avoid deep nesting (max 2 levels)        | `/v1/messages/{messageId}/reactions` (not `/v1/channels/{id}/messages/{id}/reactions`) |
+| Actions as POST sub-routes               | `/v1/messages/{messageId}/reactions` POST, not `/v1/messages/{messageId}/add-reaction` |
 
 ### 2.3 HTTP Methods
 
-| Method | Usage | Idempotent |
-|---|---|---|
-| `GET` | Read a resource or collection | Yes |
-| `POST` | Create a new resource | No |
-| `PUT` | Full replacement of a resource | Yes |
-| `PATCH` | Partial update of a resource | Yes |
-| `DELETE` | Soft-delete a resource | Yes |
+| Method   | Usage                          | Idempotent |
+| -------- | ------------------------------ | ---------- |
+| `GET`    | Read a resource or collection  | Yes        |
+| `POST`   | Create a new resource          | No         |
+| `PUT`    | Full replacement of a resource | Yes        |
+| `PATCH`  | Partial update of a resource   | Yes        |
+| `DELETE` | Soft-delete a resource         | Yes        |
 
-**Rule:** `PATCH` is preferred over `PUT` for updates. `PUT` is reserved for full-document replacements (e.g. replacing a channel's settings object entirely).
+**Rule:** `PATCH` is preferred over `PUT` for updates. `PUT` is reserved for full-document
+replacements (e.g. replacing a channel's settings object entirely).
 
 ### 2.4 HTTP Status Codes
 
-| Code | Usage |
-|---|---|
-| `200 OK` | Successful GET, PATCH, PUT |
-| `201 Created` | Successful POST (resource created) |
-| `204 No Content` | Successful DELETE (no body) |
-| `400 Bad Request` | Validation error (malformed request) |
-| `401 Unauthorized` | Missing or invalid authentication token |
-| `403 Forbidden` | Authenticated but insufficient permissions |
-| `404 Not Found` | Resource does not exist (or is soft-deleted) |
-| `409 Conflict` | Uniqueness conflict (e.g. email already exists) |
-| `422 Unprocessable Entity` | Request is valid but business logic rejects it |
-| `429 Too Many Requests` | Rate limit exceeded |
-| `500 Internal Server Error` | Unhandled server error |
-| `503 Service Unavailable` | Maintenance mode or dependency unavailable |
+| Code                        | Usage                                           |
+| --------------------------- | ----------------------------------------------- |
+| `200 OK`                    | Successful GET, PATCH, PUT                      |
+| `201 Created`               | Successful POST (resource created)              |
+| `204 No Content`            | Successful DELETE (no body)                     |
+| `400 Bad Request`           | Validation error (malformed request)            |
+| `401 Unauthorized`          | Missing or invalid authentication token         |
+| `403 Forbidden`             | Authenticated but insufficient permissions      |
+| `404 Not Found`             | Resource does not exist (or is soft-deleted)    |
+| `409 Conflict`              | Uniqueness conflict (e.g. email already exists) |
+| `422 Unprocessable Entity`  | Request is valid but business logic rejects it  |
+| `429 Too Many Requests`     | Rate limit exceeded                             |
+| `500 Internal Server Error` | Unhandled server error                          |
+| `503 Service Unavailable`   | Maintenance mode or dependency unavailable      |
 
 ---
 
@@ -139,21 +143,21 @@ All errors follow a consistent structure:
 
 ### 3.3 Error Codes
 
-| Code | HTTP Status | Description |
-|---|---|---|
-| `VALIDATION_ERROR` | 400 | One or more fields failed validation |
-| `INVALID_CREDENTIALS` | 401 | Wrong email/password |
-| `TOKEN_EXPIRED` | 401 | Access token has expired |
-| `TOKEN_INVALID` | 401 | Token is malformed or blacklisted |
-| `MFA_REQUIRED` | 401 | Valid credentials but MFA code needed |
-| `MFA_INVALID` | 401 | MFA code is incorrect |
-| `ACCOUNT_LOCKED` | 401 | Account locked after failed attempts |
-| `FORBIDDEN` | 403 | Insufficient role or permission |
-| `NOT_FOUND` | 404 | Resource does not exist |
-| `ALREADY_EXISTS` | 409 | Unique constraint violation |
-| `RATE_LIMITED` | 429 | Too many requests |
-| `BUSINESS_RULE_VIOLATION` | 422 | Valid request but business logic rejected |
-| `INTERNAL_ERROR` | 500 | Unexpected server error |
+| Code                      | HTTP Status | Description                               |
+| ------------------------- | ----------- | ----------------------------------------- |
+| `VALIDATION_ERROR`        | 400         | One or more fields failed validation      |
+| `INVALID_CREDENTIALS`     | 401         | Wrong email/password                      |
+| `TOKEN_EXPIRED`           | 401         | Access token has expired                  |
+| `TOKEN_INVALID`           | 401         | Token is malformed or blacklisted         |
+| `MFA_REQUIRED`            | 401         | Valid credentials but MFA code needed     |
+| `MFA_INVALID`             | 401         | MFA code is incorrect                     |
+| `ACCOUNT_LOCKED`          | 401         | Account locked after failed attempts      |
+| `FORBIDDEN`               | 403         | Insufficient role or permission           |
+| `NOT_FOUND`               | 404         | Resource does not exist                   |
+| `ALREADY_EXISTS`          | 409         | Unique constraint violation               |
+| `RATE_LIMITED`            | 429         | Too many requests                         |
+| `BUSINESS_RULE_VIOLATION` | 422         | Valid request but business logic rejected |
+| `INTERNAL_ERROR`          | 500         | Unexpected server error                   |
 
 ---
 
@@ -170,8 +174,10 @@ GovSphere uses **URL-based versioning** (not header-based or query-string-based)
 
 ### 4.2 Versioning Rules
 
-- New non-breaking additions (new fields, new optional parameters) may be added to the current version without a version bump.
-- Breaking changes (removing fields, changing response shapes, changing auth behavior) require a new major version.
+- New non-breaking additions (new fields, new optional parameters) may be added to the current
+  version without a version bump.
+- Breaking changes (removing fields, changing response shapes, changing auth behavior) require a new
+  major version.
 - Old versions are supported for a minimum of **12 months** after a new version is released.
 - Deprecated versions return a `Deprecation` and `Sunset` header.
 
@@ -310,7 +316,8 @@ Response:
 }
 ```
 
-**Why cursor-based:** Page numbers break when new messages arrive. A cursor points to a stable position in the message list.
+**Why cursor-based:** Page numbers break when new messages arrive. A cursor points to a stable
+position in the message list.
 
 ### 6.2 Offset-Based Pagination (For Administrative Lists)
 
@@ -381,15 +388,15 @@ Returns a unified search response across messages, files, and users (scoped to t
 
 ### 8.1 Rate Limit Tiers
 
-| Endpoint Group | Limit | Window |
-|---|---|---|
-| `POST /auth/login` | 5 requests | 15 minutes (by IP) |
-| `POST /auth/mfa/verify` | 5 requests | 5 minutes (by MFA token) |
-| `POST /auth/refresh` | 30 requests | 15 minutes (by userId) |
-| `POST /messages` | 60 requests | 1 minute (by userId) |
-| `POST /files` | 20 requests | 1 minute (by userId) |
-| `GET /search` | 30 requests | 1 minute (by userId) |
-| All other endpoints | 1000 requests | 1 minute (by userId) |
+| Endpoint Group          | Limit         | Window                   |
+| ----------------------- | ------------- | ------------------------ |
+| `POST /auth/login`      | 5 requests    | 15 minutes (by IP)       |
+| `POST /auth/mfa/verify` | 5 requests    | 5 minutes (by MFA token) |
+| `POST /auth/refresh`    | 30 requests   | 15 minutes (by userId)   |
+| `POST /messages`        | 60 requests   | 1 minute (by userId)     |
+| `POST /files`           | 20 requests   | 1 minute (by userId)     |
+| `GET /search`           | 30 requests   | 1 minute (by userId)     |
+| All other endpoints     | 1000 requests | 1 minute (by userId)     |
 
 ### 8.2 Rate Limit Response Headers
 
@@ -411,7 +418,8 @@ Retry-After: 45   (only on 429)
 All incoming data is validated through:
 
 1. **DTO classes** with `class-validator` decorators
-2. **Global `ValidationPipe`** with `whitelist: true` (strips unknown fields) and `forbidNonWhitelisted: true`
+2. **Global `ValidationPipe`** with `whitelist: true` (strips unknown fields) and
+   `forbidNonWhitelisted: true`
 3. **Zod schemas** in `@govsphere/config` for environment variables
 4. **Prisma** as the final safety net for DB-level constraints
 
@@ -419,12 +427,12 @@ All incoming data is validated through:
 
 ```typescript
 // create-message.dto.ts
-import { IsString, IsNotEmpty, MaxLength, IsOptional, IsEnum } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
-import { MessageType } from '@govsphere/types';
+import { IsString, IsNotEmpty, MaxLength, IsOptional, IsEnum } from "class-validator";
+import { ApiProperty } from "@nestjs/swagger";
+import { MessageType } from "@govsphere/types";
 
 export class CreateMessageDto {
-  @ApiProperty({ example: 'Bonjour à tous', maxLength: 10000 })
+  @ApiProperty({ example: "Bonjour à tous", maxLength: 10000 })
   @IsString()
   @IsNotEmpty()
   @MaxLength(10000)
@@ -435,7 +443,7 @@ export class CreateMessageDto {
   @IsOptional()
   type?: MessageType = MessageType.TEXT;
 
-  @ApiProperty({ required: false, description: 'ID of message being replied to' })
+  @ApiProperty({ required: false, description: "ID of message being replied to" })
   @IsString()
   @IsOptional()
   replyToId?: string;
@@ -450,14 +458,14 @@ export class CreateMessageDto {
 
 ```typescript
 // Client connection
-const socket = io('wss://api.govsphere.gouv.cd', {
+const socket = io("wss://api.govsphere.gouv.cd", {
   auth: {
-    token: accessToken   // JWT access token
+    token: accessToken, // JWT access token
   },
-  transports: ['websocket'],
+  transports: ["websocket"],
   reconnectionAttempts: 10,
   reconnectionDelay: 1000,
-  reconnectionDelayMax: 30000
+  reconnectionDelayMax: 30000,
 });
 ```
 
@@ -468,6 +476,7 @@ const socket = io('wss://api.govsphere.gouv.cd', {
 ```
 
 Examples:
+
 - `message:new`
 - `message:updated`
 - `message:deleted`
@@ -482,14 +491,14 @@ Examples:
 
 ```typescript
 // Server emits structured errors
-socket.emit('error', {
-  code: 'UNAUTHORIZED',
-  message: 'Your session has expired. Please log in again.'
+socket.emit("error", {
+  code: "UNAUTHORIZED",
+  message: "Your session has expired. Please log in again.",
 });
 
 // Client handles
-socket.on('error', (error) => {
-  if (error.code === 'UNAUTHORIZED') {
+socket.on("error", (error) => {
+  if (error.code === "UNAUTHORIZED") {
     // Redirect to login
   }
 });
@@ -508,106 +517,106 @@ socket.on('error', (error) => {
 
 ### 11.1 Authentication
 
-| Method | Endpoint | Description |
-|---|---|---|
-| POST | `/v1/auth/login` | Login with matricule or email |
-| POST | `/v1/auth/mfa/verify` | Complete MFA verification |
-| POST | `/v1/auth/mfa/setup` | Initialize TOTP setup |
-| POST | `/v1/auth/mfa/confirm` | Confirm TOTP setup with first code |
-| POST | `/v1/auth/mfa/disable` | Disable MFA (requires password) |
-| POST | `/v1/auth/refresh` | Refresh access token |
-| POST | `/v1/auth/logout` | Logout current session |
-| POST | `/v1/auth/logout-all` | Logout all sessions |
-| POST | `/v1/auth/password/reset-request` | Request password reset email |
-| POST | `/v1/auth/password/reset` | Complete password reset |
-| POST | `/v1/auth/password/change` | Change password (authenticated) |
+| Method | Endpoint                          | Description                        |
+| ------ | --------------------------------- | ---------------------------------- |
+| POST   | `/v1/auth/login`                  | Login with matricule or email      |
+| POST   | `/v1/auth/mfa/verify`             | Complete MFA verification          |
+| POST   | `/v1/auth/mfa/setup`              | Initialize TOTP setup              |
+| POST   | `/v1/auth/mfa/confirm`            | Confirm TOTP setup with first code |
+| POST   | `/v1/auth/mfa/disable`            | Disable MFA (requires password)    |
+| POST   | `/v1/auth/refresh`                | Refresh access token               |
+| POST   | `/v1/auth/logout`                 | Logout current session             |
+| POST   | `/v1/auth/logout-all`             | Logout all sessions                |
+| POST   | `/v1/auth/password/reset-request` | Request password reset email       |
+| POST   | `/v1/auth/password/reset`         | Complete password reset            |
+| POST   | `/v1/auth/password/change`        | Change password (authenticated)    |
 
 ### 11.2 Users
 
-| Method | Endpoint | Description |
-|---|---|---|
-| GET | `/v1/users` | List users (admin only) |
-| POST | `/v1/users` | Create user (admin only) |
-| GET | `/v1/users/me` | Get current user's profile |
-| PATCH | `/v1/users/me` | Update current user's profile |
-| GET | `/v1/users/{userId}` | Get user by ID |
-| PATCH | `/v1/users/{userId}` | Update user (admin only) |
-| DELETE | `/v1/users/{userId}` | Deactivate user (admin only) |
-| GET | `/v1/users/{userId}/sessions` | List user's active sessions |
-| DELETE | `/v1/users/{userId}/sessions/{sessionId}` | Revoke a session |
-| POST | `/v1/users/me/avatar` | Upload avatar |
+| Method | Endpoint                                  | Description                   |
+| ------ | ----------------------------------------- | ----------------------------- |
+| GET    | `/v1/users`                               | List users (admin only)       |
+| POST   | `/v1/users`                               | Create user (admin only)      |
+| GET    | `/v1/users/me`                            | Get current user's profile    |
+| PATCH  | `/v1/users/me`                            | Update current user's profile |
+| GET    | `/v1/users/{userId}`                      | Get user by ID                |
+| PATCH  | `/v1/users/{userId}`                      | Update user (admin only)      |
+| DELETE | `/v1/users/{userId}`                      | Deactivate user (admin only)  |
+| GET    | `/v1/users/{userId}/sessions`             | List user's active sessions   |
+| DELETE | `/v1/users/{userId}/sessions/{sessionId}` | Revoke a session              |
+| POST   | `/v1/users/me/avatar`                     | Upload avatar                 |
 
 ### 11.3 Organizations
 
-| Method | Endpoint | Description |
-|---|---|---|
-| GET | `/v1/ministries` | List ministries |
-| POST | `/v1/ministries` | Create ministry (super admin) |
-| GET | `/v1/ministries/{ministryId}` | Get ministry |
-| PATCH | `/v1/ministries/{ministryId}` | Update ministry |
-| GET | `/v1/ministries/{ministryId}/departments` | List departments |
-| POST | `/v1/ministries/{ministryId}/departments` | Create department |
-| GET | `/v1/departments/{departmentId}/divisions` | List divisions |
-| POST | `/v1/departments/{departmentId}/divisions` | Create division |
+| Method | Endpoint                                   | Description                   |
+| ------ | ------------------------------------------ | ----------------------------- |
+| GET    | `/v1/ministries`                           | List ministries               |
+| POST   | `/v1/ministries`                           | Create ministry (super admin) |
+| GET    | `/v1/ministries/{ministryId}`              | Get ministry                  |
+| PATCH  | `/v1/ministries/{ministryId}`              | Update ministry               |
+| GET    | `/v1/ministries/{ministryId}/departments`  | List departments              |
+| POST   | `/v1/ministries/{ministryId}/departments`  | Create department             |
+| GET    | `/v1/departments/{departmentId}/divisions` | List divisions                |
+| POST   | `/v1/departments/{departmentId}/divisions` | Create division               |
 
 ### 11.4 Channels
 
-| Method | Endpoint | Description |
-|---|---|---|
-| GET | `/v1/channels` | List accessible channels |
-| POST | `/v1/channels` | Create channel |
-| GET | `/v1/channels/{channelId}` | Get channel |
-| PATCH | `/v1/channels/{channelId}` | Update channel |
-| DELETE | `/v1/channels/{channelId}` | Archive channel |
-| GET | `/v1/channels/{channelId}/members` | List members |
-| POST | `/v1/channels/{channelId}/members` | Add member |
-| DELETE | `/v1/channels/{channelId}/members/{userId}` | Remove member |
+| Method | Endpoint                                    | Description              |
+| ------ | ------------------------------------------- | ------------------------ |
+| GET    | `/v1/channels`                              | List accessible channels |
+| POST   | `/v1/channels`                              | Create channel           |
+| GET    | `/v1/channels/{channelId}`                  | Get channel              |
+| PATCH  | `/v1/channels/{channelId}`                  | Update channel           |
+| DELETE | `/v1/channels/{channelId}`                  | Archive channel          |
+| GET    | `/v1/channels/{channelId}/members`          | List members             |
+| POST   | `/v1/channels/{channelId}/members`          | Add member               |
+| DELETE | `/v1/channels/{channelId}/members/{userId}` | Remove member            |
 
 ### 11.5 Messages
 
-| Method | Endpoint | Description |
-|---|---|---|
-| GET | `/v1/channels/{channelId}/messages` | List messages (cursor paginated) |
-| POST | `/v1/channels/{channelId}/messages` | Send message |
-| PATCH | `/v1/messages/{messageId}` | Edit message |
-| DELETE | `/v1/messages/{messageId}` | Delete message |
-| POST | `/v1/messages/{messageId}/reactions` | Add reaction |
-| DELETE | `/v1/messages/{messageId}/reactions/{emoji}` | Remove reaction |
-| POST | `/v1/channels/{channelId}/messages/pin` | Pin message |
-| GET | `/v1/channels/{channelId}/messages/pinned` | List pinned messages |
+| Method | Endpoint                                     | Description                      |
+| ------ | -------------------------------------------- | -------------------------------- |
+| GET    | `/v1/channels/{channelId}/messages`          | List messages (cursor paginated) |
+| POST   | `/v1/channels/{channelId}/messages`          | Send message                     |
+| PATCH  | `/v1/messages/{messageId}`                   | Edit message                     |
+| DELETE | `/v1/messages/{messageId}`                   | Delete message                   |
+| POST   | `/v1/messages/{messageId}/reactions`         | Add reaction                     |
+| DELETE | `/v1/messages/{messageId}/reactions/{emoji}` | Remove reaction                  |
+| POST   | `/v1/channels/{channelId}/messages/pin`      | Pin message                      |
+| GET    | `/v1/channels/{channelId}/messages/pinned`   | List pinned messages             |
 
 ### 11.6 Files
 
-| Method | Endpoint | Description |
-|---|---|---|
-| POST | `/v1/files/upload-url` | Request pre-signed upload URL |
-| POST | `/v1/files/confirm` | Confirm upload complete |
-| GET | `/v1/files/{fileId}` | Get file metadata |
-| GET | `/v1/files/{fileId}/download-url` | Get pre-signed download URL |
-| DELETE | `/v1/files/{fileId}` | Soft-delete file |
+| Method | Endpoint                          | Description                   |
+| ------ | --------------------------------- | ----------------------------- |
+| POST   | `/v1/files/upload-url`            | Request pre-signed upload URL |
+| POST   | `/v1/files/confirm`               | Confirm upload complete       |
+| GET    | `/v1/files/{fileId}`              | Get file metadata             |
+| GET    | `/v1/files/{fileId}/download-url` | Get pre-signed download URL   |
+| DELETE | `/v1/files/{fileId}`              | Soft-delete file              |
 
 ### 11.7 Search
 
-| Method | Endpoint | Description |
-|---|---|---|
-| GET | `/v1/search` | Global search across messages/files/users |
-| GET | `/v1/search/messages` | Search messages only |
-| GET | `/v1/search/files` | Search files only |
-| GET | `/v1/search/users` | Search users only |
+| Method | Endpoint              | Description                               |
+| ------ | --------------------- | ----------------------------------------- |
+| GET    | `/v1/search`          | Global search across messages/files/users |
+| GET    | `/v1/search/messages` | Search messages only                      |
+| GET    | `/v1/search/files`    | Search files only                         |
+| GET    | `/v1/search/users`    | Search users only                         |
 
 ### 11.8 Notifications
 
-| Method | Endpoint | Description |
-|---|---|---|
-| GET | `/v1/notifications` | List notifications |
-| PATCH | `/v1/notifications/{id}/read` | Mark as read |
-| POST | `/v1/notifications/read-all` | Mark all as read |
+| Method | Endpoint                      | Description        |
+| ------ | ----------------------------- | ------------------ |
+| GET    | `/v1/notifications`           | List notifications |
+| PATCH  | `/v1/notifications/{id}/read` | Mark as read       |
+| POST   | `/v1/notifications/read-all`  | Mark all as read   |
 
 ### 11.9 Admin
 
-| Method | Endpoint | Description |
-|---|---|---|
-| GET | `/v1/admin/audit-logs` | Query audit logs |
-| GET | `/v1/admin/stats` | System statistics |
-| GET | `/v1/admin/health` | System health check |
-| POST | `/v1/admin/users/bulk-import` | Bulk import users from CSV |
+| Method | Endpoint                      | Description                |
+| ------ | ----------------------------- | -------------------------- |
+| GET    | `/v1/admin/audit-logs`        | Query audit logs           |
+| GET    | `/v1/admin/stats`             | System statistics          |
+| GET    | `/v1/admin/health`            | System health check        |
+| POST   | `/v1/admin/users/bulk-import` | Bulk import users from CSV |

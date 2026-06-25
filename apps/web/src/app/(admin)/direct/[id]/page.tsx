@@ -4,15 +4,15 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
 import { use } from "react";
 
-import type { ChatMessage } from "@/components/collaboration/ChatWindow";
-import type { PresenceStatus } from "@/components/collaboration/PresenceBadge";
-
 import { ChatWindow } from "@/components/collaboration/ChatWindow";
 import { MessageComposer } from "@/components/collaboration/MessageComposer";
 import { PresenceBadge } from "@/components/collaboration/PresenceBadge";
 import { AdminTopBar } from "@/components/layout/AdminTopBar";
 import { PageSpinner } from "@/components/ui/Spinner";
 import { apiGet, apiPost } from "@/lib/api";
+
+import type { ChatMessage } from "@/components/collaboration/ChatWindow";
+import type { PresenceStatus } from "@/components/collaboration/PresenceBadge";
 
 interface DirectMessage {
   id: string;

@@ -5,14 +5,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import type { CalendarEvent } from "@/lib/calendar-types";
-
 import { AgendaView } from "@/components/calendar/AgendaView";
 import { CalendarNav, MonthGrid, MONTHS_FR } from "@/components/calendar/CalendarGrid";
 import { MiniCalendarWidget } from "@/components/calendar/MiniCalendarWidget";
 import { UpcomingMeetingsWidget } from "@/components/calendar/UpcomingMeetingsWidget";
 import { AdminTopBar } from "@/components/layout/AdminTopBar";
 import { apiGet } from "@/lib/api";
+
+import type { CalendarEvent } from "@/lib/calendar-types";
 
 export default function CalendarMonthPage() {
   const router = useRouter();

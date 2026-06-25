@@ -8,9 +8,12 @@
 
 ## 1. Purpose
 
-This document defines the non-negotiable engineering standards for the GovSphere platform. Every engineer — regardless of seniority — follows these standards. Consistency, readability, and maintainability are valued over personal preference or clever shortcuts.
+This document defines the non-negotiable engineering standards for the GovSphere platform. Every
+engineer — regardless of seniority — follows these standards. Consistency, readability, and
+maintainability are valued over personal preference or clever shortcuts.
 
-> "Any fool can write code that a computer can understand. Good programmers write code that humans can understand." — Martin Fowler
+> "Any fool can write code that a computer can understand. Good programmers write code that humans
+> can understand." — Martin Fowler
 
 ---
 
@@ -51,7 +54,8 @@ packages/types depends on: nothing internal
 packages/database depends on: nothing internal
 ```
 
-**Rule:** packages must never depend on apps. Apps can depend on packages. Circular dependencies are never permitted.
+**Rule:** packages must never depend on apps. Apps can depend on packages. Circular dependencies are
+never permitted.
 
 ---
 
@@ -59,42 +63,42 @@ packages/database depends on: nothing internal
 
 ### Files and Directories
 
-| Type | Convention | Example |
-|---|---|---|
-| NestJS modules, controllers, services | `kebab-case.type.ts` | `auth.service.ts`, `user.controller.ts` |
-| React components | `PascalCase.tsx` | `MessageBubble.tsx`, `UserAvatar.tsx` |
-| React hooks | `camelCase starting with "use"` | `useAuth.ts`, `useMessages.ts` |
-| Utility functions | `camelCase.ts` | `formatDate.ts`, `generateId.ts` |
-| Type definition files | `camelCase.types.ts` | `user.types.ts`, `auth.types.ts` |
-| Test files | same name + `.spec.ts` or `.test.ts` | `auth.service.spec.ts` |
-| E2E tests | `kebab-case.e2e.ts` | `login-flow.e2e.ts` |
-| Constants | `SCREAMING_SNAKE_CASE.ts` | `HTTP_STATUS.ts`, `ERROR_CODES.ts` |
-| Directories | `kebab-case` | `user-management/`, `file-storage/` |
+| Type                                  | Convention                           | Example                                 |
+| ------------------------------------- | ------------------------------------ | --------------------------------------- |
+| NestJS modules, controllers, services | `kebab-case.type.ts`                 | `auth.service.ts`, `user.controller.ts` |
+| React components                      | `PascalCase.tsx`                     | `MessageBubble.tsx`, `UserAvatar.tsx`   |
+| React hooks                           | `camelCase starting with "use"`      | `useAuth.ts`, `useMessages.ts`          |
+| Utility functions                     | `camelCase.ts`                       | `formatDate.ts`, `generateId.ts`        |
+| Type definition files                 | `camelCase.types.ts`                 | `user.types.ts`, `auth.types.ts`        |
+| Test files                            | same name + `.spec.ts` or `.test.ts` | `auth.service.spec.ts`                  |
+| E2E tests                             | `kebab-case.e2e.ts`                  | `login-flow.e2e.ts`                     |
+| Constants                             | `SCREAMING_SNAKE_CASE.ts`            | `HTTP_STATUS.ts`, `ERROR_CODES.ts`      |
+| Directories                           | `kebab-case`                         | `user-management/`, `file-storage/`     |
 
 ### TypeScript Symbols
 
-| Symbol Type | Convention | Example |
-|---|---|---|
-| Variables | `camelCase` | `const userId = ...` |
-| Functions | `camelCase` | `function getUserById() {...}` |
-| Classes | `PascalCase` | `class AuthService {...}` |
-| Interfaces | `PascalCase` (no `I` prefix) | `interface UserProfile {...}` |
-| Types | `PascalCase` | `type AuthResponse = {...}` |
-| Enums | `PascalCase` | `enum UserRole {...}` |
-| Enum members | `SCREAMING_SNAKE_CASE` | `UserRole.MINISTRY_ADMIN` |
-| Constants | `SCREAMING_SNAKE_CASE` | `const MAX_FILE_SIZE = ...` |
-| React components | `PascalCase` | `export function MessageList() {...}` |
-| React hooks | `camelCase with "use" prefix` | `export function useAuth() {...}` |
+| Symbol Type      | Convention                    | Example                               |
+| ---------------- | ----------------------------- | ------------------------------------- |
+| Variables        | `camelCase`                   | `const userId = ...`                  |
+| Functions        | `camelCase`                   | `function getUserById() {...}`        |
+| Classes          | `PascalCase`                  | `class AuthService {...}`             |
+| Interfaces       | `PascalCase` (no `I` prefix)  | `interface UserProfile {...}`         |
+| Types            | `PascalCase`                  | `type AuthResponse = {...}`           |
+| Enums            | `PascalCase`                  | `enum UserRole {...}`                 |
+| Enum members     | `SCREAMING_SNAKE_CASE`        | `UserRole.MINISTRY_ADMIN`             |
+| Constants        | `SCREAMING_SNAKE_CASE`        | `const MAX_FILE_SIZE = ...`           |
+| React components | `PascalCase`                  | `export function MessageList() {...}` |
+| React hooks      | `camelCase with "use" prefix` | `export function useAuth() {...}`     |
 
 ### Database (Prisma)
 
-| Object | Convention | Example |
-|---|---|---|
-| Model names | `PascalCase` singular | `User`, `Message`, `Channel` |
-| Field names | `camelCase` | `firstName`, `createdAt`, `ministryId` |
-| Relation fields | `camelCase`, descriptive | `author`, `messages`, `ministry` |
-| Enum names | `PascalCase` | `UserRole`, `MessageType` |
-| Enum values | `SCREAMING_SNAKE_CASE` | `MINISTRY_ADMIN`, `FILE_SHARE` |
+| Object          | Convention               | Example                                |
+| --------------- | ------------------------ | -------------------------------------- |
+| Model names     | `PascalCase` singular    | `User`, `Message`, `Channel`           |
+| Field names     | `camelCase`              | `firstName`, `createdAt`, `ministryId` |
+| Relation fields | `camelCase`, descriptive | `author`, `messages`, `ministry`       |
+| Enum names      | `PascalCase`             | `UserRole`, `MessageType`              |
+| Enum values     | `SCREAMING_SNAKE_CASE`   | `MINISTRY_ADMIN`, `FILE_SHARE`         |
 
 ---
 
@@ -102,7 +106,8 @@ packages/database depends on: nothing internal
 
 ### Strict Mode
 
-All packages must have `strict: true` in tsconfig. The following rules are mandatory and cannot be downgraded to `warn`:
+All packages must have `strict: true` in tsconfig. The following rules are mandatory and cannot be
+downgraded to `warn`:
 
 ```json
 {
@@ -138,7 +143,8 @@ function process(data: UserProfile) { ... }
 function process<T extends Record<string, unknown>>(data: T) { ... }
 ```
 
-**Prefer `type` over `interface` for unions and computed types. Prefer `interface` for object shapes that may be extended:**
+**Prefer `type` over `interface` for unions and computed types. Prefer `interface` for object shapes
+that may be extended:**
 
 ```typescript
 // ✅ interface for object shapes
@@ -186,7 +192,8 @@ export async function getUser(id: string): Promise<User> {
 
 ### Module Organization
 
-Each NestJS module is self-contained. Every resource (Auth, Users, Channels, Messages, Files, etc.) has its own module directory:
+Each NestJS module is self-contained. Every resource (Auth, Users, Channels, Messages, Files, etc.)
+has its own module directory:
 
 ```
 apps/api/src/
@@ -239,7 +246,8 @@ export class UsersController {
 
 - Services contain all business logic
 - Services depend on the database via the injected `PrismaService`
-- Services never depend on other services from a different module directly — use events or shared utilities
+- Services never depend on other services from a different module directly — use events or shared
+  utilities
 - Services throw typed exceptions, not raw Error objects
 
 ```typescript
@@ -260,7 +268,7 @@ throw new Error("user not found");
 export class LoginDto {
   @IsString()
   @IsNotEmpty()
-  credential: string;   // matricule or email
+  credential: string; // matricule or email
 
   @IsString()
   @MinLength(12)
@@ -308,7 +316,8 @@ apps/web/src/app/
 // - Third-party client libraries (socket.io-client)
 ```
 
-Rule: Keep "use client" boundaries as deep as possible. A page should be a Server Component; only the interactive parts (forms, real-time feeds) should be client components.
+Rule: Keep "use client" boundaries as deep as possible. A page should be a Server Component; only
+the interactive parts (forms, real-time feeds) should be client components.
 
 ### Data Fetching
 
@@ -325,7 +334,8 @@ useEffect(() => {
 }, []);
 ```
 
-All client-side data fetching uses TanStack Query (React Query). No raw `fetch` in client components.
+All client-side data fetching uses TanStack Query (React Query). No raw `fetch` in client
+components.
 
 ---
 
@@ -366,7 +376,8 @@ const result = await prisma.$transaction(async (tx) => {
 
 **Soft delete pattern:**
 
-No records are hard-deleted from the database. Use `isDeleted: true` or status flags. The deletion timestamp and the user who triggered the deletion are always recorded.
+No records are hard-deleted from the database. Use `isDeleted: true` or status flags. The deletion
+timestamp and the user who triggered the deletion are always recorded.
 
 ### Migration Rules
 
@@ -416,6 +427,7 @@ GovSphere follows the Conventional Commits specification:
 ```
 
 **Types:**
+
 - `feat` — new feature
 - `fix` — bug fix
 - `docs` — documentation only
@@ -439,6 +451,7 @@ test(auth): add unit tests for account lockout after 5 failed attempts
 ```
 
 **Rules:**
+
 - Subject line: 72 characters maximum
 - Subject line: imperative mood ("add" not "added", "fix" not "fixed")
 - No period at end of subject line
@@ -465,10 +478,12 @@ test(auth): add unit tests for account lockout after 5 failed attempts
 
 ### Unit Test Rules
 
-- Test file is co-located with the file it tests: `auth.service.spec.ts` is next to `auth.service.ts`
+- Test file is co-located with the file it tests: `auth.service.spec.ts` is next to
+  `auth.service.ts`
 - Each unit test is isolated — no real database, no network calls, no file system
 - External dependencies are mocked: `jest.mock("../prisma.service")`
-- Test name format: `describe("AuthService") > describe("login") > it("should throw UnauthorizedException when user is not found")`
+- Test name format:
+  `describe("AuthService") > describe("login") > it("should throw UnauthorizedException when user is not found")`
 
 ```typescript
 describe("AuthService", () => {
@@ -504,13 +519,13 @@ describe("AuthService", () => {
 
 ### Coverage Requirements
 
-| Package | Minimum Coverage |
-|---|---|
-| `packages/utils` | 95% |
-| `packages/types` | N/A (types only) |
-| `apps/api` — services | 80% |
-| `apps/api` — controllers | 70% |
-| `apps/web` — components | 60% |
+| Package                  | Minimum Coverage |
+| ------------------------ | ---------------- |
+| `packages/utils`         | 95%              |
+| `packages/types`         | N/A (types only) |
+| `apps/api` — services    | 80%              |
+| `apps/api` — controllers | 70%              |
+| `apps/web` — components  | 60%              |
 
 ---
 
@@ -519,34 +534,40 @@ describe("AuthService", () => {
 Every pull request is reviewed against this checklist before approval:
 
 **Correctness**
+
 - [ ] The implementation solves the stated problem
 - [ ] Edge cases are handled (empty state, null inputs, unauthorized access)
 - [ ] Errors are handled and reported clearly
 
 **Security**
+
 - [ ] No secrets or credentials in code
 - [ ] Input is validated before use
 - [ ] Authorization checks are in place for sensitive operations
 - [ ] Sensitive fields are not returned in API responses
 
 **Database**
+
 - [ ] Queries select only required fields
 - [ ] Multi-step operations use transactions
 - [ ] No N+1 queries (use `include` or batching)
 - [ ] New fields have appropriate database indexes
 
 **Tests**
+
 - [ ] New code has unit tests
 - [ ] Tests cover the happy path and at least one failure path
 - [ ] Test names clearly describe the scenario
 
 **Standards**
+
 - [ ] Code follows naming conventions in this document
 - [ ] No `any` types
 - [ ] All exported functions have explicit return types
 - [ ] No commented-out code committed to main
 
 **Documentation**
+
 - [ ] New public API endpoints are documented
 - [ ] Complex business logic has inline comments explaining WHY
 - [ ] Breaking changes are noted in the PR description
@@ -568,6 +589,7 @@ A feature is **Done** when ALL of the following are true:
 9. **No regressions** — existing tests continue to pass
 
 A feature is **never done** when:
+
 - It works locally but hasn't been tested in staging
 - Tests are skipped or mocked in ways that hide real failures
 - Known bugs are deferred without a tracking ticket

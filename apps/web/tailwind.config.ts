@@ -1,10 +1,7 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
-  content: [
-    "./src/**/*.{js,ts,jsx,tsx,mdx}",
-    "../../packages/ui/src/**/*.{js,ts,jsx,tsx}",
-  ],
+  content: ["./src/**/*.{js,ts,jsx,tsx,mdx}", "../../packages/ui/src/**/*.{js,ts,jsx,tsx}"],
   darkMode: "class",
   theme: {
     extend: {
@@ -135,8 +132,7 @@ const config: Config = {
       boxShadow: {
         card: "0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.04)",
         "card-md": "0 4px 6px -1px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.05)",
-        dialog:
-          "0 20px 60px -12px rgb(0 0 0 / 0.30), 0 8px 24px -6px rgb(0 0 0 / 0.14)",
+        dialog: "0 20px 60px -12px rgb(0 0 0 / 0.30), 0 8px 24px -6px rgb(0 0 0 / 0.14)",
         authority: "inset 3px 0 0 #D4A012",
         none: "none",
       },

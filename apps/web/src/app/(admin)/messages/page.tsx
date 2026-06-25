@@ -3,12 +3,12 @@
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 
-import type { ConversationItem } from "@/components/collaboration/ConversationList";
-
 import { ConversationList } from "@/components/collaboration/ConversationList";
 import { AdminTopBar } from "@/components/layout/AdminTopBar";
 import { PageSpinner } from "@/components/ui/Spinner";
 import { apiGet } from "@/lib/api";
+
+import type { ConversationItem } from "@/components/collaboration/ConversationList";
 
 interface ApiConversation {
   lastReadAt: string;

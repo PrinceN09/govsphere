@@ -3,14 +3,14 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { use } from "react";
 
-import type { ChatMessage } from "@/components/collaboration/ChatWindow";
-
 import { ChatWindow } from "@/components/collaboration/ChatWindow";
 import { MessageComposer } from "@/components/collaboration/MessageComposer";
 import { AdminTopBar } from "@/components/layout/AdminTopBar";
 import { Badge } from "@/components/ui/Badge";
 import { PageSpinner } from "@/components/ui/Spinner";
 import { apiDelete, apiGet, apiPost } from "@/lib/api";
+
+import type { ChatMessage } from "@/components/collaboration/ChatWindow";
 
 interface Channel {
   id: string;

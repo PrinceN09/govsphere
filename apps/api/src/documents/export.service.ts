@@ -403,7 +403,8 @@ export class ExportService {
               ],
               spacing: { after: 400 },
             }),
-            ...((body as { sections?: Array<{ children?: unknown[] }> }).sections?.[0]?.children ?? []),
+            ...((body as { sections?: Array<{ children?: unknown[] }> }).sections?.[0]?.children ??
+              []),
           ],
         },
       ],

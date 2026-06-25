@@ -1,6 +1,7 @@
 # Contributing to GovSphere
 
-Thank you for contributing to GovSphere — the Digital Operating System for the Government of the DRC.
+Thank you for contributing to GovSphere — the Digital Operating System for the Government of the
+DRC.
 
 ## Prerequisites
 
@@ -28,6 +29,7 @@ main           ← production-ready; protected; requires PR + 2 approvals
 ```
 
 Branch naming:
+
 - `feature/<ticket>-<short-description>` for new features
 - `fix/<ticket>-<short-description>` for bug fixes
 - `chore/<description>` for maintenance (deps, config, docs)
@@ -50,6 +52,7 @@ We follow [Conventional Commits](https://www.conventionalcommits.org/):
 **Scopes:** `api`, `web`, `db`, `auth`, `identity`, `channels`, `files`, `infra`, `i18n`
 
 **Examples:**
+
 ```
 feat(identity): add TOTP MFA device registration endpoint
 fix(auth): prevent token reuse after session revocation
@@ -59,9 +62,11 @@ chore(deps): update @nestjs/* to 10.4.0
 
 ## Code Standards
 
-Full standards are documented in [docs/08_Engineering_Standards.md](./docs/08_Engineering_Standards.md).
+Full standards are documented in
+[docs/08_Engineering_Standards.md](./docs/08_Engineering_Standards.md).
 
 **Critical rules:**
+
 - TypeScript strict mode — no `any`, no `@ts-ignore`
 - All functions have explicit return types
 - All DTOs use class-validator decorators
@@ -75,20 +80,22 @@ Full standards are documented in [docs/08_Engineering_Standards.md](./docs/08_En
 
 Every PR must maintain or improve coverage:
 
-| Metric | Minimum |
-|--------|---------|
-| Branches | 80% |
-| Functions | 85% |
-| Lines | 85% |
-| Statements | 85% |
+| Metric     | Minimum |
+| ---------- | ------- |
+| Branches   | 80%     |
+| Functions  | 85%     |
+| Lines      | 85%     |
+| Statements | 85%     |
 
 **Write tests for:**
+
 - All new service methods
 - All RBAC boundaries (permission checks, role weight validation)
 - All authentication flows
 - All error cases and edge conditions
 
 Run tests:
+
 ```bash
 npm run test        # All tests
 npm run test:watch  # Watch mode during development
@@ -111,7 +118,8 @@ npm run test:cov    # With coverage report
 6. Request review from at least one CODEOWNER
 7. Address all review comments before merging
 
-**PRs touching security-sensitive code** (auth, RBAC, MFA, session management) require review from `@govsphere-security` in addition to the engineering team.
+**PRs touching security-sensitive code** (auth, RBAC, MFA, session management) require review from
+`@govsphere-security` in addition to the engineering team.
 
 ## Database Migrations
 
@@ -126,6 +134,7 @@ npx prisma validate
 ```
 
 Rules:
+
 - Never modify existing migration files
 - Migrations must be backward-compatible (additive changes only)
 - If renaming or deleting a column, coordinate with the team first
@@ -135,7 +144,8 @@ Rules:
 
 - Never commit `.env` files or secrets
 - Never disable security checks with `// eslint-disable` without a justification comment
-- If you find a security vulnerability, report it to security@govsphere.gouv.cd — do not open a public issue
+- If you find a security vulnerability, report it to security@govsphere.gouv.cd — do not open a
+  public issue
 - See [SECURITY.md](./SECURITY.md) for the full security policy
 
 ## Getting Help

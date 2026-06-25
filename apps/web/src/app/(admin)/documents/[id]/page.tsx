@@ -2,7 +2,6 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { ClassificationBadge } from "@/components/documents/ClassificationBadge";
@@ -70,7 +69,7 @@ function fmtDate(iso: string) {
 
 export default function DocumentViewPage({ params }: { params: { id: string } }) {
   const { id } = params;
-  const router = useRouter();
+
   const qc = useQueryClient();
   const [tab, setTab] = useState<Tab>("content");
   const [showShare, setShowShare] = useState(false);

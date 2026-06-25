@@ -9,9 +9,12 @@
 
 ## 1. Overview
 
-GovSphere uses **PostgreSQL 17** as its primary relational database, managed through **Prisma 5** as the ORM. The database is designed to be the authoritative source of truth for all government collaboration data.
+GovSphere uses **PostgreSQL 17** as its primary relational database, managed through **Prisma 5** as
+the ORM. The database is designed to be the authoritative source of truth for all government
+collaboration data.
 
 **Core Principles:**
+
 - Files are NEVER stored in the database — only metadata. Files live in MinIO.
 - Soft deletes are mandatory for all user-generated content (audit requirements).
 - Every model has `createdAt` and `updatedAt` timestamps.
@@ -27,44 +30,52 @@ The current Prisma schema (migration `20260624013743_init`) contains 13 models a
 
 ### 2.1 What Is Correct
 
-**Government hierarchy modelling** — The `Ministry → Department → Division → User` chain correctly represents the DRC administrative structure with proper FK relations and indexes.
+**Government hierarchy modelling** — The `Ministry → Department → Division → User` chain correctly
+represents the DRC administrative structure with proper FK relations and indexes.
 
-**RBAC enum** — `UserRole` with 8 levels (SUPER_ADMIN → GUEST) correctly represents the permission hierarchy defined in the product requirements.
+**RBAC enum** — `UserRole` with 8 levels (SUPER_ADMIN → GUEST) correctly represents the permission
+hierarchy defined in the product requirements.
 
-**Matricule support** — `User.matriculeNumber` as an optional unique string correctly handles both government employees (with matricule) and external partners (without matricule).
+**Matricule support** — `User.matriculeNumber` as an optional unique string correctly handles both
+government employees (with matricule) and external partners (without matricule).
 
-**Soft deletes** — `User.deletedAt`, `Message.deletedAt`, `File.deletedAt` are present for the three most critical models.
+**Soft deletes** — `User.deletedAt`, `Message.deletedAt`, `File.deletedAt` are present for the three
+most critical models.
 
-**Audit logging** — `AuditLog` model with 16 action types, IP address, and user agent captures the minimum audit surface.
+**Audit logging** — `AuditLog` model with 16 action types, IP address, and user agent captures the
+minimum audit surface.
 
-**File metadata design** — `File` model stores `storageKey`, `bucketName`, `mimeType`, `size`, `checksum` — never binary content. Correct.
+**File metadata design** — `File` model stores `storageKey`, `bucketName`, `mimeType`, `size`,
+`checksum` — never binary content. Correct.
 
-**Index coverage** — All FK fields have `@@index` declarations. High-frequency query fields are indexed.
+**Index coverage** — All FK fields have `@@index` declarations. High-frequency query fields are
+indexed.
 
 ### 2.2 Issues to Address in Future Migrations
 
-| Issue | Severity | Resolution |
-|---|---|---|
-| Missing `Province` model | High | Add Province between Government and Ministry |
-| Missing `Team` model | High | Add Team between Division and User |
-| `Reaction.userId` is a bare string | Medium | Add User relation for query efficiency |
-| `PinnedMessage.pinnedById` is a bare string | Medium | Add User relation |
-| `Channel.createdById` is a bare string | Medium | Add User relation |
-| No `UserSession` model | High | Add for device/session management |
-| No `UserDevice` model | High | Add for push notification token storage |
-| No `Meeting` model | Low | Add in v1.5 |
-| No `Task` model | Low | Add in v1.5 |
-| Missing `deletedAt` on `Channel` | Medium | Add for soft delete |
-| No `MessageEdit` history table | Medium | Add to track edit history |
-| No `FileVersion` table | Low | Add for document versioning |
-| `AuditLog.userId` is nullable | Low | Consider separate AnonymousAuditLog |
-| No composite unique on `User(email, deletedAt)` | Medium | Required for reuse after soft delete |
+| Issue                                           | Severity | Resolution                                   |
+| ----------------------------------------------- | -------- | -------------------------------------------- |
+| Missing `Province` model                        | High     | Add Province between Government and Ministry |
+| Missing `Team` model                            | High     | Add Team between Division and User           |
+| `Reaction.userId` is a bare string              | Medium   | Add User relation for query efficiency       |
+| `PinnedMessage.pinnedById` is a bare string     | Medium   | Add User relation                            |
+| `Channel.createdById` is a bare string          | Medium   | Add User relation                            |
+| No `UserSession` model                          | High     | Add for device/session management            |
+| No `UserDevice` model                           | High     | Add for push notification token storage      |
+| No `Meeting` model                              | Low      | Add in v1.5                                  |
+| No `Task` model                                 | Low      | Add in v1.5                                  |
+| Missing `deletedAt` on `Channel`                | Medium   | Add for soft delete                          |
+| No `MessageEdit` history table                  | Medium   | Add to track edit history                    |
+| No `FileVersion` table                          | Low      | Add for document versioning                  |
+| `AuditLog.userId` is nullable                   | Low      | Consider separate AnonymousAuditLog          |
+| No composite unique on `User(email, deletedAt)` | Medium   | Required for reuse after soft delete         |
 
 ---
 
 ## 3. Complete Target Database Design
 
-The following represents the full database design that GovSphere will grow into across migrations. **This is a blueprint — not a single migration.**
+The following represents the full database design that GovSphere will grow into across migrations.
+**This is a blueprint — not a single migration.**
 
 ### 3.1 Entity Relationship Overview
 
@@ -497,18 +508,18 @@ enum AiEntityType {
 
 ### 5.1 High-Frequency Query Patterns
 
-| Query | Table | Index |
-|---|---|---|
-| Load channel messages | messages | `(channelId, createdAt DESC)` |
-| Unread count per user/channel | messages | `(channelId, createdAt)` + ChannelMember.lastReadAt |
-| User lookup by email | users | `(email)` |
-| User lookup by matricule | users | `(matriculeNumber)` |
-| Active sessions for user | user_sessions | `(userId, isActive)` |
-| Notifications for user | notifications | `(userId, isRead, createdAt)` |
-| Audit log by user | audit_logs | `(userId, createdAt)` |
-| Audit log by entity | audit_logs | `(entityType, entityId)` |
-| Files in channel | files | `(channelId, createdAt)` |
-| Tasks assigned to user | tasks | `(assignedToId, status)` |
+| Query                         | Table         | Index                                               |
+| ----------------------------- | ------------- | --------------------------------------------------- |
+| Load channel messages         | messages      | `(channelId, createdAt DESC)`                       |
+| Unread count per user/channel | messages      | `(channelId, createdAt)` + ChannelMember.lastReadAt |
+| User lookup by email          | users         | `(email)`                                           |
+| User lookup by matricule      | users         | `(matriculeNumber)`                                 |
+| Active sessions for user      | user_sessions | `(userId, isActive)`                                |
+| Notifications for user        | notifications | `(userId, isRead, createdAt)`                       |
+| Audit log by user             | audit_logs    | `(userId, createdAt)`                               |
+| Audit log by entity           | audit_logs    | `(entityType, entityId)`                            |
+| Files in channel              | files         | `(channelId, createdAt)`                            |
+| Tasks assigned to user        | tasks         | `(assignedToId, status)`                            |
 
 ### 5.2 Full-Text Search (PostgreSQL Native — pre-OpenSearch)
 
@@ -541,31 +552,33 @@ WHERE deleted_at IS NULL;
 
 ## 6. Data Retention Policy
 
-| Data Type | Retention | Action at Expiry |
-|---|---|---|
-| Messages (non-deleted) | Permanent | Never purged |
-| Soft-deleted messages | 7 years | Hard delete (audit requirement) |
-| Files (non-deleted) | Permanent | Never purged |
-| Soft-deleted files | 90 days | Hard delete + MinIO purge |
-| Audit logs | 10 years | Archive to cold storage |
-| Sessions (expired) | 30 days | Hard delete |
-| User data (deleted users) | 7 years | Anonymize PII, retain structure |
-| Notifications (read) | 90 days | Hard delete |
+| Data Type                 | Retention | Action at Expiry                |
+| ------------------------- | --------- | ------------------------------- |
+| Messages (non-deleted)    | Permanent | Never purged                    |
+| Soft-deleted messages     | 7 years   | Hard delete (audit requirement) |
+| Files (non-deleted)       | Permanent | Never purged                    |
+| Soft-deleted files        | 90 days   | Hard delete + MinIO purge       |
+| Audit logs                | 10 years  | Archive to cold storage         |
+| Sessions (expired)        | 30 days   | Hard delete                     |
+| User data (deleted users) | 7 years   | Anonymize PII, retain structure |
+| Notifications (read)      | 90 days   | Hard delete                     |
 
 ---
 
 ## 7. Migration Strategy
 
-| Migration | Contents | When |
-|---|---|---|
-| `init` ✅ | Base 13 models, 8 enums | v0.1 — Done |
-| `add_province_team` | Province, Team models; User.teamId | v0.5 |
-| `add_sessions_devices` | UserSession, UserDevice models | v0.5 |
-| `enhance_messages` | MessageEdit, MessageMention; Channel.deletedAt | v0.5 |
-| `enhance_user_security` | failedLoginCount, lockedUntil, passwordChangedAt | v0.5 |
-| `fix_relations` | Add User relations to Reaction, PinnedMessage, Channel | v0.5 |
-| `add_tasks` | Task model and enums | v1.5 |
-| `add_meetings` | Meeting, MeetingParticipant models | v3.0 |
-| `add_ai` | AiSummary model | v4.0 |
+| Migration               | Contents                                               | When        |
+| ----------------------- | ------------------------------------------------------ | ----------- |
+| `init` ✅               | Base 13 models, 8 enums                                | v0.1 — Done |
+| `add_province_team`     | Province, Team models; User.teamId                     | v0.5        |
+| `add_sessions_devices`  | UserSession, UserDevice models                         | v0.5        |
+| `enhance_messages`      | MessageEdit, MessageMention; Channel.deletedAt         | v0.5        |
+| `enhance_user_security` | failedLoginCount, lockedUntil, passwordChangedAt       | v0.5        |
+| `fix_relations`         | Add User relations to Reaction, PinnedMessage, Channel | v0.5        |
+| `add_tasks`             | Task model and enums                                   | v1.5        |
+| `add_meetings`          | Meeting, MeetingParticipant models                     | v3.0        |
+| `add_ai`                | AiSummary model                                        | v4.0        |
 
-All migrations are additive only. No columns are dropped in production migrations — only new tables and columns are added. Column removal is done via soft deprecation (rename + null + eventual cleanup migration).
+All migrations are additive only. No columns are dropped in production migrations — only new tables
+and columns are added. Column removal is done via soft deprecation (rename + null + eventual cleanup
+migration).

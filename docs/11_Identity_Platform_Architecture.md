@@ -31,9 +31,15 @@
 
 ### Why Identity Is the Foundation
 
-GovSphere is a platform where ministers discuss national policy, department heads share classified circulars, and civil servants collaborate on sensitive government operations. Every feature — messaging, file sharing, channels, meetings — depends on one absolute prerequisite: **we must know who you are, and we must be certain**.
+GovSphere is a platform where ministers discuss national policy, department heads share classified
+circulars, and civil servants collaborate on sensitive government operations. Every feature —
+messaging, file sharing, channels, meetings — depends on one absolute prerequisite: **we must know
+who you are, and we must be certain**.
 
-If the identity platform fails, the entire security model collapses. A message in the wrong person's hands is a data breach. A file downloaded by an unauthorized user is a national security event. A shared account used by two civil servants makes audit trails meaningless and accountability impossible.
+If the identity platform fails, the entire security model collapses. A message in the wrong person's
+hands is a data breach. A file downloaded by an unauthorized user is a national security event. A
+shared account used by two civil servants makes audit trails meaningless and accountability
+impossible.
 
 The Identity Platform is therefore not just a login screen. It is the enforcement point for:
 
@@ -42,15 +48,23 @@ The Identity Platform is therefore not just a login screen. It is the enforcemen
 - **Accountability** — record every action you take
 - **Session integrity** — ensure your credential is valid for the duration of every request
 
-No feature in GovSphere is built until the Identity Platform is in place and hardened. This is a deliberate engineering decision: all other modules — Channels, Messages, Files, Search — are built on top of the identity layer and delegate every access decision to it.
+No feature in GovSphere is built until the Identity Platform is in place and hardened. This is a
+deliberate engineering decision: all other modules — Channels, Messages, Files, Search — are built
+on top of the identity layer and delegate every access decision to it.
 
 ### Design Principles for the Identity Platform
 
-- **No implicit trust.** Every request is authenticated. Expired or missing tokens are always rejected, regardless of the source.
-- **Least privilege by default.** A new user has zero permissions until explicitly granted a role. Roles grant only what is necessary.
-- **Explicit scope.** A Ministry Admin's power extends only to their ministry. A Division Admin's power extends only to their division. Scope violations are blocked at the API layer, not just the UI.
-- **Auditability.** Every identity event — login, logout, role change, password reset — is permanently recorded and cannot be altered or deleted.
-- **Graceful degradation.** If the identity platform has a temporary error, the rest of the platform fails safely: access is denied, not granted.
+- **No implicit trust.** Every request is authenticated. Expired or missing tokens are always
+  rejected, regardless of the source.
+- **Least privilege by default.** A new user has zero permissions until explicitly granted a role.
+  Roles grant only what is necessary.
+- **Explicit scope.** A Ministry Admin's power extends only to their ministry. A Division Admin's
+  power extends only to their division. Scope violations are blocked at the API layer, not just the
+  UI.
+- **Auditability.** Every identity event — login, logout, role change, password reset — is
+  permanently recorded and cannot be altered or deleted.
+- **Graceful degradation.** If the identity platform has a temporary error, the rest of the platform
+  fails safely: access is denied, not granted.
 
 ---
 
@@ -60,9 +74,11 @@ No feature in GovSphere is built until the Identity Platform is in place and har
 
 #### Method 1: Matricule Number + Password
 
-The Matricule Number is the government-issued civil servant identification number for the DRC. It is the primary and preferred authentication method for all government employees.
+The Matricule Number is the government-issued civil servant identification number for the DRC. It is
+the primary and preferred authentication method for all government employees.
 
 **Format rules:**
+
 - Stored as a `String` in the database — never as `Int` or `BigInt`
 - Leading zeros must be preserved
 - Dots (`.`) are part of the format and must be stored as-is
@@ -70,24 +86,27 @@ The Matricule Number is the government-issued civil servant identification numbe
 
 **Accepted matricule formats:**
 
-| Example | Notes |
-|---|---|
-| `1.641.558` | Three-part format, most common |
-| `478.432` | Two-part format |
-| `424.55` | Two-part format, shorter second segment |
+| Example     | Notes                                   |
+| ----------- | --------------------------------------- |
+| `1.641.558` | Three-part format, most common          |
+| `478.432`   | Two-part format                         |
+| `424.55`    | Two-part format, shorter second segment |
 
 **Validation regex:** `^\d{1,4}(\.\d{1,4}){1,2}$`
 
-**Lookup rule:** API performs an exact string match against `User.matricule`. Case does not apply (digits and dots only). Whitespace is trimmed before comparison.
+**Lookup rule:** API performs an exact string match against `User.matricule`. Case does not apply
+(digits and dots only). Whitespace is trimmed before comparison.
 
 #### Method 2: Government Email + Password
 
-All civil servants are issued a `@gouv.cd` email address. This is the secondary authentication method.
+All civil servants are issued a `@gouv.cd` email address. This is the secondary authentication
+method.
 
 **Format:** `[firstname.lastname]@[ministry].gouv.cd`  
 **Example:** `jean.mbeki@finances.gouv.cd`
 
-**Validation:** Standard email format validation. The email domain must end in `.gouv.cd`. External email domains (Gmail, Outlook, Yahoo, etc.) are rejected for this authentication path.
+**Validation:** Standard email format validation. The email domain must end in `.gouv.cd`. External
+email domains (Gmail, Outlook, Yahoo, etc.) are rejected for this authentication path.
 
 **Lookup rule:** API performs a case-insensitive match against `User.email`.
 
@@ -95,50 +114,61 @@ All civil servants are issued a `@gouv.cd` email address. This is the secondary 
 
 #### Method 3: Microsoft SSO (v1.5+)
 
-For civil servants whose ministries use Microsoft 365. Azure AD integration via OAuth 2.0 / OpenID Connect.
+For civil servants whose ministries use Microsoft 365. Azure AD integration via OAuth 2.0 / OpenID
+Connect.
 
 - **Scope:** Government employees only — must match an existing `User` record by email
 - **Trigger:** "Sign in with Microsoft" button on the login screen
-- **Account linking:** On first Microsoft SSO login, the system links the Microsoft account to the existing government user record (matched by `.gouv.cd` email)
+- **Account linking:** On first Microsoft SSO login, the system links the Microsoft account to the
+  existing government user record (matched by `.gouv.cd` email)
 - **Restriction:** Cannot be used to create new accounts — only to authenticate existing ones
 
 #### Method 4: Google Sign-In for External Partners (v1.0+)
 
-For invited external partners (NGO representatives, international partners, consultants) who do not have DRC government credentials.
+For invited external partners (NGO representatives, international partners, consultants) who do not
+have DRC government credentials.
 
 - **Scope:** External partners with GUEST role ONLY
 - **Trigger:** Invitation email containing a one-time acceptance link
 - **Admin approval required:** A Ministry Admin or higher must issue the invitation
-- **Domain restriction:** Any Google-managed email domain is accepted, but the invitation is bound to the specific email address — changing Google accounts after acceptance is not permitted without admin action
-- **Cannot escalate:** External users authenticated via Google can never be promoted above GUEST role
+- **Domain restriction:** Any Google-managed email domain is accepted, but the invitation is bound
+  to the specific email address — changing Google accounts after acceptance is not permitted without
+  admin action
+- **Cannot escalate:** External users authenticated via Google can never be promoted above GUEST
+  role
 
 ### 2.3 Credential Storage Rules
 
-| Credential | Storage | Notes |
-|---|---|---|
-| Password | bcrypt hash, cost factor 12 | Plaintext never stored |
-| Matricule | Plaintext string | Not sensitive — government-issued public ID |
-| Government email | Plaintext string | Normalized to lowercase on save |
-| MFA secret | AES-256-GCM encrypted | Key in environment variable only |
-| OAuth tokens | Not stored | OAuth flow is stateless — only the user identity is persisted |
+| Credential       | Storage                     | Notes                                                         |
+| ---------------- | --------------------------- | ------------------------------------------------------------- |
+| Password         | bcrypt hash, cost factor 12 | Plaintext never stored                                        |
+| Matricule        | Plaintext string            | Not sensitive — government-issued public ID                   |
+| Government email | Plaintext string            | Normalized to lowercase on save                               |
+| MFA secret       | AES-256-GCM encrypted       | Key in environment variable only                              |
+| OAuth tokens     | Not stored                  | OAuth flow is stateless — only the user identity is persisted |
 
 ---
 
 ## 3. User Types
 
-User types describe the **role** a person plays in the government hierarchy. They are not the same as system roles (which control permissions) — they describe the person's real-world title and responsibilities.
+User types describe the **role** a person plays in the government hierarchy. They are not the same
+as system roles (which control permissions) — they describe the person's real-world title and
+responsibilities.
 
-| User Type | Description | Default System Role |
-|---|---|---|
-| **Government Employee** | Standard civil servant. The most common user type. Works in a specific ministry, department, and division. | `EMPLOYEE` |
-| **Minister** | Head of a ministry. Participates in cross-ministry channels and has visibility into their ministry's full communication. | `MINISTRY_ADMIN` |
-| **Director** | Head of a department within a ministry. Manages department-level channels and team assignments. | `DEPARTMENT_ADMIN` |
-| **Department Admin** | IT or administrative manager responsible for onboarding and managing users within a department. Not a director — a technical administrator. | `DEPARTMENT_ADMIN` |
-| **IT Administrator** | System-level administrator. Manages platform configuration, user accounts, and technical infrastructure. Not necessarily in any ministry. | `GOVERNMENT_ADMIN` |
-| **External Partner** | Non-government collaborator (NGO, international organization, consultant). Invited by admin. Read-only access to explicitly shared channels. | `GUEST` |
-| **Guest** | A temporary user — could be a visiting official or a contractor. Same permissions as External Partner. | `GUEST` |
+| User Type               | Description                                                                                                                                  | Default System Role |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- |
+| **Government Employee** | Standard civil servant. The most common user type. Works in a specific ministry, department, and division.                                   | `EMPLOYEE`          |
+| **Minister**            | Head of a ministry. Participates in cross-ministry channels and has visibility into their ministry's full communication.                     | `MINISTRY_ADMIN`    |
+| **Director**            | Head of a department within a ministry. Manages department-level channels and team assignments.                                              | `DEPARTMENT_ADMIN`  |
+| **Department Admin**    | IT or administrative manager responsible for onboarding and managing users within a department. Not a director — a technical administrator.  | `DEPARTMENT_ADMIN`  |
+| **IT Administrator**    | System-level administrator. Manages platform configuration, user accounts, and technical infrastructure. Not necessarily in any ministry.    | `GOVERNMENT_ADMIN`  |
+| **External Partner**    | Non-government collaborator (NGO, international organization, consultant). Invited by admin. Read-only access to explicitly shared channels. | `GUEST`             |
+| **Guest**               | A temporary user — could be a visiting official or a contractor. Same permissions as External Partner.                                       | `GUEST`             |
 
-**Important:** User type is a metadata field (`userType` on the `User` model) that describes the person. System role (stored in the `UserRole` join table) controls what they can actually do. A Minister must still be explicitly assigned `MINISTRY_ADMIN` — the user type alone does not grant permissions.
+**Important:** User type is a metadata field (`userType` on the `User` model) that describes the
+person. System role (stored in the `UserRole` join table) controls what they can actually do. A
+Minister must still be explicitly assigned `MINISTRY_ADMIN` — the user type alone does not grant
+permissions.
 
 ---
 
@@ -146,14 +176,14 @@ User types describe the **role** a person plays in the government hierarchy. The
 
 A user's status determines whether they can log in and use the platform at any given moment.
 
-| Status | Can Log In | Can Use App | Description |
-|---|---|---|---|
-| `PENDING` | ❌ | ❌ | Account created by admin, but user has not completed first login / email verification. |
-| `ACTIVE` | ✅ | ✅ | Normal operating state. Account is fully functional. |
-| `SUSPENDED` | ❌ | ❌ | Temporarily disabled by admin. Common during investigations or disciplinary proceedings. The account and its data are preserved. |
-| `LOCKED` | ❌ | ❌ | Automatically set after exceeding failed login attempts. Resets after lockout duration or admin action. |
-| `DEACTIVATED` | ❌ | ❌ | Civil servant has left the ministry or changed positions. Account is disabled but data is retained for audit purposes. Set by admin. |
-| `ARCHIVED` | ❌ | ❌ | Long-term storage state. Applied after a configurable retention period post-deactivation. User data is retained for legal compliance but the account is fully closed. |
+| Status        | Can Log In | Can Use App | Description                                                                                                                                                           |
+| ------------- | ---------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `PENDING`     | ❌         | ❌          | Account created by admin, but user has not completed first login / email verification.                                                                                |
+| `ACTIVE`      | ✅         | ✅          | Normal operating state. Account is fully functional.                                                                                                                  |
+| `SUSPENDED`   | ❌         | ❌          | Temporarily disabled by admin. Common during investigations or disciplinary proceedings. The account and its data are preserved.                                      |
+| `LOCKED`      | ❌         | ❌          | Automatically set after exceeding failed login attempts. Resets after lockout duration or admin action.                                                               |
+| `DEACTIVATED` | ❌         | ❌          | Civil servant has left the ministry or changed positions. Account is disabled but data is retained for audit purposes. Set by admin.                                  |
+| `ARCHIVED`    | ❌         | ❌          | Long-term storage state. Applied after a configurable retention period post-deactivation. User data is retained for legal compliance but the account is fully closed. |
 
 ### Status Transition Rules
 
@@ -170,6 +200,7 @@ Created by admin → PENDING
 ```
 
 **Transitions that are never permitted:**
+
 - `ARCHIVED` → any other status (archived is permanent)
 - Any status → `PENDING` (PENDING is only the initial state)
 
@@ -179,22 +210,24 @@ Created by admin → PENDING
 
 ### 5.1 Role Definitions
 
-GovSphere uses a hierarchical role system. Higher role weight includes all permissions of lower roles in the same organizational scope, plus additional permissions.
+GovSphere uses a hierarchical role system. Higher role weight includes all permissions of lower
+roles in the same organizational scope, plus additional permissions.
 
-| Role | Weight | Scope | Description |
-|---|---|---|---|
-| `SUPER_ADMIN` | 100 | System-wide | Full access to everything. Reserved for GovSphere platform engineers and the DRC IT authority. Maximum 3 accounts. |
-| `GOVERNMENT_ADMIN` | 90 | Cross-ministry | Can manage all ministries. Assigned to IT administrators and senior government officials. |
-| `MINISTRY_ADMIN` | 70 | Ministry | Full access within their assigned ministry. Can manage departments, divisions, users, and channels within the ministry. |
-| `DEPARTMENT_ADMIN` | 50 | Department | Full access within their assigned department. Can manage divisions and users within the department. |
-| `DIVISION_ADMIN` | 40 | Division | Full access within their assigned division. Can manage teams and users within the division. |
-| `TEAM_MANAGER` | 30 | Team | Can manage their team's channels and members. |
-| `EMPLOYEE` | 10 | Assigned channels | Standard user. Can send messages and upload files in channels they are members of. |
-| `GUEST` | 0 | Invited channels | Read-only access to specific channels they have been invited to. Cannot send messages or upload files. |
+| Role               | Weight | Scope             | Description                                                                                                             |
+| ------------------ | ------ | ----------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `SUPER_ADMIN`      | 100    | System-wide       | Full access to everything. Reserved for GovSphere platform engineers and the DRC IT authority. Maximum 3 accounts.      |
+| `GOVERNMENT_ADMIN` | 90     | Cross-ministry    | Can manage all ministries. Assigned to IT administrators and senior government officials.                               |
+| `MINISTRY_ADMIN`   | 70     | Ministry          | Full access within their assigned ministry. Can manage departments, divisions, users, and channels within the ministry. |
+| `DEPARTMENT_ADMIN` | 50     | Department        | Full access within their assigned department. Can manage divisions and users within the department.                     |
+| `DIVISION_ADMIN`   | 40     | Division          | Full access within their assigned division. Can manage teams and users within the division.                             |
+| `TEAM_MANAGER`     | 30     | Team              | Can manage their team's channels and members.                                                                           |
+| `EMPLOYEE`         | 10     | Assigned channels | Standard user. Can send messages and upload files in channels they are members of.                                      |
+| `GUEST`            | 0      | Invited channels  | Read-only access to specific channels they have been invited to. Cannot send messages or upload files.                  |
 
 ### 5.2 Organizational Scope
 
-Roles are scoped to organizational units. The scope is enforced at the data access layer — not just the UI — for every API request.
+Roles are scoped to organizational units. The scope is enforced at the data access layer — not just
+the UI — for every API request.
 
 ```
 SUPER_ADMIN / GOVERNMENT_ADMIN
@@ -226,7 +259,8 @@ GUEST
 
 ### 5.3 Permission System
 
-Permissions are fine-grained capabilities that can be grouped into roles. The system uses a `Role → RolePermission → Permission` join structure, allowing:
+Permissions are fine-grained capabilities that can be grouped into roles. The system uses a
+`Role → RolePermission → Permission` join structure, allowing:
 
 - Standard role assignments (role comes with a predefined permission set)
 - Custom role creation (for ministries with unique workflows)
@@ -288,47 +322,50 @@ ADMIN permissions:
 ⚠️ = Granted within organizational scope only  
 ❌ = Denied
 
-| Permission | SUPER | GOV | MIN | DEPT | DIV | TEAM | EMP | GUEST |
-|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| **Authentication** | | | | | | | | |
-| AUTH:LOGIN | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| AUTH:SETUP_MFA | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| AUTH:MANAGE_SESSIONS | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **Users** | | | | | | | | |
-| USER:READ_OWN | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| USER:UPDATE_OWN | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
-| USER:READ_MINISTRY | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
-| USER:READ_ALL | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| USER:CREATE | ✅ | ✅ | ⚠️ | ⚠️ | ❌ | ❌ | ❌ | ❌ |
-| USER:UPDATE_ROLE | ✅ | ✅ | ⚠️ | ⚠️ | ❌ | ❌ | ❌ | ❌ |
-| USER:DEACTIVATE | ✅ | ✅ | ⚠️ | ⚠️ | ❌ | ❌ | ❌ | ❌ |
-| USER:UNLOCK | ✅ | ✅ | ⚠️ | ⚠️ | ❌ | ❌ | ❌ | ❌ |
-| **Channels** | | | | | | | | |
-| CHANNEL:READ_MEMBER | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| CHANNEL:SEND_MESSAGE | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
-| CHANNEL:CREATE_PUBLIC | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
-| CHANNEL:CREATE_PRIVATE | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
-| CHANNEL:MANAGE_OWN | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
-| CHANNEL:MANAGE_MINISTRY | ✅ | ✅ | ⚠️ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| CHANNEL:MANAGE_ALL | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| CHANNEL:ARCHIVE | ✅ | ✅ | ⚠️ | ⚠️ | ❌ | ❌ | ❌ | ❌ |
-| CHANNEL:ADD_MEMBER | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
-| **Files** | | | | | | | | |
-| FILE:UPLOAD | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
-| FILE:DOWNLOAD_OWN | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| FILE:DELETE_OWN | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
-| FILE:DELETE_ANY_MINISTRY | ✅ | ✅ | ⚠️ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| FILE:DELETE_ANY | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| **Administration** | | | | | | | | |
-| ADMIN:VIEW_AUDIT_LOGS_MINISTRY | ✅ | ✅ | ⚠️ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| ADMIN:VIEW_AUDIT_LOGS_ALL | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| ADMIN:MANAGE_ROLES | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| ADMIN:INVITE_EXTERNAL | ✅ | ✅ | ⚠️ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| ADMIN:SYSTEM_CONFIG | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Permission                     | SUPER | GOV | MIN | DEPT | DIV | TEAM | EMP | GUEST |
+| ------------------------------ | :---: | :-: | :-: | :--: | :-: | :--: | :-: | :---: |
+| **Authentication**             |       |     |     |      |     |      |     |       |
+| AUTH:LOGIN                     |  ✅   | ✅  | ✅  |  ✅  | ✅  |  ✅  | ✅  |  ✅   |
+| AUTH:SETUP_MFA                 |  ✅   | ✅  | ✅  |  ✅  | ✅  |  ✅  | ✅  |  ✅   |
+| AUTH:MANAGE_SESSIONS           |  ✅   | ✅  | ✅  |  ✅  | ✅  |  ✅  | ✅  |  ✅   |
+| **Users**                      |       |     |     |      |     |      |     |       |
+| USER:READ_OWN                  |  ✅   | ✅  | ✅  |  ✅  | ✅  |  ✅  | ✅  |  ✅   |
+| USER:UPDATE_OWN                |  ✅   | ✅  | ✅  |  ✅  | ✅  |  ✅  | ✅  |  ❌   |
+| USER:READ_MINISTRY             |  ✅   | ✅  | ✅  |  ✅  | ✅  |  ✅  | ✅  |  ❌   |
+| USER:READ_ALL                  |  ✅   | ✅  | ❌  |  ❌  | ❌  |  ❌  | ❌  |  ❌   |
+| USER:CREATE                    |  ✅   | ✅  | ⚠️  |  ⚠️  | ❌  |  ❌  | ❌  |  ❌   |
+| USER:UPDATE_ROLE               |  ✅   | ✅  | ⚠️  |  ⚠️  | ❌  |  ❌  | ❌  |  ❌   |
+| USER:DEACTIVATE                |  ✅   | ✅  | ⚠️  |  ⚠️  | ❌  |  ❌  | ❌  |  ❌   |
+| USER:UNLOCK                    |  ✅   | ✅  | ⚠️  |  ⚠️  | ❌  |  ❌  | ❌  |  ❌   |
+| **Channels**                   |       |     |     |      |     |      |     |       |
+| CHANNEL:READ_MEMBER            |  ✅   | ✅  | ✅  |  ✅  | ✅  |  ✅  | ✅  |  ✅   |
+| CHANNEL:SEND_MESSAGE           |  ✅   | ✅  | ✅  |  ✅  | ✅  |  ✅  | ✅  |  ❌   |
+| CHANNEL:CREATE_PUBLIC          |  ✅   | ✅  | ✅  |  ✅  | ✅  |  ✅  | ❌  |  ❌   |
+| CHANNEL:CREATE_PRIVATE         |  ✅   | ✅  | ✅  |  ✅  | ✅  |  ✅  | ❌  |  ❌   |
+| CHANNEL:MANAGE_OWN             |  ✅   | ✅  | ✅  |  ✅  | ✅  |  ✅  | ✅  |  ❌   |
+| CHANNEL:MANAGE_MINISTRY        |  ✅   | ✅  | ⚠️  |  ❌  | ❌  |  ❌  | ❌  |  ❌   |
+| CHANNEL:MANAGE_ALL             |  ✅   | ✅  | ❌  |  ❌  | ❌  |  ❌  | ❌  |  ❌   |
+| CHANNEL:ARCHIVE                |  ✅   | ✅  | ⚠️  |  ⚠️  | ❌  |  ❌  | ❌  |  ❌   |
+| CHANNEL:ADD_MEMBER             |  ✅   | ✅  | ✅  |  ✅  | ✅  |  ✅  | ❌  |  ❌   |
+| **Files**                      |       |     |     |      |     |      |     |       |
+| FILE:UPLOAD                    |  ✅   | ✅  | ✅  |  ✅  | ✅  |  ✅  | ✅  |  ❌   |
+| FILE:DOWNLOAD_OWN              |  ✅   | ✅  | ✅  |  ✅  | ✅  |  ✅  | ✅  |  ✅   |
+| FILE:DELETE_OWN                |  ✅   | ✅  | ✅  |  ✅  | ✅  |  ✅  | ✅  |  ❌   |
+| FILE:DELETE_ANY_MINISTRY       |  ✅   | ✅  | ⚠️  |  ❌  | ❌  |  ❌  | ❌  |  ❌   |
+| FILE:DELETE_ANY                |  ✅   | ✅  | ❌  |  ❌  | ❌  |  ❌  | ❌  |  ❌   |
+| **Administration**             |       |     |     |      |     |      |     |       |
+| ADMIN:VIEW_AUDIT_LOGS_MINISTRY |  ✅   | ✅  | ⚠️  |  ❌  | ❌  |  ❌  | ❌  |  ❌   |
+| ADMIN:VIEW_AUDIT_LOGS_ALL      |  ✅   | ✅  | ❌  |  ❌  | ❌  |  ❌  | ❌  |  ❌   |
+| ADMIN:MANAGE_ROLES             |  ✅   | ✅  | ❌  |  ❌  | ❌  |  ❌  | ❌  |  ❌   |
+| ADMIN:INVITE_EXTERNAL          |  ✅   | ✅  | ⚠️  |  ❌  | ❌  |  ❌  | ❌  |  ❌   |
+| ADMIN:SYSTEM_CONFIG            |  ✅   | ❌  | ❌  |  ❌  | ❌  |  ❌  | ❌  |  ❌   |
 
 ### Channel-Level Access Control
 
-Beyond role-level permissions, channel membership is a second independent gate. Even if a user has `CHANNEL:READ_MEMBER` permission, they can only read channels they are a member of. Being a MINISTRY_ADMIN grants the ability to join any channel in the ministry — but they are not automatically a member of every channel.
+Beyond role-level permissions, channel membership is a second independent gate. Even if a user has
+`CHANNEL:READ_MEMBER` permission, they can only read channels they are a member of. Being a
+MINISTRY_ADMIN grants the ability to join any channel in the ministry — but they are not
+automatically a member of every channel.
 
 ```
 Access to a channel message requires BOTH:
@@ -369,9 +406,12 @@ Payload:
 }
 ```
 
-**Why RS256:** The private key signs tokens on the API server. Any service can verify tokens using the public key without needing the private key. The private key is never distributed.
+**Why RS256:** The private key signs tokens on the API server. Any service can verify tokens using
+the public key without needing the private key. The private key is never distributed.
 
-**Why memory-only:** localStorage survives browser close and is readable by any JavaScript on the page (XSS vulnerability). Memory storage is cleared when the tab closes, limiting the exposure window.
+**Why memory-only:** localStorage survives browser close and is readable by any JavaScript on the
+page (XSS vulnerability). Memory storage is cleared when the tab closes, limiting the exposure
+window.
 
 #### Refresh Token
 
@@ -394,9 +434,11 @@ Payload:
 }
 ```
 
-**Why HttpOnly:** The `HttpOnly` flag prevents JavaScript from reading the cookie. It can only be sent automatically by the browser to the server. This makes it XSS-immune.
+**Why HttpOnly:** The `HttpOnly` flag prevents JavaScript from reading the cookie. It can only be
+sent automatically by the browser to the server. This makes it XSS-immune.
 
-**Why `Path: /auth/refresh`:** The refresh token cookie is only transmitted when the browser calls `/auth/refresh` — not on every API request. This limits the window where the cookie is in transit.
+**Why `Path: /auth/refresh`:** The refresh token cookie is only transmitted when the browser calls
+`/auth/refresh` — not on every API request. This limits the window where the cookie is in transit.
 
 ### 7.2 Token Rotation
 
@@ -412,7 +454,10 @@ On every call to `POST /auth/refresh`:
 7. Return the new access token in the response body
 ```
 
-**Token family tracking:** Each refresh token carries a `family` identifier (set at login, not rotated). If a refresh token from a family is used after the family has been rotated (indicating token reuse / theft), the entire session is immediately invalidated and the user is forced to re-login.
+**Token family tracking:** Each refresh token carries a `family` identifier (set at login, not
+rotated). If a refresh token from a family is used after the family has been rotated (indicating
+token reuse / theft), the entire session is immediately invalidated and the user is forced to
+re-login.
 
 ### 7.3 Token Blacklist
 
@@ -429,6 +474,7 @@ TTL:   Remaining seconds until token expiry
 ```
 
 Blacklisting events:
+
 - `POST /auth/logout` → blacklist the current access token and refresh token
 - `POST /auth/logout-all` → blacklist all active tokens for all sessions belonging to the user
 - Admin suspends/deactivates account → blacklist all tokens for the user
@@ -465,11 +511,13 @@ Auto-expiry
 ### 7.5 Multi-Device Support
 
 Users can be logged in on multiple devices simultaneously:
+
 - Web browser (Next.js)
 - Desktop app (Tauri)
 - Mobile app (React Native)
 
-Each login creates an independent `UserSession`. Logging out from one device does not affect others unless `POST /auth/logout-all` is called.
+Each login creates an independent `UserSession`. Logging out from one device does not affect others
+unless `POST /auth/logout-all` is called.
 
 ---
 
@@ -487,7 +535,8 @@ Library:    otplib (Node.js)
 QR format:  otpauth://totp/GovSphere:{email}?secret={base32secret}&issuer=GovSphere
 ```
 
-**Compatible apps:** Google Authenticator, Microsoft Authenticator, Authy, 1Password, Aegis (Android)
+**Compatible apps:** Google Authenticator, Microsoft Authenticator, Authy, 1Password, Aegis
+(Android)
 
 **MFA Setup Flow:**
 
@@ -556,22 +605,25 @@ Viewing:   Shown ONCE at MFA setup. Never retrievable afterward.
 
 ### 8.3 MFA Enforcement Policy
 
-| Role | MFA Status |
-|---|---|
-| `SUPER_ADMIN` | **Mandatory** — account cannot be used without MFA |
-| `GOVERNMENT_ADMIN` | **Mandatory** |
-| `MINISTRY_ADMIN` | **Mandatory** |
+| Role               | MFA Status                                                  |
+| ------------------ | ----------------------------------------------------------- |
+| `SUPER_ADMIN`      | **Mandatory** — account cannot be used without MFA          |
+| `GOVERNMENT_ADMIN` | **Mandatory**                                               |
+| `MINISTRY_ADMIN`   | **Mandatory**                                               |
 | `DEPARTMENT_ADMIN` | **Strongly recommended** — enforced by system configuration |
-| `DIVISION_ADMIN` | Optional (default) |
-| `TEAM_MANAGER` | Optional (default) |
-| `EMPLOYEE` | Optional (default) |
-| `GUEST` | Optional (default) |
+| `DIVISION_ADMIN`   | Optional (default)                                          |
+| `TEAM_MANAGER`     | Optional (default)                                          |
+| `EMPLOYEE`         | Optional (default)                                          |
+| `GUEST`            | Optional (default)                                          |
 
-Enforcement is configured via the `SystemConfig` model. When enforcement is active, users with that role are redirected to MFA setup on first login after the policy is activated. They cannot use the platform until MFA is configured.
+Enforcement is configured via the `SystemConfig` model. When enforcement is active, users with that
+role are redirected to MFA setup on first login after the policy is activated. They cannot use the
+platform until MFA is configured.
 
 ### 8.4 Future: FIDO2 / WebAuthn (v1.0+)
 
-Hardware security keys (YubiKey 5) and platform authenticators (Windows Hello, Touch ID, Face ID) will be supported via the WebAuthn API for the highest-risk accounts.
+Hardware security keys (YubiKey 5) and platform authenticators (Windows Hello, Touch ID, Face ID)
+will be supported via the WebAuthn API for the highest-risk accounts.
 
 ```
 Registration:   navigator.credentials.create(publicKeyCredentialCreationOptions)
@@ -579,7 +631,8 @@ Authentication: navigator.credentials.get(publicKeyCredentialRequestOptions)
 Storage:        MfaDevice model stores { credentialId, publicKey, counter, deviceName }
 ```
 
-FIDO2 will be available as an alternative to TOTP, not a replacement. Users may register multiple FIDO2 devices (e.g., a YubiKey and a backup device).
+FIDO2 will be available as an alternative to TOTP, not a replacement. Users may register multiple
+FIDO2 devices (e.g., a YubiKey and a backup device).
 
 ---
 
@@ -587,21 +640,21 @@ FIDO2 will be available as an alternative to TOTP, not a replacement. Users may 
 
 ### 9.1 Requirements
 
-| Rule | Requirement |
-|---|---|
-| Minimum length | 12 characters |
-| Maximum length | 128 characters (prevents DoS via bcrypt on very long passwords) |
-| Uppercase required | At least 1 uppercase letter (A-Z) |
-| Lowercase required | At least 1 lowercase letter (a-z) |
-| Number required | At least 1 digit (0-9) |
-| Special character required | At least 1 special character (`!@#$%^&*()-_=+[]{}|;:',.<>?`) |
-| Common password rejection | Checked against a list of 100,000 most common passwords |
-| Breach check | Optional: k-anonymity check via HaveIBeenPwned API (first 5 chars of SHA-1 hash only) |
-| History | Cannot reuse the last 10 passwords (hashes stored in `PasswordHistory` table) |
-| Hashing algorithm | bcrypt with cost factor 12 |
-| Expiry — privileged roles | 90 days (`SUPER_ADMIN`, `GOVERNMENT_ADMIN`, `MINISTRY_ADMIN`) |
-| Expiry — standard roles | 180 days |
-| Expiry enforcement | User is redirected to password change screen. Cannot access platform until changed. |
+| Rule                       | Requirement                                                                           |
+| -------------------------- | ------------------------------------------------------------------------------------- | ---------- |
+| Minimum length             | 12 characters                                                                         |
+| Maximum length             | 128 characters (prevents DoS via bcrypt on very long passwords)                       |
+| Uppercase required         | At least 1 uppercase letter (A-Z)                                                     |
+| Lowercase required         | At least 1 lowercase letter (a-z)                                                     |
+| Number required            | At least 1 digit (0-9)                                                                |
+| Special character required | At least 1 special character (`!@#$%^&\*()-\_=+[]{}                                   | ;:',.<>?`) |
+| Common password rejection  | Checked against a list of 100,000 most common passwords                               |
+| Breach check               | Optional: k-anonymity check via HaveIBeenPwned API (first 5 chars of SHA-1 hash only) |
+| History                    | Cannot reuse the last 10 passwords (hashes stored in `PasswordHistory` table)         |
+| Hashing algorithm          | bcrypt with cost factor 12                                                            |
+| Expiry — privileged roles  | 90 days (`SUPER_ADMIN`, `GOVERNMENT_ADMIN`, `MINISTRY_ADMIN`)                         |
+| Expiry — standard roles    | 180 days                                                                              |
+| Expiry enforcement         | User is redirected to password change screen. Cannot access platform until changed.   |
 
 ### 9.2 Password Reset Flow
 
@@ -643,15 +696,17 @@ FIDO2 will be available as an alternative to TOTP, not a replacement. Users may 
 
 ### 9.3 Account Lockout
 
-| Trigger | Action |
-|---|---|
-| 5 consecutive failed login attempts | Account `status` set to `LOCKED`. `lockedUntil` set to `now() + 30 minutes`. |
+| Trigger                              | Action                                                                                      |
+| ------------------------------------ | ------------------------------------------------------------------------------------------- |
+| 5 consecutive failed login attempts  | Account `status` set to `LOCKED`. `lockedUntil` set to `now() + 30 minutes`.                |
 | 10 consecutive failed login attempts | Account `status` set to `LOCKED`. `lockedUntil` set to null (manual admin unlock required). |
-| Successful login | `failedLoginCount` reset to 0. |
-| Admin unlock | `status` set to `ACTIVE`, `lockedUntil` cleared, `failedLoginCount` reset to 0. |
-| Lockout expiry | On next login attempt, API checks `lockedUntil < now()` — if passed, unlocks automatically. |
+| Successful login                     | `failedLoginCount` reset to 0.                                                              |
+| Admin unlock                         | `status` set to `ACTIVE`, `lockedUntil` cleared, `failedLoginCount` reset to 0.             |
+| Lockout expiry                       | On next login attempt, API checks `lockedUntil < now()` — if passed, unlocks automatically. |
 
-**Response on locked account:** HTTP 401 with `{ error: "ACCOUNT_LOCKED", lockedUntil: ISO_TIMESTAMP }`. The lockout duration is disclosed (not the reason for lockout) to allow legitimate users to know when to try again.
+**Response on locked account:** HTTP 401 with
+`{ error: "ACCOUNT_LOCKED", lockedUntil: ISO_TIMESTAMP }`. The lockout duration is disclosed (not
+the reason for lockout) to allow legitimate users to know when to try again.
 
 ---
 
@@ -663,76 +718,77 @@ Every audit log entry has:
 
 ```typescript
 {
-  id:           string    // CUID
-  userId:       string    // Who performed the action (null for system events)
-  action:       string    // Event type (enum)
-  entityType:   string    // What was affected (e.g., "USER", "CHANNEL", "FILE")
-  entityId:     string    // ID of the affected entity
-  metadata:     JSON      // Event-specific context (see per-event schema below)
-  ipAddress:    string    // Request IP (from X-Forwarded-For via NGINX)
-  userAgent:    string    // Browser/client identifier
-  createdAt:    DateTime  // Immutable timestamp
+  id: string; // CUID
+  userId: string; // Who performed the action (null for system events)
+  action: string; // Event type (enum)
+  entityType: string; // What was affected (e.g., "USER", "CHANNEL", "FILE")
+  entityId: string; // ID of the affected entity
+  metadata: JSON; // Event-specific context (see per-event schema below)
+  ipAddress: string; // Request IP (from X-Forwarded-For via NGINX)
+  userAgent: string; // Browser/client identifier
+  createdAt: DateTime; // Immutable timestamp
 }
 ```
 
-**Immutability guarantee:** The database user has only `INSERT` and `SELECT` on `audit_logs`. `UPDATE` and `DELETE` are never granted to the application user.
+**Immutability guarantee:** The database user has only `INSERT` and `SELECT` on `audit_logs`.
+`UPDATE` and `DELETE` are never granted to the application user.
 
 ### 10.2 Authentication Events
 
-| Event | Trigger | Metadata |
-|---|---|---|
-| `LOGIN_SUCCESS` | Successful login | `{ method: "matricule" \| "email" \| "oauth", mfaUsed: boolean, sessionId }` |
-| `LOGIN_FAILED` | Failed credential attempt | `{ credential: "matricule" \| "email", reason: "INVALID_PASSWORD" \| "USER_NOT_FOUND" \| "ACCOUNT_LOCKED" \| "ACCOUNT_SUSPENDED", attemptCount: number }` |
-| `LOGOUT` | User-initiated logout | `{ sessionId, sessionDuration_minutes: number }` |
-| `LOGOUT_ALL` | User logged out all devices | `{ sessionCount: number }` |
-| `TOKEN_REFRESH` | Successful token rotation | `{ sessionId }` |
-| `TOKEN_INVALID` | Token validation failed | `{ reason: "EXPIRED" \| "BLACKLISTED" \| "INVALID_SIGNATURE" }` |
+| Event           | Trigger                     | Metadata                                                                                                                                                  |
+| --------------- | --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `LOGIN_SUCCESS` | Successful login            | `{ method: "matricule" \| "email" \| "oauth", mfaUsed: boolean, sessionId }`                                                                              |
+| `LOGIN_FAILED`  | Failed credential attempt   | `{ credential: "matricule" \| "email", reason: "INVALID_PASSWORD" \| "USER_NOT_FOUND" \| "ACCOUNT_LOCKED" \| "ACCOUNT_SUSPENDED", attemptCount: number }` |
+| `LOGOUT`        | User-initiated logout       | `{ sessionId, sessionDuration_minutes: number }`                                                                                                          |
+| `LOGOUT_ALL`    | User logged out all devices | `{ sessionCount: number }`                                                                                                                                |
+| `TOKEN_REFRESH` | Successful token rotation   | `{ sessionId }`                                                                                                                                           |
+| `TOKEN_INVALID` | Token validation failed     | `{ reason: "EXPIRED" \| "BLACKLISTED" \| "INVALID_SIGNATURE" }`                                                                                           |
 
 ### 10.3 MFA Events
 
-| Event | Trigger | Metadata |
-|---|---|---|
-| `MFA_ENABLED` | User enables TOTP MFA | `{ method: "TOTP" }` |
-| `MFA_DISABLED` | User disables MFA | `{ method: "TOTP", disabledBy: userId }` |
-| `MFA_CHALLENGE_SUCCESS` | MFA code verified | `{ method: "TOTP" \| "BACKUP_CODE" }` |
-| `MFA_CHALLENGE_FAILED` | Invalid MFA code | `{ method: "TOTP" \| "BACKUP_CODE", attemptCount: number }` |
-| `MFA_BACKUP_CODE_USED` | Backup code consumed | `{ codesRemaining: number }` |
+| Event                   | Trigger               | Metadata                                                    |
+| ----------------------- | --------------------- | ----------------------------------------------------------- |
+| `MFA_ENABLED`           | User enables TOTP MFA | `{ method: "TOTP" }`                                        |
+| `MFA_DISABLED`          | User disables MFA     | `{ method: "TOTP", disabledBy: userId }`                    |
+| `MFA_CHALLENGE_SUCCESS` | MFA code verified     | `{ method: "TOTP" \| "BACKUP_CODE" }`                       |
+| `MFA_CHALLENGE_FAILED`  | Invalid MFA code      | `{ method: "TOTP" \| "BACKUP_CODE", attemptCount: number }` |
+| `MFA_BACKUP_CODE_USED`  | Backup code consumed  | `{ codesRemaining: number }`                                |
 
 ### 10.4 Password Events
 
-| Event | Trigger | Metadata |
-|---|---|---|
-| `PASSWORD_CHANGED` | User changes own password | `{ changedBy: "self" }` |
-| `PASSWORD_CHANGED_BY_ADMIN` | Admin resets user's password | `{ changedBy: adminUserId }` |
-| `PASSWORD_RESET_REQUESTED` | Forgot password flow initiated | `{ credential: "email" }` |
-| `PASSWORD_RESET` | Password reset completed | `{}` |
-| `PASSWORD_EXPIRED` | Password expiry enforcement triggered | `{ daysSinceLastChange: number }` |
+| Event                       | Trigger                               | Metadata                          |
+| --------------------------- | ------------------------------------- | --------------------------------- |
+| `PASSWORD_CHANGED`          | User changes own password             | `{ changedBy: "self" }`           |
+| `PASSWORD_CHANGED_BY_ADMIN` | Admin resets user's password          | `{ changedBy: adminUserId }`      |
+| `PASSWORD_RESET_REQUESTED`  | Forgot password flow initiated        | `{ credential: "email" }`         |
+| `PASSWORD_RESET`            | Password reset completed              | `{}`                              |
+| `PASSWORD_EXPIRED`          | Password expiry enforcement triggered | `{ daysSinceLastChange: number }` |
 
 ### 10.5 User Management Events
 
-| Event | Trigger | Metadata |
-|---|---|---|
-| `USER_CREATED` | New user created | `{ createdBy: adminUserId, userType, initialRole }` |
-| `USER_UPDATED` | Profile or settings changed | `{ fields: string[], changedBy: userId }` |
-| `USER_DEACTIVATED` | Account deactivated | `{ deactivatedBy: adminUserId, reason?: string }` |
-| `USER_SUSPENDED` | Account suspended | `{ suspendedBy: adminUserId, reason?: string }` |
-| `USER_REACTIVATED` | Account restored | `{ reactivatedBy: adminUserId }` |
-| `USER_UNLOCKED` | Locked account unlocked | `{ unlockedBy: adminUserId \| "system_auto" }` |
-| `ACCOUNT_LOCKED` | Automatic lockout triggered | `{ attemptCount: number, lockedUntil?: ISO_TIMESTAMP }` |
+| Event              | Trigger                     | Metadata                                                |
+| ------------------ | --------------------------- | ------------------------------------------------------- |
+| `USER_CREATED`     | New user created            | `{ createdBy: adminUserId, userType, initialRole }`     |
+| `USER_UPDATED`     | Profile or settings changed | `{ fields: string[], changedBy: userId }`               |
+| `USER_DEACTIVATED` | Account deactivated         | `{ deactivatedBy: adminUserId, reason?: string }`       |
+| `USER_SUSPENDED`   | Account suspended           | `{ suspendedBy: adminUserId, reason?: string }`         |
+| `USER_REACTIVATED` | Account restored            | `{ reactivatedBy: adminUserId }`                        |
+| `USER_UNLOCKED`    | Locked account unlocked     | `{ unlockedBy: adminUserId \| "system_auto" }`          |
+| `ACCOUNT_LOCKED`   | Automatic lockout triggered | `{ attemptCount: number, lockedUntil?: ISO_TIMESTAMP }` |
 
 ### 10.6 Role & Permission Events
 
-| Event | Trigger | Metadata |
-|---|---|---|
-| `ROLE_ASSIGNED` | Role given to a user | `{ assignedBy: adminUserId, role, scope: { ministryId?, departmentId? } }` |
-| `ROLE_REMOVED` | Role revoked from a user | `{ removedBy: adminUserId, role }` |
-| `PERMISSION_CHANGED` | Role permission modified | `{ changedBy: adminUserId, permission, action: "GRANTED" \| "REVOKED" }` |
+| Event                | Trigger                  | Metadata                                                                   |
+| -------------------- | ------------------------ | -------------------------------------------------------------------------- |
+| `ROLE_ASSIGNED`      | Role given to a user     | `{ assignedBy: adminUserId, role, scope: { ministryId?, departmentId? } }` |
+| `ROLE_REMOVED`       | Role revoked from a user | `{ removedBy: adminUserId, role }`                                         |
+| `PERMISSION_CHANGED` | Role permission modified | `{ changedBy: adminUserId, permission, action: "GRANTED" \| "REVOKED" }`   |
 
 ### 10.7 Session Events
 
-| Event | Trigger | Metadata |
-|---|---|---|
-| `SESSION_CREATED` | New session on login | `{ sessionId, device, platform }` |
+| Event             | Trigger                            | Metadata                                          |
+| ----------------- | ---------------------------------- | ------------------------------------------------- |
+| `SESSION_CREATED` | New session on login               | `{ sessionId, device, platform }`                 |
 | `SESSION_REVOKED` | Session revoked (by user or admin) | `{ sessionId, revokedBy: userId \| adminUserId }` |
 
 ---
@@ -741,10 +797,14 @@ Every audit log entry has:
 
 ### 11.1 Review of Current Schema (v1 Migration)
 
-The current Prisma schema (`packages/database/prisma/schema.prisma`) contains 13 models covering the core communication features. The `User` model has foundational identity fields. However, the identity platform requires additional models and fields that are not yet present.
+The current Prisma schema (`packages/database/prisma/schema.prisma`) contains 13 models covering the
+core communication features. The `User` model has foundational identity fields. However, the
+identity platform requires additional models and fields that are not yet present.
 
 **What the current schema has (correct):**
-- `User` model with `matricule`, `email`, `passwordHash`, `role` (enum), `status` (enum), `mfaEnabled`, `mfaSecret`, `failedLoginCount`, `lockedUntil`
+
+- `User` model with `matricule`, `email`, `passwordHash`, `role` (enum), `status` (enum),
+  `mfaEnabled`, `mfaSecret`, `failedLoginCount`, `lockedUntil`
 - `UserRole` enum with all 8 roles
 - `UserStatus` enum with `ACTIVE`, `PENDING`, `SUSPENDED`, `DEACTIVATED`, `LOCKED`
 - Basic `AuditLog` model
@@ -755,7 +815,8 @@ The current Prisma schema (`packages/database/prisma/schema.prisma`) contains 13
 
 #### Model: `Role` (Custom role definitions)
 
-The current schema uses a `UserRole` enum which is suitable for standard roles. However, to support custom ministry-specific roles in the future, a `Role` table is needed.
+The current schema uses a `UserRole` enum which is suitable for standard roles. However, to support
+custom ministry-specific roles in the future, a `Role` table is needed.
 
 ```prisma
 model Role {
@@ -810,7 +871,8 @@ model RolePermission {
 
 #### Model: `UserRole` (Join: User → Role, with scope)
 
-The current schema has `role UserRole` as a simple enum on the `User` model. This must be replaced with a join table to support scoped roles and multiple roles per user.
+The current schema has `role UserRole` as a simple enum on the `User` model. This must be replaced
+with a join table to support scoped roles and multiple roles per user.
 
 ```prisma
 model UserRole {
@@ -1026,7 +1088,8 @@ enum UserStatus {
 
 ## 12. API Design
 
-All endpoints use the base path `/v1`. All requests require `Authorization: Bearer {accessToken}` except the public auth endpoints marked `[PUBLIC]`.
+All endpoints use the base path `/v1`. All requests require `Authorization: Bearer {accessToken}`
+except the public auth endpoints marked `[PUBLIC]`.
 
 ### 12.1 Authentication Endpoints
 
@@ -1336,19 +1399,24 @@ Response 200:
 
 ### Risk 1: Stolen Access Token
 
-**Threat:** An attacker intercepts or extracts a valid access token and uses it to impersonate the user.
+**Threat:** An attacker intercepts or extracts a valid access token and uses it to impersonate the
+user.
 
 **Mitigations:**
+
 - Access token TTL is 15 minutes — short enough to limit damage
 - Token is stored in memory only — cannot be extracted by XSS
 - JTI (token ID) in Redis blacklist enables immediate revocation
-- Anomaly detection: if a token is used from a different IP than the one that created the session, flag for review
+- Anomaly detection: if a token is used from a different IP than the one that created the session,
+  flag for review
 
 ### Risk 2: Stolen Refresh Token
 
-**Threat:** An attacker extracts the refresh token from the cookie and uses it to generate unlimited access tokens.
+**Threat:** An attacker extracts the refresh token from the cookie and uses it to generate unlimited
+access tokens.
 
 **Mitigations:**
+
 - HttpOnly + Secure + SameSite=Strict cookie prevents XSS and CSRF access
 - Token family tracking: reuse of an already-rotated token triggers immediate session termination
 - Refresh tokens can be revoked via "Logout all devices"
@@ -1359,6 +1427,7 @@ Response 200:
 **Threat:** Users choose easily guessable passwords. An attacker guesses or brute-forces them.
 
 **Mitigations:**
+
 - 12-character minimum with complexity requirements
 - Common password blocklist (100,000 entries)
 - HaveIBeenPwned breach check
@@ -1368,31 +1437,40 @@ Response 200:
 
 ### Risk 4: Shared Accounts
 
-**Threat:** Two civil servants share one account, destroying accountability and audit trail integrity.
+**Threat:** Two civil servants share one account, destroying accountability and audit trail
+integrity.
 
 **Mitigations:**
+
 - Matricule is unique per civil servant by government assignment — the system enforces uniqueness
-- Audit logs capture IP, user agent, and session ID per action — anomalous concurrent access is detectable
+- Audit logs capture IP, user agent, and session ID per action — anomalous concurrent access is
+  detectable
 - Device tracking flags when an account is used from a new, unrecognized device
 - Account sharing is a disciplinary matter covered in the platform's Terms of Use
-- MFA enforcement for privileged roles — sharing the account means sharing the TOTP device, which is impractical
+- MFA enforcement for privileged roles — sharing the account means sharing the TOTP device, which is
+  impractical
 
 ### Risk 5: Privilege Escalation
 
-**Threat:** A user assigns themselves or another user a higher role than authorized. Or exploits a bug to bypass scope restrictions.
+**Threat:** A user assigns themselves or another user a higher role than authorized. Or exploits a
+bug to bypass scope restrictions.
 
 **Mitigations:**
+
 - `USER:UPDATE_ROLE` permission is required to assign roles
-- Scope restriction: a MINISTRY_ADMIN can only assign roles up to `DEPARTMENT_ADMIN` within their ministry (cannot create MINISTRY_ADMIN or higher)
+- Scope restriction: a MINISTRY_ADMIN can only assign roles up to `DEPARTMENT_ADMIN` within their
+  ministry (cannot create MINISTRY_ADMIN or higher)
 - All role assignments are audit-logged with the granting admin's ID
 - RBAC checks are enforced at the API service layer — not only the controller
 - Unit tests cover all RBAC boundary conditions
 
 ### Risk 6: Unauthorized File Access
 
-**Threat:** A user constructs a direct URL to a file in MinIO and downloads it without authorization.
+**Threat:** A user constructs a direct URL to a file in MinIO and downloads it without
+authorization.
 
 **Mitigations:**
+
 - MinIO files are not publicly accessible — bucket policies deny all public read
 - Every download requires a pre-signed URL generated by the API
 - The API verifies the requesting user's channel membership before generating the URL
@@ -1404,6 +1482,7 @@ Response 200:
 **Threat:** An automated attacker submits thousands of login attempts against a user's account.
 
 **Mitigations:**
+
 - Account lockout after 5 failures
 - IP-level rate limiting (100 requests/minute per IP on all `/auth/*` endpoints)
 - Global rate limiting on the login endpoint (BullMQ rate limiter)
@@ -1411,9 +1490,11 @@ Response 200:
 
 ### Risk 8: Insider Threat
 
-**Threat:** A civil servant with legitimate access misuses it — exfiltrates data, reads unauthorized channels, covers tracks.
+**Threat:** A civil servant with legitimate access misuses it — exfiltrates data, reads unauthorized
+channels, covers tracks.
 
 **Mitigations:**
+
 - Audit logs are immutable — the application user cannot DELETE or UPDATE audit records
 - Audit log access requires `ADMIN:VIEW_AUDIT_LOGS_MINISTRY` or higher
 - Audit logs exported to WORM storage for long-term retention
@@ -1423,9 +1504,11 @@ Response 200:
 
 ### Risk 9: Session Fixation
 
-**Threat:** An attacker sets a known session token before login, then after the user logs in, uses the pre-set token.
+**Threat:** An attacker sets a known session token before login, then after the user logs in, uses
+the pre-set token.
 
 **Mitigation:**
+
 - A new session ID is always generated on successful login
 - There is no mechanism to pre-set or predict session IDs (CUIDs are cryptographically random)
 
@@ -1434,6 +1517,7 @@ Response 200:
 **Threat:** An attacker sends a JWT with `alg: "none"` or switches from RS256 to HS256.
 
 **Mitigation:**
+
 - The API uses `jsonwebtoken` with `algorithms: ["RS256"]` explicitly specified
 - Any token with a different algorithm is rejected at validation time
 
@@ -1441,19 +1525,22 @@ Response 200:
 
 ## 14. Implementation Plan
 
-The Identity Platform is implemented in the following sequence. Each task must be completed and reviewed before the next begins.
+The Identity Platform is implemented in the following sequence. Each task must be completed and
+reviewed before the next begins.
 
 ### Task 1: Prisma Schema Update
 
 **Goal:** Add all new identity models to the schema and create the migration.
 
 **Scope:**
+
 - Add `Role`, `Permission`, `RolePermission` models
 - Add `UserRole` join table (replace enum field on User)
 - Add `UserSession`, `UserDevice`, `LoginHistory` models
 - Add `PasswordResetToken`, `PasswordHistory` models
 - Add `MfaDevice`, `MfaBackupCode` models
-- Add `userType`, `firstName`, `lastName`, `displayName`, `lockedUntil`, `passwordChangedAt`, `lastLoginAt` to User
+- Add `userType`, `firstName`, `lastName`, `displayName`, `lockedUntil`, `passwordChangedAt`,
+  `lastLoginAt` to User
 - Add `UserType` enum
 - Verify `UserStatus` has all 6 statuses
 - Run `prisma migrate dev --name add_identity_platform`
@@ -1466,9 +1553,11 @@ The Identity Platform is implemented in the following sequence. Each task must b
 **Goal:** Implement the authentication service and routes.
 
 **Scope:**
+
 - `apps/api/src/auth/auth.module.ts`
 - `apps/api/src/auth/auth.service.ts` — login, refresh, logout, token generation
-- `apps/api/src/auth/auth.controller.ts` — POST /auth/login, /auth/refresh, /auth/logout, /auth/logout-all
+- `apps/api/src/auth/auth.controller.ts` — POST /auth/login, /auth/refresh, /auth/logout,
+  /auth/logout-all
 - `apps/api/src/auth/strategies/jwt.strategy.ts` — validates access tokens
 - `apps/api/src/auth/guards/jwt-auth.guard.ts`
 - `apps/api/src/auth/guards/roles.guard.ts`
@@ -1483,9 +1572,12 @@ The Identity Platform is implemented in the following sequence. Each task must b
 **Goal:** User CRUD for administrators.
 
 **Scope:**
+
 - `apps/api/src/users/users.module.ts`
-- `apps/api/src/users/users.service.ts` — findById, create, updateStatus, list with pagination and filters
-- `apps/api/src/users/users.controller.ts` — GET /users, POST /users, PATCH /users/:id/status, GET /auth/me
+- `apps/api/src/users/users.service.ts` — findById, create, updateStatus, list with pagination and
+  filters
+- `apps/api/src/users/users.controller.ts` — GET /users, POST /users, PATCH /users/:id/status, GET
+  /auth/me
 - DTOs: `create-user.dto.ts`, `update-user-status.dto.ts`
 - Response transformers: strip passwordHash, mfaSecret from all responses
 - Unit tests: users.service.spec.ts
@@ -1497,6 +1589,7 @@ The Identity Platform is implemented in the following sequence. Each task must b
 **Goal:** Manage roles and assign them to users with scope.
 
 **Scope:**
+
 - `apps/api/src/roles/roles.module.ts`
 - `apps/api/src/roles/roles.service.ts` — findAll, create, assignToUser, revokeFromUser
 - `apps/api/src/roles/roles.controller.ts` — GET /roles, POST /roles, POST /users/:id/roles
@@ -1510,6 +1603,7 @@ The Identity Platform is implemented in the following sequence. Each task must b
 **Goal:** Register permissions and attach them to roles.
 
 **Scope:**
+
 - `apps/api/src/permissions/permissions.module.ts`
 - `apps/api/src/permissions/permissions.service.ts` — resolvePermissionsForUser(userId)
 - Permission seeder: insert all permissions defined in Section 5.3
@@ -1523,9 +1617,11 @@ The Identity Platform is implemented in the following sequence. Each task must b
 **Goal:** Device-aware session tracking and revocation.
 
 **Scope:**
+
 - `apps/api/src/sessions/sessions.module.ts`
 - `apps/api/src/sessions/sessions.service.ts` — create, list, revoke, revokeAll, cleanup
-- `apps/api/src/sessions/sessions.controller.ts` — GET /sessions, DELETE /sessions/:id, DELETE /sessions (all)
+- `apps/api/src/sessions/sessions.controller.ts` — GET /sessions, DELETE /sessions/:id, DELETE
+  /sessions (all)
 - Redis integration for token blacklisting
 - Scheduled job: invalidate sessions with `lastUsedAt > 30 days`
 - Unit tests
@@ -1537,8 +1633,11 @@ The Identity Platform is implemented in the following sequence. Each task must b
 **Goal:** TOTP MFA with backup codes.
 
 **Scope:**
-- `apps/api/src/auth/mfa/mfa.service.ts` — generateSecret, verifySetup, verifyCode, generateBackupCodes, verifyBackupCode
-- `apps/api/src/auth/mfa/mfa.controller.ts` — POST /auth/mfa/setup, /auth/mfa/verify-setup, /auth/mfa/verify
+
+- `apps/api/src/auth/mfa/mfa.service.ts` — generateSecret, verifySetup, verifyCode,
+  generateBackupCodes, verifyBackupCode
+- `apps/api/src/auth/mfa/mfa.controller.ts` — POST /auth/mfa/setup, /auth/mfa/verify-setup,
+  /auth/mfa/verify
 - MFA enforcement guard: checks mfaEnabled for roles that require it
 - MFA challenge token logic (short-lived JWT, 5-minute TTL)
 - Encryption of TOTP secret with AES-256-GCM
@@ -1551,6 +1650,7 @@ The Identity Platform is implemented in the following sequence. Each task must b
 **Goal:** Immutable, comprehensive audit trail for all identity events.
 
 **Scope:**
+
 - `apps/api/src/audit/audit.service.ts` — log(event) method, async BullMQ queue
 - BullMQ queue: audit-log-queue (write to DB asynchronously to avoid blocking request)
 - `apps/api/src/audit/audit.controller.ts` — GET /audit-logs (with filters, pagination)
@@ -1564,6 +1664,7 @@ The Identity Platform is implemented in the following sequence. Each task must b
 **Goal:** Login, MFA verification, password reset, and first-login password change screens.
 
 **Scope:**
+
 - `apps/web/src/app/(auth)/login/page.tsx` — Matricule or email + password form
 - `apps/web/src/app/(auth)/mfa/page.tsx` — TOTP code input + backup code option
 - `apps/web/src/app/(auth)/forgot-password/page.tsx` — Credential input
@@ -1579,10 +1680,13 @@ The Identity Platform is implemented in the following sequence. Each task must b
 **Goal:** Admin panel screens for managing users, roles, and viewing audit logs.
 
 **Scope:**
+
 - `apps/web/src/app/(dashboard)/admin/users/page.tsx` — Paginated user list with filters
-- `apps/web/src/app/(dashboard)/admin/users/[id]/page.tsx` — User detail: status, roles, sessions, audit history
+- `apps/web/src/app/(dashboard)/admin/users/[id]/page.tsx` — User detail: status, roles, sessions,
+  audit history
 - `apps/web/src/app/(dashboard)/admin/users/new/page.tsx` — Create user form
-- `apps/web/src/app/(dashboard)/admin/audit/page.tsx` — Audit log viewer with date range + event type filters
-- Role-based route protection: redirect non-admins away from /admin/*
+- `apps/web/src/app/(dashboard)/admin/audit/page.tsx` — Audit log viewer with date range + event
+  type filters
+- Role-based route protection: redirect non-admins away from /admin/\*
 
 **Output:** Administrators can manage the full user lifecycle from the web interface.

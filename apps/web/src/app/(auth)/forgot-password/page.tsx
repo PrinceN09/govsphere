@@ -6,12 +6,12 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import type { AxiosError } from "axios";
-
 import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { apiClient } from "@/lib/api";
+
+import type { AxiosError } from "axios";
 
 const schema = z.object({
   credential: z.string().min(1, "Identifiant requis"),

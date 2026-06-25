@@ -8,7 +8,9 @@
 
 ## Overview
 
-GovSphere is built in four major phases across seven version milestones. Each milestone has a clear objective and gates the start of the next. No milestone begins until the prior milestone is stable, tested, and reviewed.
+GovSphere is built in four major phases across seven version milestones. Each milestone has a clear
+objective and gates the start of the next. No milestone begins until the prior milestone is stable,
+tested, and reviewed.
 
 ```
 Phase 1 — Foundation       v0.1  Infrastructure, Auth, Database
@@ -24,7 +26,8 @@ Phase 4 — Intelligence     v3.0  Video, Voice, Calendar
 
 ## v0.1 — Foundation
 
-**Objective:** A running, tested, deployable skeleton. No features yet — only the engineering backbone.
+**Objective:** A running, tested, deployable skeleton. No features yet — only the engineering
+backbone.
 
 **Milestone Gate:** All quality gates pass. Team can deploy to staging with one command.
 
@@ -56,7 +59,8 @@ Phase 4 — Intelligence     v3.0  Video, Voice, Calendar
 
 ## v0.5 — Core Platform
 
-**Objective:** A working government messaging platform. Civil servants can log in, join channels, and send messages.
+**Objective:** A working government messaging platform. Civil servants can log in, join channels,
+and send messages.
 
 **Milestone Gate:** End-to-end user journey tested by internal team. Zero P1 bugs.
 
@@ -133,9 +137,11 @@ Phase 4 — Intelligence     v3.0  Video, Voice, Calendar
 
 ## v1.0 — MVP (Production-Ready)
 
-**Objective:** GovSphere is ready for real government users. The platform is secure, stable, performant, and internationalized.
+**Objective:** GovSphere is ready for real government users. The platform is secure, stable,
+performant, and internationalized.
 
-**Milestone Gate:** Third-party security audit passed. 99.9% uptime maintained for 30 days in staging.
+**Milestone Gate:** Third-party security audit passed. 99.9% uptime maintained for 30 days in
+staging.
 
 ### Localization
 
@@ -196,9 +202,11 @@ Phase 4 — Intelligence     v3.0  Video, Voice, Calendar
 
 ## v1.5 — Desktop Application (Tauri)
 
-**Objective:** A native desktop experience for Windows and macOS that feels native, loads instantly, and works partially offline.
+**Objective:** A native desktop experience for Windows and macOS that feels native, loads instantly,
+and works partially offline.
 
-**Milestone Gate:** Desktop app passes all v1.0 feature tests. Installable packages distributed to pilot government offices.
+**Milestone Gate:** Desktop app passes all v1.0 feature tests. Installable packages distributed to
+pilot government offices.
 
 ### Desktop
 
@@ -222,9 +230,11 @@ Phase 4 — Intelligence     v3.0  Video, Voice, Calendar
 
 ## v2.0 — Mobile Application (iOS & Android)
 
-**Objective:** A full-featured mobile app for civil servants who need government communication on the go.
+**Objective:** A full-featured mobile app for civil servants who need government communication on
+the go.
 
-**Milestone Gate:** App approved in government-managed App Store / Play Store distribution. 200 pilot users onboarded.
+**Milestone Gate:** App approved in government-managed App Store / Play Store distribution. 200
+pilot users onboarded.
 
 ### Mobile
 
@@ -249,7 +259,8 @@ Phase 4 — Intelligence     v3.0  Video, Voice, Calendar
 
 ## v3.0 — Video, Voice & Calendar
 
-**Objective:** GovSphere becomes the complete government communication platform. Replaces Zoom, Skype, and Calendly for internal use.
+**Objective:** GovSphere becomes the complete government communication platform. Replaces Zoom,
+Skype, and Calendly for internal use.
 
 **Milestone Gate:** 1,000+ concurrent video meeting participants tested successfully.
 
@@ -345,12 +356,12 @@ _Scope defined as part of v1.5 and v2.0. Listed separately for planning visibili
 
 ## Version Summary
 
-| Version | Focus | Status |
-|---|---|---|
-| v0.1 | Foundation — Infrastructure & CI/CD | 🔄 In Progress |
-| v0.5 | Core Platform — Auth, Messaging, Files | 📋 Planned |
-| v1.0 | MVP — Production Ready, Localized, Accessible | 📋 Planned |
-| v1.5 | Tauri Desktop | 📋 Planned |
-| v2.0 | React Native Mobile (iOS + Android) | 📋 Planned |
-| v3.0 | Video, Voice, Calendar | 📋 Planned |
-| v4.0 | AI, Workflows, Digital Signatures | 📋 Planned |
+| Version | Focus                                         | Status         |
+| ------- | --------------------------------------------- | -------------- |
+| v0.1    | Foundation — Infrastructure & CI/CD           | 🔄 In Progress |
+| v0.5    | Core Platform — Auth, Messaging, Files        | 📋 Planned     |
+| v1.0    | MVP — Production Ready, Localized, Accessible | 📋 Planned     |
+| v1.5    | Tauri Desktop                                 | 📋 Planned     |
+| v2.0    | React Native Mobile (iOS + Android)           | 📋 Planned     |
+| v3.0    | Video, Voice, Calendar                        | 📋 Planned     |
+| v4.0    | AI, Workflows, Digital Signatures             | 📋 Planned     |

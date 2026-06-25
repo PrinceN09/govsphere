@@ -49,9 +49,9 @@ export const applicationConfig = registerAs(
     },
     i18n: {
       defaultLanguage: (process.env["DEFAULT_LANGUAGE"] as SupportedLanguage) ?? "fr",
-      supportedLanguages: (
-        (process.env["SUPPORTED_LANGUAGES"] ?? "fr,en,ln,sw,lua").split(",") as SupportedLanguage[]
-      ),
+      supportedLanguages: (process.env["SUPPORTED_LANGUAGES"] ?? "fr,en,ln,sw,lua").split(
+        ",",
+      ) as SupportedLanguage[],
       defaultTimezone: process.env["DEFAULT_TIMEZONE"] ?? "Africa/Kinshasa",
       defaultCountryCode: process.env["DEFAULT_COUNTRY_CODE"] ?? "CD",
     },

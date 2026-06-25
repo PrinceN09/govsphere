@@ -10,9 +10,12 @@
 
 DevOps at GovSphere follows three principles:
 
-- **Reproducible environments** — Development, staging, and production are identical. "Works on my machine" is never an acceptable answer.
-- **Automate everything** — No manual steps in the path from code to production. Every deployment is triggered by a Git push, not a human SSH session.
-- **Fail fast** — Problems are caught in CI before they reach staging. Staging problems are caught before they reach production.
+- **Reproducible environments** — Development, staging, and production are identical. "Works on my
+  machine" is never an acceptable answer.
+- **Automate everything** — No manual steps in the path from code to production. Every deployment is
+  triggered by a Git push, not a human SSH session.
+- **Fail fast** — Problems are caught in CI before they reach staging. Staging problems are caught
+  before they reach production.
 
 ---
 
@@ -80,8 +83,8 @@ services:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
     ports:
-      - "9000:9000"   # S3 API
-      - "9001:9001"   # MinIO Console
+      - "9000:9000" # S3 API
+      - "9001:9001" # MinIO Console
     volumes:
       - minio_data:/data
 
@@ -116,6 +119,7 @@ npm run dev   # Turborepo runs all apps in parallel
 ```
 
 After this, the developer has:
+
 - Web: `http://localhost:3000`
 - API: `http://localhost:4000`
 - MinIO Console: `http://localhost:9001`
@@ -457,19 +461,21 @@ server {
 
 ### Rule: No Secrets in Code or CI Logs
 
-Secrets are never committed to the repository, never printed to logs, and never passed as plain environment variables in container definitions.
+Secrets are never committed to the repository, never printed to logs, and never passed as plain
+environment variables in container definitions.
 
 ### Secret Storage by Environment
 
-| Environment | Secrets Store |
-|---|---|
-| Local development | `.env` file (gitignored) |
-| CI/CD | GitHub Actions Secrets (encrypted) |
-| Staging / Production | AWS Secrets Manager |
+| Environment          | Secrets Store                      |
+| -------------------- | ---------------------------------- |
+| Local development    | `.env` file (gitignored)           |
+| CI/CD                | GitHub Actions Secrets (encrypted) |
+| Staging / Production | AWS Secrets Manager                |
 
 ### AWS Secrets Manager Integration
 
-At container startup, the ECS task definition retricts secrets from AWS Secrets Manager via IAM role — no secrets appear in plaintext in ECS console or CloudWatch logs.
+At container startup, the ECS task definition retricts secrets from AWS Secrets Manager via IAM role
+— no secrets appear in plaintext in ECS console or CloudWatch logs.
 
 ```json
 {
@@ -488,13 +494,13 @@ At container startup, the ECS task definition retricts secrets from AWS Secrets 
 
 ### Secret Rotation Policy
 
-| Secret | Rotation Frequency |
-|---|---|
-| Database password | 90 days |
-| JWT private/public key pair | 180 days |
-| MinIO access keys | 90 days |
-| Redis password | 90 days |
-| SMTP credentials | 180 days |
+| Secret                      | Rotation Frequency |
+| --------------------------- | ------------------ |
+| Database password           | 90 days            |
+| JWT private/public key pair | 180 days           |
+| MinIO access keys           | 90 days            |
+| Redis password              | 90 days            |
+| SMTP credentials            | 180 days           |
 
 ---
 
@@ -502,7 +508,8 @@ At container startup, the ECS task definition retricts secrets from AWS Secrets 
 
 ### Metrics (Prometheus + Grafana)
 
-The NestJS API exposes a `/metrics` endpoint in Prometheus format via `@willsoto/nestjs-prometheus`. Metrics include:
+The NestJS API exposes a `/metrics` endpoint in Prometheus format via `@willsoto/nestjs-prometheus`.
+Metrics include:
 
 - HTTP request rate, latency (p50, p90, p99), error rate
 - Active WebSocket connections
@@ -511,6 +518,7 @@ The NestJS API exposes a `/metrics` endpoint in Prometheus format via `@willsoto
 - Memory usage, CPU usage
 
 Grafana dashboards are pre-configured for:
+
 - API health overview
 - Authentication events (login success/failure rate)
 - Message throughput (messages/second)
@@ -519,7 +527,8 @@ Grafana dashboards are pre-configured for:
 
 ### Logging (Loki + Grafana)
 
-All application logs go to stdout/stderr in JSON format. ECS Fargate ships them to CloudWatch Logs → Grafana Loki.
+All application logs go to stdout/stderr in JSON format. ECS Fargate ships them to CloudWatch Logs →
+Grafana Loki.
 
 ```typescript
 // Logging format — every log line is structured JSON
@@ -537,6 +546,7 @@ All application logs go to stdout/stderr in JSON format. ECS Fargate ships them 
 ```
 
 **Log Levels:**
+
 - `error` — actionable failures (bug, infrastructure outage)
 - `warn` — degraded behavior (rate limit hit, retry needed)
 - `info` — significant business events (login, message sent, file uploaded)
@@ -546,14 +556,14 @@ All application logs go to stdout/stderr in JSON format. ECS Fargate ships them 
 
 Alerts are triggered via Grafana Alerting → PagerDuty:
 
-| Alert | Threshold | Severity |
-|---|---|---|
-| API error rate | > 1% for 5 minutes | P1 |
-| API p99 latency | > 2 seconds for 5 minutes | P2 |
-| Database connection pool exhausted | 90% full for 2 minutes | P1 |
-| BullMQ queue depth | > 10,000 jobs for 10 minutes | P2 |
-| Disk usage | > 80% | P2 |
-| Failed login spike | > 100/minute | P2 (security alert) |
+| Alert                              | Threshold                    | Severity            |
+| ---------------------------------- | ---------------------------- | ------------------- |
+| API error rate                     | > 1% for 5 minutes           | P1                  |
+| API p99 latency                    | > 2 seconds for 5 minutes    | P2                  |
+| Database connection pool exhausted | 90% full for 2 minutes       | P1                  |
+| BullMQ queue depth                 | > 10,000 jobs for 10 minutes | P2                  |
+| Disk usage                         | > 80%                        | P2                  |
+| Failed login spike                 | > 100/minute                 | P2 (security alert) |
 
 ---
 
@@ -561,19 +571,19 @@ Alerts are triggered via Grafana Alerting → PagerDuty:
 
 ### Backup Strategy
 
-| Data | Method | Frequency | Retention |
-|---|---|---|---|
-| PostgreSQL | RDS automated snapshot | Daily | 30 days |
-| PostgreSQL | pg_dump + S3 encryption | Hourly (WAL streaming) | 7 days |
-| MinIO / S3 files | S3 cross-region replication | Continuous | 365 days |
-| Redis | RDB snapshot to S3 | Every 6 hours | 7 days |
+| Data             | Method                      | Frequency              | Retention |
+| ---------------- | --------------------------- | ---------------------- | --------- |
+| PostgreSQL       | RDS automated snapshot      | Daily                  | 30 days   |
+| PostgreSQL       | pg_dump + S3 encryption     | Hourly (WAL streaming) | 7 days    |
+| MinIO / S3 files | S3 cross-region replication | Continuous             | 365 days  |
+| Redis            | RDB snapshot to S3          | Every 6 hours          | 7 days    |
 
 ### Recovery Targets
 
-| Metric | Target |
-|---|---|
-| RTO (Recovery Time Objective) | 4 hours (time to restore service) |
-| RPO (Recovery Point Objective) | 1 hour (maximum data loss) |
+| Metric                         | Target                            |
+| ------------------------------ | --------------------------------- |
+| RTO (Recovery Time Objective)  | 4 hours (time to restore service) |
+| RPO (Recovery Point Objective) | 1 hour (maximum data loss)        |
 
 ### Disaster Recovery Runbook
 
@@ -608,7 +618,8 @@ Scenario 3: Security breach
 
 ## 10. Future: Kubernetes Migration
 
-The initial production deployment uses ECS Fargate for simplicity. When traffic and team size justify the complexity, GovSphere will migrate to Kubernetes (EKS):
+The initial production deployment uses ECS Fargate for simplicity. When traffic and team size
+justify the complexity, GovSphere will migrate to Kubernetes (EKS):
 
 ```
 ECS Fargate (v0.x - v1.x)
@@ -623,4 +634,5 @@ Kubernetes/EKS (v2.0+)
   → Helm charts for environment management
 ```
 
-The Dockerfile standards and container architecture defined in this document are designed to be compatible with Kubernetes from day one — no refactoring will be needed at migration time.
+The Dockerfile standards and container architecture defined in this document are designed to be
+compatible with Kubernetes from day one — no refactoring will be needed at migration time.

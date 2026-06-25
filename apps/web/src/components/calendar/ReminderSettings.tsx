@@ -3,10 +3,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 
-import type { EventReminder } from "@/lib/calendar-types";
-
 import { cn } from "@/components/ui/cn";
 import { apiPost, apiDelete } from "@/lib/api";
+
+import type { EventReminder } from "@/lib/calendar-types";
 
 interface Props {
   eventId: string;

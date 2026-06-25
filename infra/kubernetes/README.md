@@ -3,6 +3,7 @@
 Kubernetes manifests for production deployment.
 
 ## Planned Structure
+
 ```
 kubernetes/
 ├── namespaces/

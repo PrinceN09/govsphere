@@ -3,12 +3,12 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { cn } from "@/components/ui/cn";
+
 import { PresenceBadge } from "./PresenceBadge";
 import { UnreadBadge } from "./UnreadBadge";
 
 import type { PresenceStatus } from "./PresenceBadge";
-
-import { cn } from "@/components/ui/cn";
 
 export interface ConversationItem {
   id: string;
@@ -53,7 +53,6 @@ function ItemAvatar({
   return (
     <div className="relative flex-shrink-0">
       {url ? (
-        // eslint-disable-next-line @next/next/no-img-element
         <img src={url} alt={name} className="h-9 w-9 rounded-full object-cover" />
       ) : (
         <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary-100 text-sm font-bold text-primary-700">

@@ -4,13 +4,12 @@ import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useState } from "react";
 
-import type { DocumentSummary } from "@/components/documents/DocumentCard";
-
-import { ClassificationBadge } from "@/components/documents/ClassificationBadge";
 import { DocumentCard } from "@/components/documents/DocumentCard";
 import { AdminTopBar } from "@/components/layout/AdminTopBar";
 import { PageSpinner } from "@/components/ui/Spinner";
 import { apiGet } from "@/lib/api";
+
+import type { DocumentSummary } from "@/components/documents/DocumentCard";
 
 type DocStatus = "DRAFT" | "REVIEW" | "APPROVED" | "PUBLISHED" | "ARCHIVED";
 type DocType =

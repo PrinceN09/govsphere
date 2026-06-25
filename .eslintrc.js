@@ -88,11 +88,7 @@ module.exports = {
       // defined in each package's tsconfig.json paths field.
       typescript: {
         alwaysTryTypes: true,
-        project: [
-          "./tsconfig.json",
-          "./apps/*/tsconfig.json",
-          "./packages/*/tsconfig.json",
-        ],
+        project: ["./tsconfig.json", "./apps/*/tsconfig.json", "./packages/*/tsconfig.json"],
       },
     },
   },

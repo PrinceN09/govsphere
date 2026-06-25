@@ -8,7 +8,8 @@
 
 - [ ] Bug fix (non-breaking change that fixes an issue)
 - [ ] New feature (non-breaking change that adds functionality)
-- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
+- [ ] Breaking change (fix or feature that would cause existing functionality to not work as
+      expected)
 - [ ] Refactor (code quality improvement, no behavior change)
 - [ ] Documentation update
 - [ ] Infrastructure / DevOps change
@@ -68,6 +69,7 @@ Closes #<!-- issue number -->
 ---
 
 By submitting this PR, I confirm that:
+
 - I have read and followed the [Engineering Standards](../docs/08_Engineering_Standards.md)
 - My code follows the existing style and patterns
 - I have added/updated documentation where needed

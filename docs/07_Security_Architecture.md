@@ -9,10 +9,14 @@
 
 ## 1. Security Philosophy
 
-GovSphere protects **state secrets**. The threat model is not an individual hacker — it is nation-state actors, corporate espionage, insider threats, and the systemic risk of government communication being exposed. The security architecture is designed accordingly:
+GovSphere protects **state secrets**. The threat model is not an individual hacker — it is
+nation-state actors, corporate espionage, insider threats, and the systemic risk of government
+communication being exposed. The security architecture is designed accordingly:
 
-- **Zero Trust** — no implicit trust based on network location. Every request is authenticated and authorized.
-- **Defense in Depth** — multiple independent security layers. Compromise of one layer does not compromise the system.
+- **Zero Trust** — no implicit trust based on network location. Every request is authenticated and
+  authorized.
+- **Defense in Depth** — multiple independent security layers. Compromise of one layer does not
+  compromise the system.
 - **Least Privilege** — every user, service, and process has the minimum permissions required.
 - **Audit Everything** — every action that changes state is recorded immutably.
 - **Fail Secure** — when in doubt, deny. Errors default to access denied, not access granted.
@@ -25,13 +29,15 @@ GovSphere protects **state secrets**. The threat model is not an individual hack
 
 GovSphere supports three authentication paths:
 
-| Path | Users | Method |
-|---|---|---|
-| Matricule + Password | All civil servants | Internal |
-| Government Email + Password | All civil servants | Internal |
-| Google / Microsoft OAuth | External partners only | Invitation-only, admin-approved |
+| Path                        | Users                  | Method                          |
+| --------------------------- | ---------------------- | ------------------------------- |
+| Matricule + Password        | All civil servants     | Internal                        |
+| Government Email + Password | All civil servants     | Internal                        |
+| Google / Microsoft OAuth    | External partners only | Invitation-only, admin-approved |
 
-**External OAuth Rule:** External provider login is never available by default. An administrator must explicitly invite an external user, approve their access, and assign them the GUEST role. External users cannot escalate beyond GUEST without admin action.
+**External OAuth Rule:** External provider login is never available by default. An administrator
+must explicitly invite an external user, approve their access, and assign them the GUEST role.
+External users cannot escalate beyond GUEST without admin action.
 
 ### 2.2 Login Flow
 
@@ -52,26 +58,26 @@ GovSphere supports three authentication paths:
 
 ### 2.3 Account Lockout Policy
 
-| Event | Action |
-|---|---|
-| 5 consecutive failed login attempts | Lock account for 30 minutes |
-| 10 consecutive failed login attempts | Lock account until admin unlock |
-| Lockout expires | `lockedUntil` passes, failedLoginCount resets |
-| Successful login | `failedLoginCount` resets to 0 |
-| Admin unlock | `lockedUntil` cleared, `failedLoginCount` reset |
+| Event                                | Action                                          |
+| ------------------------------------ | ----------------------------------------------- |
+| 5 consecutive failed login attempts  | Lock account for 30 minutes                     |
+| 10 consecutive failed login attempts | Lock account until admin unlock                 |
+| Lockout expires                      | `lockedUntil` passes, failedLoginCount resets   |
+| Successful login                     | `failedLoginCount` resets to 0                  |
+| Admin unlock                         | `lockedUntil` cleared, `failedLoginCount` reset |
 
 ### 2.4 Password Policy
 
-| Rule | Requirement |
-|---|---|
-| Minimum length | 12 characters |
-| Maximum length | 128 characters |
-| Complexity | At least 1 uppercase, 1 lowercase, 1 number, 1 special character |
-| Common password check | Rejected against list of 100,000 common passwords |
-| Breach check | Optional: HaveIBeenPwned API (k-anonymity model — password never sent) |
-| History | Cannot reuse last 10 passwords |
-| Expiry | 90 days for privileged roles (SUPER_ADMIN, GOVERNMENT_ADMIN, MINISTRY_ADMIN) |
-| Hashing | bcrypt with cost factor 12 (upgrade to Argon2id in v1.0) |
+| Rule                  | Requirement                                                                  |
+| --------------------- | ---------------------------------------------------------------------------- |
+| Minimum length        | 12 characters                                                                |
+| Maximum length        | 128 characters                                                               |
+| Complexity            | At least 1 uppercase, 1 lowercase, 1 number, 1 special character             |
+| Common password check | Rejected against list of 100,000 common passwords                            |
+| Breach check          | Optional: HaveIBeenPwned API (k-anonymity model — password never sent)       |
+| History               | Cannot reuse last 10 passwords                                               |
+| Expiry                | 90 days for privileged roles (SUPER_ADMIN, GOVERNMENT_ADMIN, MINISTRY_ADMIN) |
+| Hashing               | bcrypt with cost factor 12 (upgrade to Argon2id in v1.0)                     |
 
 ### 2.5 Password Reset Flow
 
@@ -109,9 +115,13 @@ Payload:
 }
 ```
 
-**Why RS256:** Asymmetric signing allows the frontend and any future microservice to verify tokens using only the public key — without access to the private key. The private key never leaves the API server.
+**Why RS256:** Asymmetric signing allows the frontend and any future microservice to verify tokens
+using only the public key — without access to the private key. The private key never leaves the API
+server.
 
-**Why memory-only storage:** localStorage is accessible to any JavaScript on the page (XSS risk). Cookies require careful SameSite/HttpOnly configuration. Memory storage is cleared on tab close, limiting token lifetime exposure.
+**Why memory-only storage:** localStorage is accessible to any JavaScript on the page (XSS risk).
+Cookies require careful SameSite/HttpOnly configuration. Memory storage is cleared on tab close,
+limiting token lifetime exposure.
 
 ### 3.2 Refresh Token (JWT — RS256)
 
@@ -131,13 +141,17 @@ Payload:
 }
 ```
 
-**Why HttpOnly cookie:** HttpOnly cookies cannot be accessed by JavaScript (XSS-proof). `SameSite=Strict` prevents CSRF attacks. `Secure` ensures HTTPS-only transmission.
+**Why HttpOnly cookie:** HttpOnly cookies cannot be accessed by JavaScript (XSS-proof).
+`SameSite=Strict` prevents CSRF attacks. `Secure` ensures HTTPS-only transmission.
 
-**Why rotation:** If a refresh token is stolen, the attacker can only use it once before it is invalidated. The legitimate user's next refresh will fail (token already rotated), alerting them to potential compromise.
+**Why rotation:** If a refresh token is stolen, the attacker can only use it once before it is
+invalidated. The legitimate user's next refresh will fail (token already rotated), alerting them to
+potential compromise.
 
 ### 3.3 Token Blacklist
 
-Access tokens cannot be invalidated before expiry (stateless by design). To enable immediate revocation (logout, session termination, account suspension):
+Access tokens cannot be invalidated before expiry (stateless by design). To enable immediate
+revocation (logout, session termination, account suspension):
 
 ```
 Redis key: blacklist:{jti}
@@ -150,7 +164,8 @@ On every authenticated request:
   → If not exists: proceed
 ```
 
-The Redis blacklist adds ~1ms to every authenticated request — acceptable for a security-critical system.
+The Redis blacklist adds ~1ms to every authenticated request — acceptable for a security-critical
+system.
 
 ---
 
@@ -168,6 +183,7 @@ Library:     otplib (Node.js)
 ```
 
 **Setup Flow:**
+
 ```
 1. User initiates MFA setup (POST /v1/auth/mfa/setup)
 2. API generates 160-bit random secret
@@ -181,7 +197,9 @@ Library:     otplib (Node.js)
 10. Write AUDIT LOG: MFA_ENABLED event
 ```
 
-**MFA Secret Storage:** The TOTP secret is encrypted at rest using AES-256-GCM with a key derived from the server's `MFA_ENCRYPTION_KEY` environment variable. The encryption key must never be stored in the database.
+**MFA Secret Storage:** The TOTP secret is encrypted at rest using AES-256-GCM with a key derived
+from the server's `MFA_ENCRYPTION_KEY` environment variable. The encryption key must never be stored
+in the database.
 
 ### 4.2 Backup Codes
 
@@ -193,7 +211,8 @@ Library:     otplib (Node.js)
 
 ### 4.3 Future: FIDO2 / WebAuthn (v1.0)
 
-Hardware security keys (YubiKey) and platform authenticators (Windows Hello, Touch ID) will be supported via the WebAuthn API for the highest-security accounts.
+Hardware security keys (YubiKey) and platform authenticators (Windows Hello, Touch ID) will be
+supported via the WebAuthn API for the highest-security accounts.
 
 ---
 
@@ -221,24 +240,25 @@ GUEST              (0)    — Read-only access to invited channels
 
 ### 5.2 Permission Matrix
 
-| Action | SUPER | GOV | MIN | DEPT | DIV | TEAM | EMP | GUEST |
-|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| Manage users (system) | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Manage users (ministry) | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Create channels | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
-| Send messages | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
-| Upload files | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
-| Delete any message | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
-| Delete own message | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
-| View audit logs (ministry) | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| View audit logs (system) | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Invite external partners | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Archive channels | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
-| Read channel (member) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Action                     | SUPER | GOV | MIN | DEPT | DIV | TEAM | EMP | GUEST |
+| -------------------------- | :---: | :-: | :-: | :--: | :-: | :--: | :-: | :---: |
+| Manage users (system)      |  ✅   | ✅  | ❌  |  ❌  | ❌  |  ❌  | ❌  |  ❌   |
+| Manage users (ministry)    |  ✅   | ✅  | ✅  |  ❌  | ❌  |  ❌  | ❌  |  ❌   |
+| Create channels            |  ✅   | ✅  | ✅  |  ✅  | ✅  |  ✅  | ❌  |  ❌   |
+| Send messages              |  ✅   | ✅  | ✅  |  ✅  | ✅  |  ✅  | ✅  |  ❌   |
+| Upload files               |  ✅   | ✅  | ✅  |  ✅  | ✅  |  ✅  | ✅  |  ❌   |
+| Delete any message         |  ✅   | ✅  | ✅  |  ✅  | ❌  |  ❌  | ❌  |  ❌   |
+| Delete own message         |  ✅   | ✅  | ✅  |  ✅  | ✅  |  ✅  | ✅  |  ❌   |
+| View audit logs (ministry) |  ✅   | ✅  | ✅  |  ❌  | ❌  |  ❌  | ❌  |  ❌   |
+| View audit logs (system)   |  ✅   | ✅  | ❌  |  ❌  | ❌  |  ❌  | ❌  |  ❌   |
+| Invite external partners   |  ✅   | ✅  | ✅  |  ❌  | ❌  |  ❌  | ❌  |  ❌   |
+| Archive channels           |  ✅   | ✅  | ✅  |  ✅  | ❌  |  ❌  | ❌  |  ❌   |
+| Read channel (member)      |  ✅   | ✅  | ✅  |  ✅  | ✅  |  ✅  | ✅  |  ✅   |
 
 ### 5.3 Resource Scoping
 
-Access is scoped by organizational unit. A `MINISTRY_ADMIN` for the Ministry of Finance cannot access the Ministry of Defense's channels even though they share the same role level.
+Access is scoped by organizational unit. A `MINISTRY_ADMIN` for the Ministry of Finance cannot
+access the Ministry of Defense's channels even though they share the same role level.
 
 ```typescript
 // Scoping rules applied on every data access:
@@ -293,7 +313,9 @@ Admin revoke → Set session.isActive = false
 
 ### 6.2 Multi-Device Sessions
 
-Users can have simultaneous active sessions across Web, Desktop, and Mobile. Each session is independent. Logging out from one device does not affect others unless "Logout all devices" is explicitly triggered.
+Users can have simultaneous active sessions across Web, Desktop, and Mobile. Each session is
+independent. Logging out from one device does not affect others unless "Logout all devices" is
+explicitly triggered.
 
 Users can view and revoke individual sessions from their security settings page:
 
@@ -321,24 +343,24 @@ Active Sessions:
 
 ### 7.2 Data at Rest
 
-| Data | Encryption | Key Management |
-|---|---|---|
-| PostgreSQL | AES-256 (disk-level via OS/cloud) | Server key |
-| MinIO files | AES-256 server-side encryption | Per-bucket key |
-| Redis | Memory encryption (Redis Enterprise) or OS disk encryption | Server key |
-| MFA secrets | AES-256-GCM at application level | `MFA_ENCRYPTION_KEY` env var |
-| JWT private key | Stored only in env var / secrets manager | Never in DB |
-| Backup files | AES-256 encrypted before transmission | Separate backup key |
+| Data            | Encryption                                                 | Key Management               |
+| --------------- | ---------------------------------------------------------- | ---------------------------- |
+| PostgreSQL      | AES-256 (disk-level via OS/cloud)                          | Server key                   |
+| MinIO files     | AES-256 server-side encryption                             | Per-bucket key               |
+| Redis           | Memory encryption (Redis Enterprise) or OS disk encryption | Server key                   |
+| MFA secrets     | AES-256-GCM at application level                           | `MFA_ENCRYPTION_KEY` env var |
+| JWT private key | Stored only in env var / secrets manager                   | Never in DB                  |
+| Backup files    | AES-256 encrypted before transmission                      | Separate backup key          |
 
 ### 7.3 Sensitive Field Handling
 
-| Field | Treatment |
-|---|---|
-| `User.passwordHash` | bcrypt hash — never returned in API response |
-| `User.mfaSecret` | AES-256-GCM encrypted — never returned in API response |
-| `User.mfaBackupCodes` | bcrypt hashed array — one-time display only, then hash-only |
-| `UserSession.refreshToken` | Hashed before DB storage (full token only in cookie) |
-| JWT private key | Environment variable only, never in codebase or DB |
+| Field                      | Treatment                                                   |
+| -------------------------- | ----------------------------------------------------------- |
+| `User.passwordHash`        | bcrypt hash — never returned in API response                |
+| `User.mfaSecret`           | AES-256-GCM encrypted — never returned in API response      |
+| `User.mfaBackupCodes`      | bcrypt hashed array — one-time display only, then hash-only |
+| `UserSession.refreshToken` | Hashed before DB storage (full token only in cookie)        |
+| JWT private key            | Environment variable only, never in codebase or DB          |
 
 ---
 
@@ -386,9 +408,11 @@ server_tokens off;
 
 ### 9.1 Audit Events
 
-Every audit log entry includes: `userId`, `action`, `entityType`, `entityId`, `metadata`, `ipAddress`, `userAgent`, `createdAt`.
+Every audit log entry includes: `userId`, `action`, `entityType`, `entityId`, `metadata`,
+`ipAddress`, `userAgent`, `createdAt`.
 
 **Authentication Events:**
+
 - `LOGIN` — successful login
 - `LOGIN_FAILED` — failed login attempt
 - `LOGOUT` — user logged out
@@ -398,27 +422,34 @@ Every audit log entry includes: `userId`, `action`, `entityType`, `entityId`, `m
 - `SESSION_REVOKED`
 
 **User Management Events:**
+
 - `USER_CREATED` / `USER_UPDATED` / `USER_DEACTIVATED`
 - `ROLE_CHANGED` — role reassignment
 
 **Content Events:**
+
 - `MESSAGE_SENT` / `MESSAGE_EDITED` / `MESSAGE_DELETED`
 - `FILE_UPLOADED` / `FILE_DOWNLOADED` / `FILE_DELETED`
 - `CHANNEL_CREATED` / `CHANNEL_ARCHIVED`
 
 **Administrative Events:**
+
 - `ADMIN_ACTION` — bulk operations, system settings changes
 - `INVITATION_SENT` — external partner invited
 
 ### 9.2 Immutability
 
-Audit logs are **write-once, append-only**. No API endpoint or admin interface provides the ability to modify or delete audit log entries. The PostgreSQL user used by the application is granted only `INSERT` and `SELECT` on the `audit_logs` table — `UPDATE` and `DELETE` are never granted.
+Audit logs are **write-once, append-only**. No API endpoint or admin interface provides the ability
+to modify or delete audit log entries. The PostgreSQL user used by the application is granted only
+`INSERT` and `SELECT` on the `audit_logs` table — `UPDATE` and `DELETE` are never granted.
 
-For long-term immutability, audit logs older than 30 days should be exported to WORM (Write Once Read Many) storage.
+For long-term immutability, audit logs older than 30 days should be exported to WORM (Write Once
+Read Many) storage.
 
 ### 9.3 Sensitive Data in Audit Logs
 
 Audit logs NEVER contain:
+
 - Passwords or password hashes
 - JWT tokens
 - MFA secrets
@@ -473,7 +504,8 @@ Archives:  zip, rar, 7z, tar, gz (scanned before access)
 
 ### 11.1 DRC Data Protection
 
-GovSphere is designed to comply with future DRC data protection legislation and to meet the requirements of any government data classification framework:
+GovSphere is designed to comply with future DRC data protection legislation and to meet the
+requirements of any government data classification framework:
 
 - All data is stored within the DRC or in government-approved facilities
 - User PII is treated as sensitive data
@@ -484,14 +516,14 @@ GovSphere is designed to comply with future DRC data protection legislation and 
 
 The security architecture aligns with ISO/IEC 27001 controls:
 
-| Control Domain | Implementation |
-|---|---|
-| Access Control | RBAC, MFA, session management |
-| Cryptography | TLS 1.3, AES-256, bcrypt, RS256 |
-| Physical Security | Government data center (deployment requirement) |
-| Operations Security | Audit logging, change management, backups |
+| Control Domain      | Implementation                                            |
+| ------------------- | --------------------------------------------------------- |
+| Access Control      | RBAC, MFA, session management                             |
+| Cryptography        | TLS 1.3, AES-256, bcrypt, RS256                           |
+| Physical Security   | Government data center (deployment requirement)           |
+| Operations Security | Audit logging, change management, backups                 |
 | Incident Management | Alert system, security event logging, response procedures |
-| Business Continuity | Multi-server deployment, backup/restore, RTO/RPO targets |
+| Business Continuity | Multi-server deployment, backup/restore, RTO/RPO targets  |
 
 ### 11.3 Penetration Testing Requirements
 

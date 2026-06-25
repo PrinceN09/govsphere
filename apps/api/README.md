@@ -3,6 +3,7 @@
 NestJS backend API — REST + WebSocket for GovSphere.
 
 ## Stack
+
 - NestJS 10
 - TypeScript
 - Prisma ORM (PostgreSQL)
@@ -13,6 +14,7 @@ NestJS backend API — REST + WebSocket for GovSphere.
 - Swagger (API documentation)
 
 ## Dev
+
 ```bash
 cd apps/api
 npm run dev    # http://localhost:4000
@@ -20,6 +22,7 @@ npm run dev    # http://localhost:4000
 ```
 
 ## Module Structure (to be built)
+
 ```
 src/
 ├── app.module.ts

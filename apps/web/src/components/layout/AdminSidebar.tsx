@@ -247,6 +247,86 @@ function PlusCircleIcon() {
   );
 }
 
+// ─── Executive icons ──────────────────────────────────────────────────────────
+
+function StarIcon() {
+  return (
+    <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+      <path
+        fillRule="evenodd"
+        d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401z"
+        clipRule="evenodd"
+      />
+    </svg>
+  );
+}
+
+function BuildingLibraryIcon() {
+  return (
+    <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+      <path
+        fillRule="evenodd"
+        d="M9.674 2.075a.75.75 0 01.652 0l7.25 3.5A.75.75 0 0117 6.957V8.5a.75.75 0 01-.75.75h-13.5A.75.75 0 012 8.5V6.957a.75.75 0 01.424-.682l7.25-3.5z"
+        clipRule="evenodd"
+      />
+      <path d="M3.5 11.25a.75.75 0 01.75-.75h1.5a.75.75 0 010 1.5H4.25a.75.75 0 01-.75-.75zM3.5 13.25a.75.75 0 01.75-.75h1.5a.75.75 0 010 1.5H4.25a.75.75 0 01-.75-.75zM8.5 11.25a.75.75 0 01.75-.75h1.5a.75.75 0 010 1.5H9.25a.75.75 0 01-.75-.75zM8.5 13.25a.75.75 0 01.75-.75h1.5a.75.75 0 010 1.5H9.25a.75.75 0 01-.75-.75zM13.5 11.25a.75.75 0 01.75-.75h1.5a.75.75 0 010 1.5H14.25a.75.75 0 01-.75-.75zM13.5 13.25a.75.75 0 01.75-.75h1.5a.75.75 0 010 1.5H14.25a.75.75 0 01-.75-.75zM2 16.25A.75.75 0 012.75 15.5h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 16.25z" />
+    </svg>
+  );
+}
+
+function ScaleIcon() {
+  return (
+    <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+      <path
+        fillRule="evenodd"
+        d="M10 2a.75.75 0 01.75.75v.258a33.186 33.186 0 016.668.83.75.75 0 01-.336 1.461 31.28 31.28 0 00-1.103-.232l1.702 7.545a.75.75 0 01-.387.832A4.981 4.981 0 0115 14c-.825 0-1.606-.2-2.294-.556a.75.75 0 01-.387-.832l1.77-7.849a31.743 31.743 0 00-3.339-.254v11.505a20.01 20.01 0 013.78.501.75.75 0 11-.339 1.462A18.51 18.51 0 0010 17.5c-1.375 0-2.712.184-3.992.52a.75.75 0 11-.34-1.462 20.01 20.01 0 013.78-.501V5.509a31.748 31.748 0 00-3.339.254l1.77 7.85a.75.75 0 01-.387.832A4.979 4.979 0 015 14a4.979 4.979 0 01-2.294-.556.75.75 0 01-.387-.832L4.021 5.067c-.37.07-.738.148-1.103.232a.75.75 0 01-.336-1.462 33.186 33.186 0 016.668-.829V2.75A.75.75 0 0110 2zM5 7.543L3.92 12.33a3.499 3.499 0 002.16 0L5 7.543zm10 0l-1.08 4.787a3.498 3.498 0 002.16 0L15 7.543z"
+        clipRule="evenodd"
+      />
+    </svg>
+  );
+}
+
+function EnvelopeIcon() {
+  return (
+    <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+      <path d="M3 4a2 2 0 00-2 2v1.161l8.441 4.221a1.25 1.25 0 001.118 0L19 7.162V6a2 2 0 00-2-2H3z" />
+      <path d="M19 8.839l-7.77 3.885a2.75 2.75 0 01-2.46 0L1 8.839V14a2 2 0 002 2h14a2 2 0 002-2V8.839z" />
+    </svg>
+  );
+}
+
+function SpeakerWaveIcon() {
+  return (
+    <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+      <path d="M10 3.75a.75.75 0 00-1.264-.546L4.703 7H3.167a.75.75 0 00-.7.48A6.985 6.985 0 002 10c0 .893.165 1.749.467 2.52.111.29.39.48.7.48h1.537l4.033 3.796A.75.75 0 0010 16.25V3.75zM15.95 5.05a.75.75 0 000 1.06A5.5 5.5 0 0117.5 10a5.5 5.5 0 01-1.55 3.89.75.75 0 101.06 1.06A7 7 0 0019 10a7 7 0 00-2.05-4.95.75.75 0 00-1 0zm-2.121 2.122a.75.75 0 000 1.06 2.5 2.5 0 010 3.536.75.75 0 001.06 1.06A4 4 0 0016 10a4 4 0 00-1.171-2.828.75.75 0 00-1.06 0z" />
+    </svg>
+  );
+}
+
+function DocumentCheckIcon() {
+  return (
+    <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+      <path
+        fillRule="evenodd"
+        d="M3 3.5A1.5 1.5 0 014.5 2h6.879a1.5 1.5 0 011.06.44l4.122 4.12A1.5 1.5 0 0117 7.622V16.5a1.5 1.5 0 01-1.5 1.5h-11A1.5 1.5 0 013 16.5v-13zm10.22 4.22a.75.75 0 011.06 0l.75.75a.75.75 0 010 1.06l-4.5 4.5a.75.75 0 01-1.06 0l-2.25-2.25a.75.75 0 011.06-1.06L10 11.94l3.97-3.97a.75.75 0 010 0z"
+        clipRule="evenodd"
+      />
+    </svg>
+  );
+}
+
+function PresentationChartLineIcon() {
+  return (
+    <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+      <path
+        fillRule="evenodd"
+        d="M1 2.75A.75.75 0 011.75 2h16.5a.75.75 0 010 1.5H18v8.75A2.75 2.75 0 0115.25 15h-1.072l.798 3.06a.75.75 0 01-1.452.38L13.41 18H6.59l-.114.44a.75.75 0 01-1.452-.38L5.823 15H4.75A2.75 2.75 0 012 12.25V3.5h-.25A.75.75 0 011 2.75zM7.373 15l-.391 1.5h6.037l-.39-1.5H7.373zm3.309-5.973a.75.75 0 011.06 0l2.25 2.25a.75.75 0 010 1.06l-2.25 2.25a.75.75 0 11-1.06-1.06l.72-.72H7.25a.75.75 0 010-1.5h4.152l-.72-.72a.75.75 0 010-1.06z"
+        clipRule="evenodd"
+      />
+    </svg>
+  );
+}
+
 // ─── Nav items ────────────────────────────────────────────────────────────────
 
 const NAV_SECTION_MAIN: NavItem[] = [
@@ -387,6 +467,57 @@ const NAV_SECTION_CALENDAR: NavItem[] = [
     label: "Planifier une réunion",
     icon: <PlusCircleIcon />,
     permission: PERMS.MEETING_CREATE,
+  },
+];
+
+const NAV_SECTION_EXECUTIVE: NavItem[] = [
+  {
+    href: "/admin/executive/dashboard",
+    label: "Tableau exécutif",
+    icon: <StarIcon />,
+    permission: PERMS.EXECUTIVE_READ,
+  },
+  {
+    href: "/admin/executive/offices",
+    label: "Bureaux exécutifs",
+    icon: <BuildingLibraryIcon />,
+    permission: PERMS.EXECUTIVE_OFFICE_READ,
+  },
+  {
+    href: "/admin/executive/cabinet",
+    label: "Conseil des ministres",
+    icon: <ScaleIcon />,
+    permission: PERMS.CABINET_READ,
+  },
+  {
+    href: "/admin/executive/cabinet/decisions",
+    label: "Décisions",
+    icon: <DocumentCheckIcon />,
+    permission: PERMS.CABINET_DECISION_READ,
+  },
+  {
+    href: "/admin/executive/briefings",
+    label: "Briefings",
+    icon: <BriefcaseIcon />,
+    permission: PERMS.BRIEFING_READ,
+  },
+  {
+    href: "/admin/executive/correspondence",
+    label: "Correspondances",
+    icon: <EnvelopeIcon />,
+    permission: PERMS.CORRESPONDENCE_READ,
+  },
+  {
+    href: "/admin/executive/announcements",
+    label: "Annonces",
+    icon: <SpeakerWaveIcon />,
+    permission: PERMS.EXECUTIVE_READ,
+  },
+  {
+    href: "/admin/executive/kpi",
+    label: "Indicateurs (KPI)",
+    icon: <PresentationChartLineIcon />,
+    permission: PERMS.KPI_READ,
   },
 ];
 
@@ -538,6 +669,17 @@ export function AdminSidebar({ mobileOpen = false, onMobileClose }: AdminSidebar
             <NavGroup label="Calendrier & Réunions">
               <NavSection
                 items={filterItems(NAV_SECTION_CALENDAR)}
+                pathname={pathname}
+                isActive={isActive}
+              />
+            </NavGroup>
+          )}
+
+          {/* Bureau Exécutif & Cabinet */}
+          {filterItems(NAV_SECTION_EXECUTIVE).length > 0 && (
+            <NavGroup label="Bureau Exécutif & Cabinet">
+              <NavSection
+                items={filterItems(NAV_SECTION_EXECUTIVE)}
                 pathname={pathname}
                 isActive={isActive}
               />
