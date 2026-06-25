@@ -1,4 +1,4 @@
-// GovSphere — Prisma Schema v4 (v0.6.0 — User Lifecycle)
+// GovSphere — Prisma Schema v5 (v0.7.0 — Collaboration Platform)
 // Database: PostgreSQL 17
 // ORM: Prisma 5
 //
@@ -157,6 +157,27 @@ enum AuditAction {
   EMPLOYEE_TRANSFERRED
   EMPLOYEE_MANAGER_CHANGED
   EMPLOYEE_POSITION_CHANGED
+  // Collaboration (v0.7.0)
+  MESSAGE_EDITED
+  CHANNEL_ARCHIVED
+  CHANNEL_MEMBER_ADDED
+  CHANNEL_MEMBER_REMOVED
+  CHANNEL_UPDATED
+  CONVERSATION_CREATED
+  DIRECT_MESSAGE_DELETED
+}
+
+enum PresenceStatus {
+  ONLINE
+  AWAY
+  BUSY
+  DO_NOT_DISTURB
+  OFFLINE
+}
+
+enum ConversationType {
+  DIRECT // 1:1 DM
+  GROUP  // multi-user group chat
 }
 
 enum SupportedLanguage {
@@ -238,6 +259,7 @@ model Division {
   users            User[]
   userRoles        UserRoleAssignment[]
   positions        Position[]
+  channels         Channel[]
   createdAt        DateTime   @default(now())
   updatedAt        DateTime   @updatedAt
 
@@ -254,6 +276,7 @@ model Province {
   capital          String?   @db.VarChar(255)
   isActive         Boolean   @default(true)
   offices          Office[]
+  channels         Channel[]
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
 
@@ -398,12 +421,18 @@ model User {
   // Government structure
   employeeAssignments EmployeeAssignment[]
   workforceTransfers  WorkforceTransfer[]
-  // Content relations
-  sentMessages        Message[]         @relation("SentMessages")
-  channelMemberships  ChannelMember[]
-  notifications       Notification[]
-  auditLogs           AuditLog[]
-  uploadedFiles       File[]
+  // Collaboration relations (v0.7.0)
+  sentMessages           Message[]            @relation("SentMessages")
+  channelMemberships     ChannelMember[]
+  receivedMentions       Mention[]            @relation("ReceivedMentions")
+  readReceipts           ReadReceipt[]        @relation("ReadReceipts")
+  conversationMemberships ConversationMember[] @relation("ConversationMemberships")
+  sentDirectMessages     DirectMessage[]      @relation("SentDirectMessages")
+  dmReactions            DMReaction[]         @relation("DMReactions")
+  conversationSettings   ConversationSettings[] @relation("ConversationSettings")
+  notifications          Notification[]
+  auditLogs              AuditLog[]
+  uploadedFiles          File[]
   createdAt           DateTime          @default(now())
   updatedAt           DateTime          @updatedAt
   deletedAt           DateTime?
@@ -689,40 +718,57 @@ model MfaBackupCode {
 model Channel {
   id             String          @id @default(cuid())
   name           String          @db.VarChar(100)
+  slug           String?         @db.VarChar(120) // URL-safe name
   description    String?         @db.Text
   type           ChannelType     @default(PUBLIC)
+  // Organizational scope — a channel belongs to exactly one org unit
   ministryId     String?
   ministry       Ministry?       @relation(fields: [ministryId], references: [id])
   departmentId   String?
   department     Department?     @relation(fields: [departmentId], references: [id])
+  divisionId     String?
+  division       Division?       @relation(fields: [divisionId], references: [id])
+  provinceId     String?
+  province       Province?       @relation(fields: [provinceId], references: [id])
   isArchived     Boolean         @default(false)
+  archivedAt     DateTime?
+  archivedById   String?
   createdById    String
+  memberCount    Int             @default(0) // denormalised for perf
+  lastMessageAt  DateTime?
   members        ChannelMember[]
   messages       Message[]
   pinnedMessages PinnedMessage[]
+  mentions       Mention[]
   files          File[]
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
 
   @@index([ministryId])
   @@index([departmentId])
+  @@index([divisionId])
+  @@index([provinceId])
   @@index([type])
+  @@index([isArchived])
   @@map("channels")
 }
 
 model ChannelMember {
-  id         String   @id @default(cuid())
-  channelId  String
-  channel    Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
-  userId     String
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  isAdmin    Boolean  @default(false)
-  joinedAt   DateTime @default(now())
-  lastReadAt DateTime @default(now())
+  id               String   @id @default(cuid())
+  channelId        String
+  channel          Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  isAdmin          Boolean  @default(false)
+  muteNotifications Boolean @default(false)
+  joinedAt         DateTime @default(now())
+  lastReadAt       DateTime @default(now())
+  leftAt           DateTime?
 
   @@unique([channelId, userId])
   @@index([channelId])
   @@index([userId])
+  @@index([channelId, lastReadAt])
   @@map("channel_members")
 }
 
@@ -740,6 +786,8 @@ model Message {
   isPinned      Boolean       @default(false)
   pinnedMessage PinnedMessage?
   reactions     Reaction[]
+  mentions      Mention[]
+  readReceipts  ReadReceipt[]
   attachments   File[]        @relation("MessageFiles")
   editedAt      DateTime?
   deletedAt     DateTime?
@@ -749,6 +797,7 @@ model Message {
   @@index([channelId])
   @@index([senderId])
   @@index([createdAt])
+  @@index([channelId, createdAt]) // cursor pagination
   @@map("messages")
 }
 
@@ -776,6 +825,132 @@ model PinnedMessage {
 
   @@index([channelId])
   @@map("pinned_messages")
+}
+
+model Mention {
+  id             String    @id @default(cuid())
+  messageId      String
+  message        Message   @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  channelId      String
+  channel        Channel   @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  // Who was mentioned
+  userId         String
+  user           User      @relation("ReceivedMentions", fields: [userId], references: [id], onDelete: Cascade)
+  mentionedById  String
+  isRead         Boolean   @default(false)
+  readAt         DateTime?
+  createdAt      DateTime  @default(now())
+
+  @@index([userId, isRead])
+  @@index([messageId])
+  @@index([channelId])
+  @@map("mentions")
+}
+
+model ReadReceipt {
+  id        String   @id @default(cuid())
+  messageId String
+  message   Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation("ReadReceipts", fields: [userId], references: [id], onDelete: Cascade)
+  readAt    DateTime @default(now())
+
+  @@unique([messageId, userId])
+  @@index([messageId])
+  @@index([userId])
+  @@map("read_receipts")
+}
+
+// =============================================================================
+// DIRECT MESSAGES & CONVERSATIONS (v0.7.0)
+// Separate from org Channels — these are personal DMs and group chats.
+// =============================================================================
+
+model Conversation {
+  id            String               @id @default(cuid())
+  type          ConversationType     @default(DIRECT)
+  name          String?              @db.VarChar(255) // null for 1:1 DMs
+  avatarUrl     String?              @db.VarChar(500)
+  createdById   String
+  isArchived    Boolean              @default(false)
+  lastMessageAt DateTime?
+  members       ConversationMember[]
+  messages      DirectMessage[]
+  settings      ConversationSettings[]
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+
+  @@index([createdById])
+  @@index([lastMessageAt])
+  @@map("conversations")
+}
+
+model ConversationMember {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User         @relation("ConversationMemberships", fields: [userId], references: [id], onDelete: Cascade)
+  lastReadAt     DateTime     @default(now())
+  joinedAt       DateTime     @default(now())
+  leftAt         DateTime?
+
+  @@unique([conversationId, userId])
+  @@index([conversationId])
+  @@index([userId])
+  @@map("conversation_members")
+}
+
+model DirectMessage {
+  id             String        @id @default(cuid())
+  conversationId String
+  conversation   Conversation  @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  senderId       String
+  sender         User          @relation("SentDirectMessages", fields: [senderId], references: [id])
+  type           MessageType   @default(TEXT)
+  content        String        @db.Text
+  replyToId      String?
+  replyTo        DirectMessage?  @relation("DMReplies", fields: [replyToId], references: [id])
+  replies        DirectMessage[] @relation("DMReplies")
+  reactions      DMReaction[]
+  editedAt       DateTime?
+  deletedAt      DateTime?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([conversationId, createdAt]) // cursor pagination
+  @@index([senderId])
+  @@map("direct_messages")
+}
+
+model DMReaction {
+  id        String        @id @default(cuid())
+  messageId String
+  message   DirectMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User          @relation("DMReactions", fields: [userId], references: [id], onDelete: Cascade)
+  emoji     String        @db.VarChar(20)
+  createdAt DateTime      @default(now())
+
+  @@unique([messageId, userId, emoji])
+  @@index([messageId])
+  @@map("dm_reactions")
+}
+
+model ConversationSettings {
+  id                String       @id @default(cuid())
+  conversationId    String
+  conversation      Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  userId            String
+  user              User         @relation("ConversationSettings", fields: [userId], references: [id], onDelete: Cascade)
+  muteNotifications Boolean      @default(false)
+  mutedUntil        DateTime?
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  @@unique([conversationId, userId])
+  @@index([conversationId])
+  @@map("conversation_settings")
 }
 
 // =============================================================================

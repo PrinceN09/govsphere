@@ -118,6 +118,42 @@ function ClipboardDocumentListIcon() {
   );
 }
 
+function ChatBubbleIcon() {
+  return (
+    <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+      <path
+        fillRule="evenodd"
+        d="M3.43 2.524A41.29 41.29 0 0110 2c2.236 0 4.43.18 6.57.524 1.437.231 2.43 1.49 2.43 2.902v5.148c0 1.413-.993 2.67-2.43 2.902A41.202 41.202 0 0114 13.6v2.838a.75.75 0 01-1.28.53l-3.434-3.434A41.319 41.319 0 013.43 13.476C1.993 13.245 1 11.986 1 10.574V5.426c0-1.413.993-2.67 2.43-2.902z"
+        clipRule="evenodd"
+      />
+    </svg>
+  );
+}
+
+function HashIcon() {
+  return (
+    <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+      <path
+        fillRule="evenodd"
+        d="M9.493 2.852a.75.75 0 00-1.486-.204L7.545 6H4.198a.75.75 0 000 1.5h3.14l-.69 5H3.302a.75.75 0 000 1.5h3.14l-.435 3.148a.75.75 0 001.486.204L7.955 14h2.986l-.434 3.148a.75.75 0 001.486.204L12.456 14h3.346a.75.75 0 000-1.5h-3.14l.69-5h3.346a.75.75 0 000-1.5h-3.14l.435-3.148a.75.75 0 00-1.486-.204L12.045 6H9.059l.434-3.148zM8.852 7.5l-.69 5h2.986l.69-5H8.852z"
+        clipRule="evenodd"
+      />
+    </svg>
+  );
+}
+
+function BellIcon() {
+  return (
+    <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+      <path
+        fillRule="evenodd"
+        d="M4 8a6 6 0 1112 0v2.17a3 3 0 01-.879 2.12l-1.168 1.169a2.25 2.25 0 01-1.59.659H7.637a2.25 2.25 0 01-1.59-.659L4.879 12.29A3 3 0 014 10.17V8zm6 9.25a2.25 2.25 0 01-2.122-1.5h4.244A2.25 2.25 0 0110 17.25z"
+        clipRule="evenodd"
+      />
+    </svg>
+  );
+}
+
 // ─── Nav items ────────────────────────────────────────────────────────────────
 
 const NAV_SECTION_MAIN: NavItem[] = [
@@ -170,6 +206,25 @@ const NAV_SECTION_HR: NavItem[] = [
     label: "Organigramme",
     icon: <GridIcon />,
     permission: PERMS.USER_READ,
+  },
+];
+
+const NAV_SECTION_COLLAB: NavItem[] = [
+  {
+    href: "/admin/messages",
+    label: "Messages",
+    icon: <ChatBubbleIcon />,
+  },
+  {
+    href: "/admin/channels",
+    label: "Canaux",
+    icon: <HashIcon />,
+    permission: PERMS.CHANNEL_READ,
+  },
+  {
+    href: "/admin/notifications",
+    label: "Notifications",
+    icon: <BellIcon />,
   },
 ];
 
@@ -280,6 +335,15 @@ export function AdminSidebar({ mobileOpen = false, onMobileClose }: AdminSidebar
           <NavGroup label="Ressources humaines">
             <NavSection
               items={filterItems(NAV_SECTION_HR)}
+              pathname={pathname}
+              isActive={isActive}
+            />
+          </NavGroup>
+
+          {/* Collaboration */}
+          <NavGroup label="Collaboration">
+            <NavSection
+              items={filterItems(NAV_SECTION_COLLAB)}
               pathname={pathname}
               isActive={isActive}
             />

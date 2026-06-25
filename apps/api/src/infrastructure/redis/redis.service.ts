@@ -50,6 +50,17 @@ export class RedisService implements OnModuleDestroy {
     return this.client.ttl(key);
   }
 
+  /** Set expiry (in seconds) on an existing key. */
+  async expire(key: string, ttlSeconds: number): Promise<void> {
+    await this.client.expire(key, ttlSeconds);
+  }
+
+  /** Get multiple keys in one round-trip. Returns null for missing keys. */
+  async mGet(keys: string[]): Promise<(string | null)[]> {
+    if (keys.length === 0) return [];
+    return this.client.mget(keys);
+  }
+
   // ── Permission cache ─────────────────────────────────────────────────────────
 
   private permKey(userId: string): string {
