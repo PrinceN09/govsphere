@@ -3,17 +3,33 @@
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 
-import { AdminTopBar } from "@/components/layout/AdminTopBar";
 import { ClassificationBadge } from "@/components/documents/ClassificationBadge";
+import { AdminTopBar } from "@/components/layout/AdminTopBar";
 import { PageSpinner } from "@/components/ui/Spinner";
 import { apiGet } from "@/lib/api";
 
 type Classification = "PUBLIC" | "INTERNAL" | "CONFIDENTIAL" | "SECRET";
-type DocType = "MEMO" | "REPORT" | "CIRCULAR" | "LETTER" | "SPEECH" | "DECREE" | "DIRECTIVE" | "NOTE" | "OTHER";
+type DocType =
+  | "MEMO"
+  | "REPORT"
+  | "CIRCULAR"
+  | "LETTER"
+  | "SPEECH"
+  | "DECREE"
+  | "DIRECTIVE"
+  | "NOTE"
+  | "OTHER";
 
 const TYPE_LABELS: Record<DocType, string> = {
-  MEMO: "Mémo", REPORT: "Rapport", CIRCULAR: "Circulaire", LETTER: "Lettre",
-  SPEECH: "Discours", DECREE: "Décret", DIRECTIVE: "Directive", NOTE: "Note", OTHER: "Autre",
+  MEMO: "Mémo",
+  REPORT: "Rapport",
+  CIRCULAR: "Circulaire",
+  LETTER: "Lettre",
+  SPEECH: "Discours",
+  DECREE: "Décret",
+  DIRECTIVE: "Directive",
+  NOTE: "Note",
+  OTHER: "Autre",
 };
 
 interface SharedEntry {
@@ -36,7 +52,11 @@ interface SharedEntry {
 }
 
 function fmtDate(iso: string) {
-  return new Date(iso).toLocaleDateString("fr-FR", { day: "2-digit", month: "short", year: "numeric" });
+  return new Date(iso).toLocaleDateString("fr-FR", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
 }
 
 export default function SharedWithMePage() {
@@ -58,7 +78,9 @@ export default function SharedWithMePage() {
         ) : !shares?.length ? (
           <div className="py-24 text-center">
             <p className="text-base font-medium text-slate-700">Aucun document partagé</p>
-            <p className="mt-1 text-sm text-slate-500">Les documents partagés avec vous apparaîtront ici.</p>
+            <p className="mt-1 text-sm text-slate-500">
+              Les documents partagés avec vous apparaîtront ici.
+            </p>
           </div>
         ) : (
           <div className="divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white shadow-sm">
@@ -85,9 +107,21 @@ export default function SharedWithMePage() {
                   <p>Partagé par {s.sharedBy.displayName}</p>
                   <p className="text-slate-400">{fmtDate(s.createdAt)}</p>
                   <div className="mt-1 flex justify-end gap-1">
-                    {s.canEdit && <span className="rounded bg-blue-50 px-1 py-0.5 text-[10px] text-blue-700">modifier</span>}
-                    {s.canComment && <span className="rounded bg-slate-100 px-1 py-0.5 text-[10px] text-slate-600">commenter</span>}
-                    {s.canExport && <span className="rounded bg-slate-100 px-1 py-0.5 text-[10px] text-slate-600">exporter</span>}
+                    {s.canEdit && (
+                      <span className="rounded bg-blue-50 px-1 py-0.5 text-[10px] text-blue-700">
+                        modifier
+                      </span>
+                    )}
+                    {s.canComment && (
+                      <span className="rounded bg-slate-100 px-1 py-0.5 text-[10px] text-slate-600">
+                        commenter
+                      </span>
+                    )}
+                    {s.canExport && (
+                      <span className="rounded bg-slate-100 px-1 py-0.5 text-[10px] text-slate-600">
+                        exporter
+                      </span>
+                    )}
                   </div>
                 </div>
               </Link>

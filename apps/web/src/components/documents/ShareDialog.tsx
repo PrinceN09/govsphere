@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 
 import { apiDelete, apiGet, apiPost } from "@/lib/api";
 
@@ -33,11 +33,13 @@ const SCOPE_LABELS: Record<ShareScope, string> = {
 };
 
 function shareTargetLabel(s: ShareEntry): string {
-  return s.targetUser?.displayName
-    ?? s.targetMinistry?.name
-    ?? s.targetDepartment?.name
-    ?? s.targetDivision?.name
-    ?? "—";
+  return (
+    s.targetUser?.displayName ??
+    s.targetMinistry?.name ??
+    s.targetDepartment?.name ??
+    s.targetDivision?.name ??
+    "—"
+  );
 }
 
 export function ShareDialog({ documentId, onClose }: Props) {
@@ -72,8 +74,7 @@ export function ShareDialog({ documentId, onClose }: Props) {
   });
 
   const removeShare = useMutation({
-    mutationFn: (shareId: string) =>
-      apiDelete(`/v1/documents/${documentId}/shares/${shareId}`),
+    mutationFn: (shareId: string) => apiDelete(`/v1/documents/${documentId}/shares/${shareId}`),
     onSuccess: () => void qc.invalidateQueries({ queryKey: ["document-shares", documentId] }),
   });
 
@@ -82,19 +83,28 @@ export function ShareDialog({ documentId, onClose }: Props) {
       <div className="w-full max-w-lg rounded-2xl bg-white shadow-2xl">
         <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
           <h2 className="text-lg font-semibold text-slate-900">Partager le document</h2>
-          <button type="button" onClick={onClose} className="rounded-lg p-1 hover:bg-slate-100 text-slate-500">
-            <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22z"/></svg>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-lg p-1 hover:bg-slate-100 text-slate-500"
+          >
+            <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22z" />
+            </svg>
           </button>
         </div>
 
         <div className="space-y-4 p-6">
           {/* Scope selector */}
           <div className="flex gap-2">
-            {(["USER","MINISTRY","DEPARTMENT","DIVISION"] as ShareScope[]).map((s) => (
+            {(["USER", "MINISTRY", "DEPARTMENT", "DIVISION"] as ShareScope[]).map((s) => (
               <button
                 key={s}
                 type="button"
-                onClick={() => { setScope(s); setTargetId(""); }}
+                onClick={() => {
+                  setScope(s);
+                  setTargetId("");
+                }}
                 className={`flex-1 rounded-lg border py-1.5 text-xs font-medium transition-colors ${scope === s ? "border-primary-500 bg-primary-50 text-primary-700" : "border-slate-200 text-slate-600 hover:bg-slate-50"}`}
               >
                 {SCOPE_LABELS[s]}
@@ -104,7 +114,9 @@ export function ShareDialog({ documentId, onClose }: Props) {
 
           {/* Target ID input */}
           <div>
-            <label className="mb-1 block text-xs font-medium text-slate-700">ID de {SCOPE_LABELS[scope]}</label>
+            <label className="mb-1 block text-xs font-medium text-slate-700">
+              ID de {SCOPE_LABELS[scope]}
+            </label>
             <input
               type="text"
               value={targetId}
@@ -121,8 +133,16 @@ export function ShareDialog({ documentId, onClose }: Props) {
               { key: "canComment", label: "Commenter", value: canComment, set: setCanComment },
               { key: "canExport", label: "Exporter", value: canExport, set: setCanExport },
             ].map(({ key, label, value, set }) => (
-              <label key={key} className="flex items-center gap-1.5 text-xs text-slate-700 cursor-pointer">
-                <input type="checkbox" checked={value} onChange={(e) => set(e.target.checked)} className="rounded" />
+              <label
+                key={key}
+                className="flex items-center gap-1.5 text-xs text-slate-700 cursor-pointer"
+              >
+                <input
+                  type="checkbox"
+                  checked={value}
+                  onChange={(e) => set(e.target.checked)}
+                  className="rounded"
+                />
                 {label}
               </label>
             ))}
@@ -140,7 +160,9 @@ export function ShareDialog({ documentId, onClose }: Props) {
 
         {/* Existing shares */}
         <div className="border-t border-slate-200 px-6 pb-6">
-          <p className="mb-3 mt-4 text-xs font-semibold uppercase tracking-wide text-slate-500">Accès actuels</p>
+          <p className="mb-3 mt-4 text-xs font-semibold uppercase tracking-wide text-slate-500">
+            Accès actuels
+          </p>
           {isLoading ? (
             <div className="py-4 text-center text-sm text-slate-400">Chargement…</div>
           ) : !shares?.length ? (
@@ -164,7 +186,9 @@ export function ShareDialog({ documentId, onClose }: Props) {
                     disabled={removeShare.isPending}
                     className="rounded p-1 text-slate-400 hover:bg-red-50 hover:text-red-600 transition-colors"
                   >
-                    <svg className="h-4 w-4" viewBox="0 0 16 16" fill="currentColor"><path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L6.94 8l-1.72 1.72a.75.75 0 1 0 1.06 1.06L8 9.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L9.06 8l1.72-1.72a.75.75 0 0 0-1.06-1.06L8 6.94 6.28 5.22z"/></svg>
+                    <svg className="h-4 w-4" viewBox="0 0 16 16" fill="currentColor">
+                      <path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L6.94 8l-1.72 1.72a.75.75 0 1 0 1.06 1.06L8 9.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L9.06 8l1.72-1.72a.75.75 0 0 0-1.06-1.06L8 6.94 6.28 5.22z" />
+                    </svg>
                   </button>
                 </div>
               ))}

@@ -6,6 +6,8 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
+import type { PaginatedResponse } from "@/lib/api";
+
 import { AdminTopBar } from "@/components/layout/AdminTopBar";
 import { PermissionGate } from "@/components/layout/PermissionGate";
 import { Badge, StatusBadge } from "@/components/ui/Badge";
@@ -28,8 +30,6 @@ import {
 import { apiGet } from "@/lib/api";
 import { PERMS } from "@/lib/permissions";
 import { useListQuery } from "@/lib/use-list-query";
-
-import type { PaginatedResponse } from "@/lib/api";
 
 type PositionLevel = "EXECUTIVE" | "DIRECTOR" | "MANAGER" | "SPECIALIST" | "OFFICER" | "SUPPORT";
 

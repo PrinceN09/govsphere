@@ -3,11 +3,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
 
+import type { PaginatedResponse } from "@/lib/api";
+
 import { AdminTopBar } from "@/components/layout/AdminTopBar";
 import { StatCard } from "@/components/ui/StatCard";
 import { apiGet } from "@/lib/api";
-
-import type { PaginatedResponse } from "@/lib/api";
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
 

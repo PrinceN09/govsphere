@@ -1,26 +1,42 @@
 "use client";
 
-import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
-import { AdminTopBar } from "@/components/layout/AdminTopBar";
 import { ClassificationBadge } from "@/components/documents/ClassificationBadge";
 import { DocumentEditor } from "@/components/documents/DocumentEditor";
 import { ExportMenu } from "@/components/documents/ExportMenu";
 import { ShareDialog } from "@/components/documents/ShareDialog";
 import { VersionHistory } from "@/components/documents/VersionHistory";
+import { AdminTopBar } from "@/components/layout/AdminTopBar";
 import { PageSpinner } from "@/components/ui/Spinner";
 import { apiGet, apiPost } from "@/lib/api";
 
 type Classification = "PUBLIC" | "INTERNAL" | "CONFIDENTIAL" | "SECRET";
 type DocStatus = "DRAFT" | "REVIEW" | "APPROVED" | "PUBLISHED" | "ARCHIVED";
-type DocType = "MEMO" | "REPORT" | "CIRCULAR" | "LETTER" | "SPEECH" | "DECREE" | "DIRECTIVE" | "NOTE" | "OTHER";
+type DocType =
+  | "MEMO"
+  | "REPORT"
+  | "CIRCULAR"
+  | "LETTER"
+  | "SPEECH"
+  | "DECREE"
+  | "DIRECTIVE"
+  | "NOTE"
+  | "OTHER";
 
 const TYPE_LABELS: Record<DocType, string> = {
-  MEMO: "Mémo", REPORT: "Rapport", CIRCULAR: "Circulaire", LETTER: "Lettre",
-  SPEECH: "Discours", DECREE: "Décret", DIRECTIVE: "Directive", NOTE: "Note", OTHER: "Autre",
+  MEMO: "Mémo",
+  REPORT: "Rapport",
+  CIRCULAR: "Circulaire",
+  LETTER: "Lettre",
+  SPEECH: "Discours",
+  DECREE: "Décret",
+  DIRECTIVE: "Directive",
+  NOTE: "Note",
+  OTHER: "Autre",
 };
 
 interface Document {
@@ -44,8 +60,11 @@ type Tab = "content" | "versions" | "comments";
 
 function fmtDate(iso: string) {
   return new Date(iso).toLocaleString("fr-FR", {
-    day: "2-digit", month: "long", year: "numeric",
-    hour: "2-digit", minute: "2-digit",
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
   });
 }
 
@@ -108,7 +127,13 @@ export default function DocumentViewPage({ params }: { params: { id: string } })
         <main className="flex flex-1 flex-col overflow-hidden">
           {/* Tabs */}
           <div className="flex border-b border-slate-200 bg-white px-6">
-            {([["content","Contenu"],["versions","Versions"],["comments","Commentaires"]] as [Tab, string][]).map(([k, label]) => (
+            {(
+              [
+                ["content", "Contenu"],
+                ["versions", "Versions"],
+                ["comments", "Commentaires"],
+              ] as [Tab, string][]
+            ).map(([k, label]) => (
               <button
                 key={k}
                 type="button"
@@ -161,7 +186,9 @@ export default function DocumentViewPage({ params }: { params: { id: string } })
             </div>
             {doc.ministry && (
               <div>
-                <p className="mb-1 font-semibold uppercase tracking-wide text-slate-500">Ministère</p>
+                <p className="mb-1 font-semibold uppercase tracking-wide text-slate-500">
+                  Ministère
+                </p>
                 <p className="text-slate-700">{doc.ministry.name}</p>
               </div>
             )}
@@ -174,14 +201,21 @@ export default function DocumentViewPage({ params }: { params: { id: string } })
                 <p className="mb-1 font-semibold uppercase tracking-wide text-slate-500">Tags</p>
                 <div className="flex flex-wrap gap-1">
                   {doc.tags.map((t) => (
-                    <span key={t} className="rounded bg-slate-200 px-1.5 py-0.5 text-[10px] text-slate-700">{t}</span>
+                    <span
+                      key={t}
+                      className="rounded bg-slate-200 px-1.5 py-0.5 text-[10px] text-slate-700"
+                    >
+                      {t}
+                    </span>
                   ))}
                 </div>
               </div>
             )}
             <div>
               <p className="mb-1 font-semibold uppercase tracking-wide text-slate-500">Créé le</p>
-              <p className="text-slate-700">{new Date(doc.createdAt).toLocaleDateString("fr-FR")}</p>
+              <p className="text-slate-700">
+                {new Date(doc.createdAt).toLocaleDateString("fr-FR")}
+              </p>
             </div>
             {canPublish && (
               <button
@@ -204,19 +238,48 @@ export default function DocumentViewPage({ params }: { params: { id: string } })
 
 function StatusBadge({ status }: { status: DocStatus }) {
   const cfg: Record<DocStatus, { label: string; className: string }> = {
-    DRAFT:     { label: "Brouillon",  className: "bg-slate-100 text-slate-600" },
-    REVIEW:    { label: "En révision", className: "bg-amber-100 text-amber-700" },
-    APPROVED:  { label: "Approuvé",   className: "bg-blue-100 text-blue-700" },
-    PUBLISHED: { label: "Publié",     className: "bg-emerald-100 text-emerald-700" },
-    ARCHIVED:  { label: "Archivé",    className: "bg-slate-100 text-slate-500" },
+    DRAFT: { label: "Brouillon", className: "bg-slate-100 text-slate-600" },
+    REVIEW: { label: "En révision", className: "bg-amber-100 text-amber-700" },
+    APPROVED: { label: "Approuvé", className: "bg-blue-100 text-blue-700" },
+    PUBLISHED: { label: "Publié", className: "bg-emerald-100 text-emerald-700" },
+    ARCHIVED: { label: "Archivé", className: "bg-slate-100 text-slate-500" },
   };
   const c = cfg[status];
-  return <span className={`rounded px-1.5 py-0.5 text-xs font-medium ${c.className}`}>{c.label}</span>;
+  return (
+    <span className={`rounded px-1.5 py-0.5 text-xs font-medium ${c.className}`}>{c.label}</span>
+  );
 }
 
 function ShareIcon() {
-  return <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="4" r="1.5"/><circle cx="4" cy="8" r="1.5"/><circle cx="12" cy="12" r="1.5"/><path d="M5.5 7.1 10.5 4.9M5.5 8.9l5-2.2" strokeLinecap="round"/></svg>;
+  return (
+    <svg
+      className="h-4 w-4"
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+    >
+      <circle cx="12" cy="4" r="1.5" />
+      <circle cx="4" cy="8" r="1.5" />
+      <circle cx="12" cy="12" r="1.5" />
+      <path d="M5.5 7.1 10.5 4.9M5.5 8.9l5-2.2" strokeLinecap="round" />
+    </svg>
+  );
 }
 function EditIcon() {
-  return <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M11.5 2.5 13.5 4.5l-8 8L3 13l.5-2.5 8-8z" strokeLinecap="round" strokeLinejoin="round"/></svg>;
+  return (
+    <svg
+      className="h-4 w-4"
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+    >
+      <path
+        d="M11.5 2.5 13.5 4.5l-8 8L3 13l.5-2.5 8-8z"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
 }

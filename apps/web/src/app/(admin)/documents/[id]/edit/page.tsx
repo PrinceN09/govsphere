@@ -1,21 +1,37 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+import { useState, useEffect, useCallback } from "react";
 
-import { AdminTopBar } from "@/components/layout/AdminTopBar";
 import { ClassificationBadge } from "@/components/documents/ClassificationBadge";
 import { DocumentEditor } from "@/components/documents/DocumentEditor";
+import { AdminTopBar } from "@/components/layout/AdminTopBar";
 import { PageSpinner } from "@/components/ui/Spinner";
 import { apiGet, apiPatch } from "@/lib/api";
 
 type Classification = "PUBLIC" | "INTERNAL" | "CONFIDENTIAL" | "SECRET";
-type DocType = "MEMO" | "REPORT" | "CIRCULAR" | "LETTER" | "SPEECH" | "DECREE" | "DIRECTIVE" | "NOTE" | "OTHER";
+type DocType =
+  | "MEMO"
+  | "REPORT"
+  | "CIRCULAR"
+  | "LETTER"
+  | "SPEECH"
+  | "DECREE"
+  | "DIRECTIVE"
+  | "NOTE"
+  | "OTHER";
 
 const TYPE_LABELS: Record<DocType, string> = {
-  MEMO: "Mémo", REPORT: "Rapport", CIRCULAR: "Circulaire", LETTER: "Lettre",
-  SPEECH: "Discours", DECREE: "Décret", DIRECTIVE: "Directive", NOTE: "Note", OTHER: "Autre",
+  MEMO: "Mémo",
+  REPORT: "Rapport",
+  CIRCULAR: "Circulaire",
+  LETTER: "Lettre",
+  SPEECH: "Discours",
+  DECREE: "Décret",
+  DIRECTIVE: "Directive",
+  NOTE: "Note",
+  OTHER: "Autre",
 };
 
 interface Document {
@@ -66,7 +82,10 @@ export default function EditDocumentPage({ params }: { params: { id: string } })
         type,
         classification,
         content,
-        tags: tags.split(",").map((t) => t.trim()).filter(Boolean),
+        tags: tags
+          .split(",")
+          .map((t) => t.trim())
+          .filter(Boolean),
       }),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ["document", id] });
@@ -83,9 +102,7 @@ export default function EditDocumentPage({ params }: { params: { id: string } })
         title={`Modifier — ${title}`}
         actions={
           <div className="flex items-center gap-2">
-            {dirty && (
-              <span className="text-xs text-amber-600 font-medium">Non sauvegardé</span>
-            )}
+            {dirty && <span className="text-xs text-amber-600 font-medium">Non sauvegardé</span>}
             <button
               type="button"
               onClick={() => router.push(`/admin/documents/${id}`)}
@@ -114,7 +131,10 @@ export default function EditDocumentPage({ params }: { params: { id: string } })
               <input
                 type="text"
                 value={title}
-                onChange={(e) => { setTitle(e.target.value); setDirty(true); }}
+                onChange={(e) => {
+                  setTitle(e.target.value);
+                  setDirty(true);
+                }}
                 className="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
               />
             </div>
@@ -122,23 +142,35 @@ export default function EditDocumentPage({ params }: { params: { id: string } })
               <label className="mb-1 block text-xs font-semibold text-slate-600">TYPE</label>
               <select
                 value={type}
-                onChange={(e) => { setType(e.target.value as DocType); setDirty(true); }}
+                onChange={(e) => {
+                  setType(e.target.value as DocType);
+                  setDirty(true);
+                }}
                 className="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-sm focus:border-primary-500 focus:outline-none"
               >
                 {(Object.keys(TYPE_LABELS) as DocType[]).map((k) => (
-                  <option key={k} value={k}>{TYPE_LABELS[k]}</option>
+                  <option key={k} value={k}>
+                    {TYPE_LABELS[k]}
+                  </option>
                 ))}
               </select>
             </div>
             <div>
-              <label className="mb-1 block text-xs font-semibold text-slate-600">CLASSIFICATION</label>
+              <label className="mb-1 block text-xs font-semibold text-slate-600">
+                CLASSIFICATION
+              </label>
               <select
                 value={classification}
-                onChange={(e) => { setClassification(e.target.value as Classification); setDirty(true); }}
+                onChange={(e) => {
+                  setClassification(e.target.value as Classification);
+                  setDirty(true);
+                }}
                 className="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-sm focus:border-primary-500 focus:outline-none"
               >
-                {(["PUBLIC","INTERNAL","CONFIDENTIAL","SECRET"] as Classification[]).map((c) => (
-                  <option key={c} value={c}>{c}</option>
+                {(["PUBLIC", "INTERNAL", "CONFIDENTIAL", "SECRET"] as Classification[]).map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
                 ))}
               </select>
               <div className="mt-1.5">
@@ -150,7 +182,10 @@ export default function EditDocumentPage({ params }: { params: { id: string } })
               <input
                 type="text"
                 value={tags}
-                onChange={(e) => { setTags(e.target.value); setDirty(true); }}
+                onChange={(e) => {
+                  setTags(e.target.value);
+                  setDirty(true);
+                }}
                 placeholder="tag1, tag2"
                 className="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-sm focus:border-primary-500 focus:outline-none"
               />

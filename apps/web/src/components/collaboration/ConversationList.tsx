@@ -3,10 +3,12 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { cn } from "@/components/ui/cn";
-import { UnreadBadge } from "./UnreadBadge";
 import { PresenceBadge } from "./PresenceBadge";
+import { UnreadBadge } from "./UnreadBadge";
+
 import type { PresenceStatus } from "./PresenceBadge";
+
+import { cn } from "@/components/ui/cn";
 
 export interface ConversationItem {
   id: string;
@@ -100,7 +102,9 @@ export function ConversationList({
               <ItemAvatar
                 name={item.name}
                 {...(item.avatarUrl !== undefined ? { url: item.avatarUrl } : {})}
-                {...(item.presenceStatus !== undefined ? { presenceStatus: item.presenceStatus } : {})}
+                {...(item.presenceStatus !== undefined
+                  ? { presenceStatus: item.presenceStatus }
+                  : {})}
               />
 
               <div className="min-w-0 flex-1">

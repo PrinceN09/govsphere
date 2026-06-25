@@ -21,8 +21,11 @@ interface Props {
 
 function fmtDate(iso: string) {
   return new Date(iso).toLocaleString("fr-FR", {
-    day: "2-digit", month: "short", year: "numeric",
-    hour: "2-digit", minute: "2-digit",
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
   });
 }
 
@@ -54,8 +57,11 @@ export function VersionHistory({ documentId, currentVersionNumber }: Props) {
   if (!versions?.length) {
     return (
       <div className="py-8 text-center text-sm text-slate-500">
-        Aucune version sauvegardée.<br />
-        <span className="text-xs text-slate-400">Les versions sont créées manuellement ou automatiquement lors de l&apos;enregistrement.</span>
+        Aucune version sauvegardée.
+        <br />
+        <span className="text-xs text-slate-400">
+          Les versions sont créées manuellement ou automatiquement lors de l&apos;enregistrement.
+        </span>
       </div>
     );
   }
@@ -70,7 +76,9 @@ export function VersionHistory({ documentId, currentVersionNumber }: Props) {
               <div className="flex items-center gap-2">
                 <span className="text-sm font-semibold text-slate-700">v{v.version}</span>
                 {isCurrent && (
-                  <span className="rounded-full bg-primary-100 px-1.5 py-0.5 text-[10px] font-medium text-primary-700">Actuelle</span>
+                  <span className="rounded-full bg-primary-100 px-1.5 py-0.5 text-[10px] font-medium text-primary-700">
+                    Actuelle
+                  </span>
                 )}
               </div>
               <p className="truncate text-sm text-slate-700">{v.title}</p>
@@ -78,7 +86,8 @@ export function VersionHistory({ documentId, currentVersionNumber }: Props) {
                 <p className="mt-0.5 text-xs text-slate-500 italic">{v.changeNote}</p>
               )}
               <p className="mt-0.5 text-xs text-slate-400">
-                {fmtDate(v.createdAt)} · {v.wordCount.toLocaleString()} mots · {v.savedBy.displayName}
+                {fmtDate(v.createdAt)} · {v.wordCount.toLocaleString()} mots ·{" "}
+                {v.savedBy.displayName}
               </p>
             </div>
             {!isCurrent && (

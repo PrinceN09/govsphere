@@ -35,17 +35,28 @@ interface UnreadCounts {
 }
 
 const TYPE_BADGE: Record<string, "blue" | "yellow" | "red" | "green" | "gray"> = {
-  MENTION: "yellow", MESSAGE: "blue", REACTION: "green",
-  CHANNEL_INVITE: "blue", TASK_ASSIGNED: "red", SYSTEM: "gray",
+  MENTION: "yellow",
+  MESSAGE: "blue",
+  REACTION: "green",
+  CHANNEL_INVITE: "blue",
+  TASK_ASSIGNED: "red",
+  SYSTEM: "gray",
 };
 const TYPE_LABEL: Record<string, string> = {
-  MENTION: "Mention", MESSAGE: "Message", REACTION: "Réaction",
-  CHANNEL_INVITE: "Invitation", TASK_ASSIGNED: "Tâche", SYSTEM: "Système",
+  MENTION: "Mention",
+  MESSAGE: "Message",
+  REACTION: "Réaction",
+  CHANNEL_INVITE: "Invitation",
+  TASK_ASSIGNED: "Tâche",
+  SYSTEM: "Système",
 };
 
 function fmtDate(iso: string): string {
   return new Date(iso).toLocaleDateString("fr-FR", {
-    day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit",
+    day: "2-digit",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
   });
 }
 
@@ -86,8 +97,16 @@ export default function NotificationsPage() {
   type FilterDef = { key: FilterKey; label: string; count?: number };
   const FILTERS: FilterDef[] = [
     { key: "ALL", label: "Toutes" },
-    { key: "UNREAD", label: "Non lues", ...(counts?.notifications !== undefined ? { count: counts.notifications } : {}) },
-    { key: "MENTIONS", label: "Mentions", ...(counts?.mentions !== undefined ? { count: counts.mentions } : {}) },
+    {
+      key: "UNREAD",
+      label: "Non lues",
+      ...(counts?.notifications !== undefined ? { count: counts.notifications } : {}),
+    },
+    {
+      key: "MENTIONS",
+      label: "Mentions",
+      ...(counts?.mentions !== undefined ? { count: counts.mentions } : {}),
+    },
   ];
 
   return (
@@ -135,11 +154,21 @@ export default function NotificationsPage() {
 
         <div className="mx-auto max-w-2xl p-6">
           {isLoading ? (
-            <div className="flex justify-center py-12"><PageSpinner /></div>
+            <div className="flex justify-center py-12">
+              <PageSpinner />
+            </div>
           ) : notifications.length === 0 ? (
             <div className="py-16 text-center">
-              <svg className="mx-auto h-10 w-10 text-slate-300" viewBox="0 0 24 24" fill="currentColor">
-                <path fillRule="evenodd" d="M5.25 9a6.75 6.75 0 0113.5 0v.75c0 2.123.8 4.057 2.118 5.52a.75.75 0 01-.297 1.206c-1.544.57-3.16.99-4.831 1.243a3.75 3.75 0 11-7.48 0 24.585 24.585 0 01-4.831-1.244.75.75 0 01-.298-1.205A8.217 8.217 0 005.25 9.75V9zm4.502 8.9a2.25 2.25 0 104.496 0 25.057 25.057 0 01-4.496 0z" clipRule="evenodd" />
+              <svg
+                className="mx-auto h-10 w-10 text-slate-300"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M5.25 9a6.75 6.75 0 0113.5 0v.75c0 2.123.8 4.057 2.118 5.52a.75.75 0 01-.297 1.206c-1.544.57-3.16.99-4.831 1.243a3.75 3.75 0 11-7.48 0 24.585 24.585 0 01-4.831-1.244.75.75 0 01-.298-1.205A8.217 8.217 0 005.25 9.75V9zm4.502 8.9a2.25 2.25 0 104.496 0 25.057 25.057 0 01-4.496 0z"
+                  clipRule="evenodd"
+                />
               </svg>
               <p className="mt-3 text-sm text-slate-500">Aucune notification.</p>
             </div>
@@ -154,7 +183,9 @@ export default function NotificationsPage() {
                   ].join(" ")}
                 >
                   <div className="mt-1 flex-shrink-0">
-                    {!n.isRead && <span className="inline-block h-2 w-2 rounded-full bg-primary-600" />}
+                    {!n.isRead && (
+                      <span className="inline-block h-2 w-2 rounded-full bg-primary-600" />
+                    )}
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-start justify-between gap-2">

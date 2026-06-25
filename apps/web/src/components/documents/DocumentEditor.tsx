@@ -1,21 +1,23 @@
 "use client";
 
-import { useEffect, useCallback } from "react";
-import { useEditor, EditorContent } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import Underline from "@tiptap/extension-underline";
+import CharacterCount from "@tiptap/extension-character-count";
+import Color from "@tiptap/extension-color";
+import Highlight from "@tiptap/extension-highlight";
 import Link from "@tiptap/extension-link";
-import Table from "@tiptap/extension-table";
-import TableRow from "@tiptap/extension-table-row";
+import Placeholder from "@tiptap/extension-placeholder";
+import { Table } from "@tiptap/extension-table";
 import TableCell from "@tiptap/extension-table-cell";
 import TableHeader from "@tiptap/extension-table-header";
+import TableRow from "@tiptap/extension-table-row";
 import TextAlign from "@tiptap/extension-text-align";
-import Highlight from "@tiptap/extension-highlight";
-import Color from "@tiptap/extension-color";
-import CharacterCount from "@tiptap/extension-character-count";
-import Placeholder from "@tiptap/extension-placeholder";
+import Underline from "@tiptap/extension-underline";
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import { useEffect } from "react";
 
 import { EditorToolbar } from "./EditorToolbar";
+
+import type { Content } from "@tiptap/react";
 
 interface Props {
   content?: Record<string, unknown> | null;
@@ -25,7 +27,13 @@ interface Props {
   className?: string;
 }
 
-export function DocumentEditor({ content, onChange, readOnly = false, placeholder = "Commencez à rédiger...", className = "" }: Props) {
+export function DocumentEditor({
+  content,
+  onChange,
+  readOnly = false,
+  placeholder = "Commencez à rédiger...",
+  className = "",
+}: Props) {
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -41,7 +49,7 @@ export function DocumentEditor({ content, onChange, readOnly = false, placeholde
       CharacterCount,
       Placeholder.configure({ placeholder }),
     ],
-    content: (content ?? undefined) as Record<string, unknown> | undefined,
+    content: (content ?? { type: "doc", content: [{ type: "paragraph" }] }) as Content,
     editable: !readOnly,
     onUpdate: ({ editor: ed }) => {
       onChange?.(ed.getJSON() as Record<string, unknown>);
@@ -55,7 +63,7 @@ export function DocumentEditor({ content, onChange, readOnly = false, placeholde
     const current = JSON.stringify(editor.getJSON());
     const next = JSON.stringify(content);
     if (current !== next) {
-      editor.commands.setContent(content as Record<string, unknown>);
+      editor.commands.setContent(content);
     }
   }, [editor, content]);
 
@@ -70,7 +78,9 @@ export function DocumentEditor({ content, onChange, readOnly = false, placeholde
   const wordCount = editor.storage["characterCount"]?.words() as number | undefined;
 
   return (
-    <div className={`flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm ${className}`}>
+    <div
+      className={`flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm ${className}`}
+    >
       {!readOnly && <EditorToolbar editor={editor} />}
 
       <div className="relative flex-1 overflow-y-auto">
@@ -92,7 +102,9 @@ export function DocumentEditor({ content, onChange, readOnly = false, placeholde
 
       {!readOnly && wordCount !== undefined && (
         <div className="flex items-center justify-end border-t border-slate-100 px-4 py-1.5">
-          <span className="text-xs text-slate-400">{wordCount.toLocaleString()} mot{wordCount !== 1 ? "s" : ""}</span>
+          <span className="text-xs text-slate-400">
+            {wordCount.toLocaleString()} mot{wordCount !== 1 ? "s" : ""}
+          </span>
         </div>
       )}
     </div>

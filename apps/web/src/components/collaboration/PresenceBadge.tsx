@@ -24,13 +24,14 @@ export function PresenceBadge({ status, className, showLabel = false }: Presence
   return (
     <span className={cn("inline-flex items-center gap-1.5", className)}>
       <span
-        className={cn("inline-block h-2.5 w-2.5 flex-shrink-0 rounded-full ring-2 ring-white", color)}
+        className={cn(
+          "inline-block h-2.5 w-2.5 flex-shrink-0 rounded-full ring-2 ring-white",
+          color,
+        )}
         aria-label={label}
         title={label}
       />
-      {showLabel && (
-        <span className="text-xs text-slate-500">{label}</span>
-      )}
+      {showLabel && <span className="text-xs text-slate-500">{label}</span>}
     </span>
   );
 }

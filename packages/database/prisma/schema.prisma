@@ -1,4 +1,4 @@
-// GovSphere — Prisma Schema v6 (v0.8.0 — Documents & Writer Platform)
+// GovSphere — Prisma Schema v7 (v0.9.0 — Calendar, Meetings & Events Platform)
 // Database: PostgreSQL 17
 // ORM: Prisma 5
 //
@@ -204,6 +204,25 @@ enum AuditAction {
   TASK_DELETED
   TASK_OVERDUE
   TASK_COMMENT_ADDED
+  // Calendar & Meetings (v0.9.0)
+  EVENT_CREATED
+  EVENT_UPDATED
+  EVENT_DELETED
+  EVENT_CANCELLED
+  MEETING_CREATED
+  MEETING_UPDATED
+  MEETING_CANCELLED
+  MEETING_COMPLETED
+  MEETING_PARTICIPANT_INVITED
+  MEETING_RSVP_ACCEPTED
+  MEETING_RSVP_DECLINED
+  MEETING_RSVP_DELEGATED
+  MEETING_ATTENDANCE_RECORDED
+  MEETING_MINUTES_CREATED
+  MEETING_MINUTES_PUBLISHED
+  MEETING_ACTION_ITEM_CREATED
+  ROOM_BOOKED
+  ROOM_BOOKING_CANCELLED
 }
 
 enum PresenceStatus {
@@ -216,7 +235,7 @@ enum PresenceStatus {
 
 enum ConversationType {
   DIRECT // 1:1 DM
-  GROUP  // multi-user group chat
+  GROUP // multi-user group chat
 }
 
 // ─── Document enums (v0.8.0) ─────────────────────────────────────────────────
@@ -291,40 +310,42 @@ enum FileStatus {
 // =============================================================================
 
 model Ministry {
-  id               String       @id @default(cuid())
-  name             String       @db.VarChar(255)
-  nameTranslations Json         @default("{}")
-  code             String       @unique @db.VarChar(50)
-  description      String?      @db.Text
-  logoUrl          String?      @db.VarChar(500)
-  isActive         Boolean      @default(true)
-  departments      Department[]
-  positions        Position[]
-  offices          Office[]
-  users            User[]
-  channels         Channel[]
-  userRoles        UserRoleAssignment[]
-  documents        Document[]
-  documentShares   DocumentShare[]
-  documentTemplates         DocumentTemplate[]
-  workflowTemplates         WorkflowTemplate[]
-  workflowDefinitions       WorkflowDefinition[]
-  createdAt        DateTime     @default(now())
-  updatedAt        DateTime     @updatedAt
+  id                  String               @id @default(cuid())
+  name                String               @db.VarChar(255)
+  nameTranslations    Json                 @default("{}")
+  code                String               @unique @db.VarChar(50)
+  description         String?              @db.Text
+  logoUrl             String?              @db.VarChar(500)
+  isActive            Boolean              @default(true)
+  departments         Department[]
+  positions           Position[]
+  offices             Office[]
+  users               User[]
+  channels            Channel[]
+  userRoles           UserRoleAssignment[]
+  documents           Document[]
+  documentShares      DocumentShare[]
+  documentTemplates   DocumentTemplate[]
+  workflowTemplates   WorkflowTemplate[]
+  workflowDefinitions WorkflowDefinition[]
+  calendarEvents      CalendarEvent[]
+  rooms               Room[]
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
 
   @@index([code])
   @@map("ministries")
 }
 
 model Department {
-  id               String     @id @default(cuid())
+  id               String               @id @default(cuid())
   ministryId       String
-  ministry         Ministry   @relation(fields: [ministryId], references: [id])
-  name             String     @db.VarChar(255)
-  nameTranslations Json       @default("{}")
-  code             String     @db.VarChar(50)
-  description      String?    @db.Text
-  isActive         Boolean    @default(true)
+  ministry         Ministry             @relation(fields: [ministryId], references: [id])
+  name             String               @db.VarChar(255)
+  nameTranslations Json                 @default("{}")
+  code             String               @db.VarChar(50)
+  description      String?              @db.Text
+  isActive         Boolean              @default(true)
   divisions        Division[]
   positions        Position[]
   users            User[]
@@ -332,8 +353,9 @@ model Department {
   userRoles        UserRoleAssignment[]
   documents        Document[]
   documentShares   DocumentShare[]
-  createdAt        DateTime   @default(now())
-  updatedAt        DateTime   @updatedAt
+  calendarEvents   CalendarEvent[]
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
 
   @@unique([ministryId, code])
   @@index([ministryId])
@@ -341,22 +363,23 @@ model Department {
 }
 
 model Division {
-  id               String     @id @default(cuid())
+  id               String               @id @default(cuid())
   departmentId     String
-  department       Department @relation(fields: [departmentId], references: [id])
-  name             String     @db.VarChar(255)
-  nameTranslations Json       @default("{}")
-  code             String     @db.VarChar(50)
-  description      String?    @db.Text
-  isActive         Boolean    @default(true)
+  department       Department           @relation(fields: [departmentId], references: [id])
+  name             String               @db.VarChar(255)
+  nameTranslations Json                 @default("{}")
+  code             String               @db.VarChar(50)
+  description      String?              @db.Text
+  isActive         Boolean              @default(true)
   users            User[]
   userRoles        UserRoleAssignment[]
   positions        Position[]
   channels         Channel[]
   documents        Document[]
   documentShares   DocumentShare[]
-  createdAt        DateTime   @default(now())
-  updatedAt        DateTime   @updatedAt
+  calendarEvents   CalendarEvent[]
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
 
   @@unique([departmentId, code])
   @@index([departmentId])
@@ -364,35 +387,36 @@ model Division {
 }
 
 model Province {
-  id               String    @id @default(cuid())
-  name             String    @db.VarChar(255)
-  nameTranslations Json      @default("{}")
-  code             String    @unique @db.VarChar(10)
-  capital          String?   @db.VarChar(255)
-  isActive         Boolean   @default(true)
+  id               String          @id @default(cuid())
+  name             String          @db.VarChar(255)
+  nameTranslations Json            @default("{}")
+  code             String          @unique @db.VarChar(10)
+  capital          String?         @db.VarChar(255)
+  isActive         Boolean         @default(true)
   offices          Office[]
   channels         Channel[]
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  calendarEvents   CalendarEvent[]
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
 
   @@index([code])
   @@map("provinces")
 }
 
 model Office {
-  id          String     @id @default(cuid())
-  provinceId  String
-  province    Province   @relation(fields: [provinceId], references: [id])
-  ministryId  String?
-  ministry    Ministry?  @relation(fields: [ministryId], references: [id])
-  name        String     @db.VarChar(255)
-  code        String     @db.VarChar(50)
-  address     String?    @db.Text
-  isActive    Boolean    @default(true)
-  positions   Position[]
-  users       User[]
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  id         String     @id @default(cuid())
+  provinceId String
+  province   Province   @relation(fields: [provinceId], references: [id])
+  ministryId String?
+  ministry   Ministry?  @relation(fields: [ministryId], references: [id])
+  name       String     @db.VarChar(255)
+  code       String     @db.VarChar(50)
+  address    String?    @db.Text
+  isActive   Boolean    @default(true)
+  positions  Position[]
+  users      User[]
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
 
   @@unique([provinceId, code])
   @@index([provinceId])
@@ -401,33 +425,33 @@ model Office {
 }
 
 enum PositionLevel {
-  EXECUTIVE       // Minister, Secretary-General
-  DIRECTOR        // Director-General, Director
-  MANAGER         // Division Chief, Section Chief
-  SPECIALIST      // Senior officer, Specialist
-  OFFICER         // Standard civil servant
-  SUPPORT         // Administrative support
+  EXECUTIVE // Minister, Secretary-General
+  DIRECTOR // Director-General, Director
+  MANAGER // Division Chief, Section Chief
+  SPECIALIST // Senior officer, Specialist
+  OFFICER // Standard civil servant
+  SUPPORT // Administrative support
 }
 
 model Position {
-  id               String        @id @default(cuid())
-  title            String        @db.VarChar(255)
-  titleTranslations Json         @default("{}")
-  code             String        @db.VarChar(50)
-  level            PositionLevel @default(OFFICER)
-  headcount        Int           @default(1)
-  ministryId       String?
-  ministry         Ministry?     @relation(fields: [ministryId], references: [id])
-  departmentId     String?
-  department       Department?   @relation(fields: [departmentId], references: [id])
-  divisionId       String?
-  division         Division?     @relation(fields: [divisionId], references: [id])
-  officeId         String?
-  office           Office?       @relation(fields: [officeId], references: [id])
-  isActive         Boolean       @default(true)
-  assignments      EmployeeAssignment[]
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @updatedAt
+  id                String               @id @default(cuid())
+  title             String               @db.VarChar(255)
+  titleTranslations Json                 @default("{}")
+  code              String               @db.VarChar(50)
+  level             PositionLevel        @default(OFFICER)
+  headcount         Int                  @default(1)
+  ministryId        String?
+  ministry          Ministry?            @relation(fields: [ministryId], references: [id])
+  departmentId      String?
+  department        Department?          @relation(fields: [departmentId], references: [id])
+  divisionId        String?
+  division          Division?            @relation(fields: [divisionId], references: [id])
+  officeId          String?
+  office            Office?              @relation(fields: [officeId], references: [id])
+  isActive          Boolean              @default(true)
+  assignments       EmployeeAssignment[]
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
 
   @@unique([ministryId, code])
   @@index([ministryId])
@@ -463,84 +487,112 @@ model EmployeeAssignment {
 // =============================================================================
 
 model User {
-  id                  String            @id @default(cuid())
+  id                         String                 @id @default(cuid())
   // Matricule — government-issued ID (e.g. "1.641.558", "478.432", "424.55")
   // MUST be stored as string: dots, varying formats, leading zeros must be preserved
-  matriculeNumber     String?           @unique @db.VarChar(50)
-  email               String            @unique @db.VarChar(255)
-  passwordHash        String            @db.VarChar(255)
-  firstName           String            @db.VarChar(100)
-  lastName            String            @db.VarChar(100)
-  displayName         String            @db.VarChar(200)
-  avatarUrl           String?           @db.VarChar(500)
-  userType            UserType          @default(GOVERNMENT_EMPLOYEE)
+  matriculeNumber            String?                @unique @db.VarChar(50)
+  email                      String                 @unique @db.VarChar(255)
+  passwordHash               String                 @db.VarChar(255)
+  firstName                  String                 @db.VarChar(100)
+  lastName                   String                 @db.VarChar(100)
+  displayName                String                 @db.VarChar(200)
+  avatarUrl                  String?                @db.VarChar(500)
+  userType                   UserType               @default(GOVERNMENT_EMPLOYEE)
   // Legacy single-role field — kept for quick permission checks.
   // Source of truth is UserRoleAssignment join table.
-  role                UserRole          @default(EMPLOYEE)
-  status              UserStatus        @default(PENDING)
-  preferredLanguage   SupportedLanguage @default(fr)
+  role                       UserRole               @default(EMPLOYEE)
+  status                     UserStatus             @default(PENDING)
+  preferredLanguage          SupportedLanguage      @default(fr)
   // MFA
-  mfaEnabled          Boolean           @default(false)
-  mfaSecret           String?           @db.VarChar(512) // AES-256-GCM encrypted
+  mfaEnabled                 Boolean                @default(false)
+  mfaSecret                  String?                @db.VarChar(512) // AES-256-GCM encrypted
   // Security tracking
-  failedLoginCount    Int               @default(0)
-  lockedUntil         DateTime?
-  passwordChangedAt   DateTime?
-  lastLoginAt         DateTime?
-  lastLoginIp         String?           @db.VarChar(50)
+  failedLoginCount           Int                    @default(0)
+  lockedUntil                DateTime?
+  passwordChangedAt          DateTime?
+  lastLoginAt                DateTime?
+  lastLoginIp                String?                @db.VarChar(50)
   // Contact
-  phone               String?           @db.VarChar(50)
+  phone                      String?                @db.VarChar(50)
   // Government structure
-  ministryId          String?
-  ministry            Ministry?         @relation(fields: [ministryId], references: [id])
-  departmentId        String?
-  department          Department?       @relation(fields: [departmentId], references: [id])
-  divisionId          String?
-  division            Division?         @relation(fields: [divisionId], references: [id])
-  officeId            String?
-  office              Office?           @relation(fields: [officeId], references: [id])
+  ministryId                 String?
+  ministry                   Ministry?              @relation(fields: [ministryId], references: [id])
+  departmentId               String?
+  department                 Department?            @relation(fields: [departmentId], references: [id])
+  divisionId                 String?
+  division                   Division?              @relation(fields: [divisionId], references: [id])
+  officeId                   String?
+  office                     Office?                @relation(fields: [officeId], references: [id])
   // Manager (self-relation)
-  managerId           String?
-  manager             User?             @relation("Subordinates", fields: [managerId], references: [id])
-  subordinates        User[]            @relation("Subordinates")
+  managerId                  String?
+  manager                    User?                  @relation("Subordinates", fields: [managerId], references: [id])
+  subordinates               User[]                 @relation("Subordinates")
   // Identity relations
-  roleAssignments     UserRoleAssignment[]
-  sessions            UserSession[]
-  devices             UserDevice[]
-  loginHistory        LoginHistory[]
-  passwordResetTokens PasswordResetToken[]
-  passwordHistory     PasswordHistory[]
-  mfaDevices          MfaDevice[]
-  mfaBackupCodes      MfaBackupCode[]
-  invitations         EmployeeInvitation[]
+  roleAssignments            UserRoleAssignment[]
+  sessions                   UserSession[]
+  devices                    UserDevice[]
+  loginHistory               LoginHistory[]
+  passwordResetTokens        PasswordResetToken[]
+  passwordHistory            PasswordHistory[]
+  mfaDevices                 MfaDevice[]
+  mfaBackupCodes             MfaBackupCode[]
+  invitations                EmployeeInvitation[]
   // Government structure
-  employeeAssignments EmployeeAssignment[]
-  workforceTransfers  WorkforceTransfer[]
+  employeeAssignments        EmployeeAssignment[]
+  workforceTransfers         WorkforceTransfer[]
   // Collaboration relations (v0.7.0)
-  sentMessages           Message[]            @relation("SentMessages")
-  channelMemberships     ChannelMember[]
-  receivedMentions       Mention[]            @relation("ReceivedMentions")
-  readReceipts           ReadReceipt[]        @relation("ReadReceipts")
-  conversationMemberships ConversationMember[] @relation("ConversationMemberships")
-  sentDirectMessages     DirectMessage[]      @relation("SentDirectMessages")
-  dmReactions            DMReaction[]         @relation("DMReactions")
-  conversationSettings   ConversationSettings[] @relation("ConversationSettings")
-  notifications          Notification[]
-  auditLogs              AuditLog[]
-  uploadedFiles          File[]
+  sentMessages               Message[]              @relation("SentMessages")
+  channelMemberships         ChannelMember[]
+  receivedMentions           Mention[]              @relation("ReceivedMentions")
+  readReceipts               ReadReceipt[]          @relation("ReadReceipts")
+  conversationMemberships    ConversationMember[]   @relation("ConversationMemberships")
+  sentDirectMessages         DirectMessage[]        @relation("SentDirectMessages")
+  dmReactions                DMReaction[]           @relation("DMReactions")
+  conversationSettings       ConversationSettings[] @relation("ConversationSettings")
+  notifications              Notification[]
+  auditLogs                  AuditLog[]
+  uploadedFiles              File[]
   // Document relations (v0.8.0)
-  authoredDocuments      Document[]           @relation("AuthoredDocuments")
-  savedVersions          DocumentVersion[]    @relation("SavedVersions")
-  documentShares         DocumentShare[]      @relation("SharingUser")
-  receivedShares         DocumentShare[]      @relation("SharedWithUser")
-  documentComments       DocumentComment[]    @relation("DocumentComments")
-  createdTemplates       DocumentTemplate[]   @relation("CreatedTemplates")
-  documentExports        DocumentExport[]     @relation("DocumentExports")
-  approvalRequests       DocumentApproval[]   @relation("ApprovalRequests")
-  approvalReviews        DocumentApproval[]   @relation("DocumentApprovals")
-  createdAt           DateTime          @default(now())
-  updatedAt           DateTime          @updatedAt
-  deletedAt           DateTime?
+  authoredDocuments          Document[]             @relation("AuthoredDocuments")
+  savedVersions              DocumentVersion[]      @relation("SavedVersions")
+  documentShares             DocumentShare[]        @relation("SharingUser")
+  receivedShares             DocumentShare[]        @relation("SharedWithUser")
+  documentComments           DocumentComment[]      @relation("DocumentComments")
+  createdTemplates           DocumentTemplate[]     @relation("CreatedTemplates")
+  documentExports            DocumentExport[]       @relation("DocumentExports")
+  approvalRequests           DocumentApproval[]     @relation("ApprovalRequests")
+  approvalReviews            DocumentApproval[]     @relation("DocumentApprovals")
+  // Workflow relations (v0.8.1)
+  createdWorkflowTemplates   WorkflowTemplate[]     @relation("CreatedWorkflowTemplates")
+  createdWorkflowDefinitions WorkflowDefinition[]   @relation("CreatedWorkflowDefinitions")
+  assignedWorkflowSteps      WorkflowStep[]         @relation("WorkflowStepAssignees")
+  initiatedWorkflows         WorkflowInstance[]     @relation("InitiatedWorkflows")
+  cancelledWorkflows         WorkflowInstance[]     @relation("CancelledWorkflows")
+  workflowAssignments        WorkflowAssignment[]   @relation("WorkflowAssignments")
+  workflowApprovals          WorkflowApproval[]     @relation("WorkflowApprovals")
+  delegatedApprovals         WorkflowApproval[]     @relation("DelegatedApprovals")
+  workflowComments           WorkflowComment[]      @relation("WorkflowComments")
+  workflowHistory            WorkflowHistory[]      @relation("WorkflowHistory")
+  digitalSignatures          DigitalSignature[]     @relation("DigitalSignatures")
+  revokedSignatures          DigitalSignature[]     @relation("RevokedSignatures")
+  assignedTasks              Task[]                 @relation("AssignedTasks")
+  createdTasks               Task[]                 @relation("CreatedTasks")
+  taskComments               TaskComment[]          @relation("TaskComments")
+  taskAttachments            TaskAttachment[]       @relation("TaskAttachments")
+  // Calendar & Meetings (v0.9.0)
+  createdEvents              CalendarEvent[]        @relation("CreatedEvents")
+  eventReminders             EventReminder[]        @relation("EventReminders")
+  organizedMeetings          Meeting[]              @relation("OrganizedMeetings")
+  meetingParticipations      MeetingParticipant[]   @relation("MeetingParticipations")
+  delegatedParticipations    MeetingParticipant[]   @relation("DelegatedParticipations")
+  agendaPresentations        MeetingAgendaItem[]    @relation("AgendaPresenters")
+  meetingMinutesAuthored     MeetingMinutes[]       @relation("MeetingMinutesAuthor")
+  meetingMinutesPublished    MeetingMinutes[]       @relation("MeetingMinutesPublisher")
+  meetingAttachments         MeetingAttachment[]    @relation("MeetingAttachments")
+  roomBookings               RoomBooking[]          @relation("RoomBookings")
+  createdAt                  DateTime               @default(now())
+  updatedAt                  DateTime               @updatedAt
+  deletedAt                  DateTime?
 
   @@index([email])
   @@index([matriculeNumber])
@@ -619,8 +671,8 @@ model Role {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  permissions  RolePermission[]
-  assignments  UserRoleAssignment[]
+  permissions RolePermission[]
+  assignments UserRoleAssignment[]
 
   @@index([weight])
   @@map("roles")
@@ -642,12 +694,12 @@ model Permission {
 }
 
 model RolePermission {
-  id           String   @id @default(cuid())
+  id           String     @id @default(cuid())
   roleId       String
   role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
   permissionId String
   permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
-  createdAt    DateTime @default(now())
+  createdAt    DateTime   @default(now())
 
   @@unique([roleId, permissionId])
   @@index([roleId])
@@ -657,11 +709,11 @@ model RolePermission {
 
 // Scoped role assignment: a user may hold different roles in different orgs
 model UserRoleAssignment {
-  id           String    @id @default(cuid())
+  id           String      @id @default(cuid())
   userId       String
-  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   roleId       String
-  role         Role      @relation(fields: [roleId], references: [id])
+  role         Role        @relation(fields: [roleId], references: [id])
   // Organizational scope (null = system-wide)
   ministryId   String?
   ministry     Ministry?   @relation(fields: [ministryId], references: [id])
@@ -670,9 +722,9 @@ model UserRoleAssignment {
   divisionId   String?
   division     Division?   @relation(fields: [divisionId], references: [id])
   grantedById  String
-  grantedAt    DateTime  @default(now())
+  grantedAt    DateTime    @default(now())
   expiresAt    DateTime?
-  isActive     Boolean   @default(true)
+  isActive     Boolean     @default(true)
 
   @@unique([userId, roleId, ministryId, departmentId, divisionId])
   @@index([userId])
@@ -686,23 +738,23 @@ model UserRoleAssignment {
 // =============================================================================
 
 model UserSession {
-  id           String    @id @default(cuid())
-  userId       String
-  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  deviceId     String?
-  device       UserDevice? @relation(fields: [deviceId], references: [id])
+  id              String      @id @default(cuid())
+  userId          String
+  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deviceId        String?
+  device          UserDevice? @relation(fields: [deviceId], references: [id])
   // Hashed JTI of the active refresh token (for rotation validation)
-  refreshTokenJti String? @db.VarChar(255)
+  refreshTokenJti String?     @db.VarChar(255)
   // Token family for reuse detection
-  tokenFamily  String    @db.VarChar(100)
-  ipAddress    String    @db.VarChar(50)
-  userAgent    String    @db.Text
-  platform     String    @db.VarChar(50) // "web" | "desktop" | "mobile"
-  isActive     Boolean   @default(true)
-  lastUsedAt   DateTime  @default(now())
-  revokedAt    DateTime?
-  expiresAt    DateTime
-  createdAt    DateTime  @default(now())
+  tokenFamily     String      @db.VarChar(100)
+  ipAddress       String      @db.VarChar(50)
+  userAgent       String      @db.Text
+  platform        String      @db.VarChar(50) // "web" | "desktop" | "mobile"
+  isActive        Boolean     @default(true)
+  lastUsedAt      DateTime    @default(now())
+  revokedAt       DateTime?
+  expiresAt       DateTime
+  createdAt       DateTime    @default(now())
 
   @@index([userId])
   @@index([refreshTokenJti])
@@ -713,17 +765,17 @@ model UserSession {
 }
 
 model UserDevice {
-  id          String    @id @default(cuid())
+  id          String   @id @default(cuid())
   userId      String
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  name        String    @db.VarChar(255)
-  platform    String    @db.VarChar(50)
-  fingerprint String    @db.VarChar(255)
-  trusted     Boolean   @default(false)
-  lastSeenAt  DateTime  @default(now())
-  createdAt   DateTime  @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String   @db.VarChar(255)
+  platform    String   @db.VarChar(50)
+  fingerprint String   @db.VarChar(255)
+  trusted     Boolean  @default(false)
+  lastSeenAt  DateTime @default(now())
+  createdAt   DateTime @default(now())
 
-  sessions    UserSession[]
+  sessions UserSession[]
 
   @@unique([userId, fingerprint])
   @@index([userId])
@@ -756,15 +808,15 @@ model LoginHistory {
 // =============================================================================
 
 model PasswordResetToken {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   // SHA-256 hash of the raw token (raw token is in the email link only)
-  tokenHash String   @unique @db.VarChar(255)
-  used      Boolean  @default(false)
+  tokenHash String    @unique @db.VarChar(255)
+  used      Boolean   @default(false)
   usedAt    DateTime?
   expiresAt DateTime
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
 
   @@index([userId])
   @@map("password_reset_tokens")
@@ -804,13 +856,13 @@ model MfaDevice {
 }
 
 model MfaBackupCode {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  codeHash  String   @db.VarChar(255) // bcrypt hash
-  isUsed    Boolean  @default(false)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  codeHash  String    @db.VarChar(255) // bcrypt hash
+  isUsed    Boolean   @default(false)
   usedAt    DateTime?
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
 
   @@index([userId])
   @@map("mfa_backup_codes")
@@ -859,16 +911,16 @@ model Channel {
 }
 
 model ChannelMember {
-  id               String   @id @default(cuid())
-  channelId        String
-  channel          Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
-  userId           String
-  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  isAdmin          Boolean  @default(false)
-  muteNotifications Boolean @default(false)
-  joinedAt         DateTime @default(now())
-  lastReadAt       DateTime @default(now())
-  leftAt           DateTime?
+  id                String    @id @default(cuid())
+  channelId         String
+  channel           Channel   @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  userId            String
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  isAdmin           Boolean   @default(false)
+  muteNotifications Boolean   @default(false)
+  joinedAt          DateTime  @default(now())
+  lastReadAt        DateTime  @default(now())
+  leftAt            DateTime?
 
   @@unique([channelId, userId])
   @@index([channelId])
@@ -878,26 +930,26 @@ model ChannelMember {
 }
 
 model Message {
-  id            String        @id @default(cuid())
+  id            String         @id @default(cuid())
   channelId     String
-  channel       Channel       @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  channel       Channel        @relation(fields: [channelId], references: [id], onDelete: Cascade)
   senderId      String
-  sender        User          @relation("SentMessages", fields: [senderId], references: [id])
-  type          MessageType   @default(TEXT)
-  content       String        @db.Text
+  sender        User           @relation("SentMessages", fields: [senderId], references: [id])
+  type          MessageType    @default(TEXT)
+  content       String         @db.Text
   replyToId     String?
-  replyTo       Message?      @relation("Replies", fields: [replyToId], references: [id])
-  replies       Message[]     @relation("Replies")
-  isPinned      Boolean       @default(false)
+  replyTo       Message?       @relation("Replies", fields: [replyToId], references: [id])
+  replies       Message[]      @relation("Replies")
+  isPinned      Boolean        @default(false)
   pinnedMessage PinnedMessage?
   reactions     Reaction[]
   mentions      Mention[]
   readReceipts  ReadReceipt[]
-  attachments   File[]        @relation("MessageFiles")
+  attachments   File[]         @relation("MessageFiles")
   editedAt      DateTime?
   deletedAt     DateTime?
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
 
   @@index([channelId])
   @@index([senderId])
@@ -920,31 +972,31 @@ model Reaction {
 }
 
 model PinnedMessage {
-  id        String   @id @default(cuid())
-  messageId String   @unique
-  message   Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
-  channelId String
-  channel   Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  id         String   @id @default(cuid())
+  messageId  String   @unique
+  message    Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  channelId  String
+  channel    Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
   pinnedById String
-  pinnedAt  DateTime @default(now())
+  pinnedAt   DateTime @default(now())
 
   @@index([channelId])
   @@map("pinned_messages")
 }
 
 model Mention {
-  id             String    @id @default(cuid())
-  messageId      String
-  message        Message   @relation(fields: [messageId], references: [id], onDelete: Cascade)
-  channelId      String
-  channel        Channel   @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  id            String    @id @default(cuid())
+  messageId     String
+  message       Message   @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  channelId     String
+  channel       Channel   @relation(fields: [channelId], references: [id], onDelete: Cascade)
   // Who was mentioned
-  userId         String
-  user           User      @relation("ReceivedMentions", fields: [userId], references: [id], onDelete: Cascade)
-  mentionedById  String
-  isRead         Boolean   @default(false)
-  readAt         DateTime?
-  createdAt      DateTime  @default(now())
+  userId        String
+  user          User      @relation("ReceivedMentions", fields: [userId], references: [id], onDelete: Cascade)
+  mentionedById String
+  isRead        Boolean   @default(false)
+  readAt        DateTime?
+  createdAt     DateTime  @default(now())
 
   @@index([userId, isRead])
   @@index([messageId])
@@ -972,18 +1024,18 @@ model ReadReceipt {
 // =============================================================================
 
 model Conversation {
-  id            String               @id @default(cuid())
-  type          ConversationType     @default(DIRECT)
-  name          String?              @db.VarChar(255) // null for 1:1 DMs
-  avatarUrl     String?              @db.VarChar(500)
+  id            String                 @id @default(cuid())
+  type          ConversationType       @default(DIRECT)
+  name          String?                @db.VarChar(255) // null for 1:1 DMs
+  avatarUrl     String?                @db.VarChar(500)
   createdById   String
-  isArchived    Boolean              @default(false)
+  isArchived    Boolean                @default(false)
   lastMessageAt DateTime?
   members       ConversationMember[]
   messages      DirectMessage[]
   settings      ConversationSettings[]
-  createdAt     DateTime             @default(now())
-  updatedAt     DateTime             @updatedAt
+  createdAt     DateTime               @default(now())
+  updatedAt     DateTime               @updatedAt
 
   @@index([createdById])
   @@index([lastMessageAt])
@@ -1007,21 +1059,21 @@ model ConversationMember {
 }
 
 model DirectMessage {
-  id             String        @id @default(cuid())
+  id             String          @id @default(cuid())
   conversationId String
-  conversation   Conversation  @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  conversation   Conversation    @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   senderId       String
-  sender         User          @relation("SentDirectMessages", fields: [senderId], references: [id])
-  type           MessageType   @default(TEXT)
-  content        String        @db.Text
+  sender         User            @relation("SentDirectMessages", fields: [senderId], references: [id])
+  type           MessageType     @default(TEXT)
+  content        String          @db.Text
   replyToId      String?
   replyTo        DirectMessage?  @relation("DMReplies", fields: [replyToId], references: [id])
   replies        DirectMessage[] @relation("DMReplies")
   reactions      DMReaction[]
   editedAt       DateTime?
   deletedAt      DateTime?
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
 
   @@index([conversationId, createdAt]) // cursor pagination
   @@index([senderId])
@@ -1064,26 +1116,26 @@ model ConversationSettings {
 // =============================================================================
 
 model File {
-  id           String      @id @default(cuid())
-  name         String      @db.VarChar(255)
-  originalName String      @db.VarChar(255)
-  mimeType     String      @db.VarChar(127)
+  id           String       @id @default(cuid())
+  name         String       @db.VarChar(255)
+  originalName String       @db.VarChar(255)
+  mimeType     String       @db.VarChar(127)
   size         BigInt
   category     FileCategory @default(OTHER)
-  status       FileStatus  @default(PENDING)
-  storageKey   String      @db.VarChar(500)
-  bucketName   String      @db.VarChar(100)
-  checksum     String?     @db.VarChar(64)
+  status       FileStatus   @default(PENDING)
+  storageKey   String       @db.VarChar(500)
+  bucketName   String       @db.VarChar(100)
+  checksum     String?      @db.VarChar(64)
   uploadedById String
-  uploadedBy   User        @relation(fields: [uploadedById], references: [id])
+  uploadedBy   User         @relation(fields: [uploadedById], references: [id])
   channelId    String?
-  channel      Channel?    @relation(fields: [channelId], references: [id])
+  channel      Channel?     @relation(fields: [channelId], references: [id])
   messageId    String?
-  message      Message?    @relation("MessageFiles", fields: [messageId], references: [id])
-  isPublic     Boolean     @default(false)
+  message      Message?     @relation("MessageFiles", fields: [messageId], references: [id])
+  isPublic     Boolean      @default(false)
   deletedAt    DateTime?
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
 
   @@index([uploadedById])
   @@index([channelId])
@@ -1383,21 +1435,21 @@ enum WorkflowTrigger {
 // ─── Workflow Templates ───────────────────────────────────────────────────────
 
 model WorkflowTemplate {
-  id             String          @id @default(cuid())
-  name           String          @db.VarChar(255)
-  description    String?         @db.Text
-  slug           String          @unique @db.VarChar(255)
-  trigger        WorkflowTrigger @default(MANUAL)
-  stepDefinitions Json           @default("[]")   // ordered array of step configs
-  isSystem       Boolean         @default(false)   // built-in government templates
-  isActive       Boolean         @default(true)
-  ministryId     String?
-  ministry       Ministry?       @relation(fields: [ministryId], references: [id])
-  createdById    String
-  createdBy      User            @relation("CreatedWorkflowTemplates", fields: [createdById], references: [id])
-  definitions    WorkflowDefinition[]
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
+  id              String               @id @default(cuid())
+  name            String               @db.VarChar(255)
+  description     String?              @db.Text
+  slug            String               @unique @db.VarChar(255)
+  trigger         WorkflowTrigger      @default(MANUAL)
+  stepDefinitions Json                 @default("[]") // ordered array of step configs
+  isSystem        Boolean              @default(false) // built-in government templates
+  isActive        Boolean              @default(true)
+  ministryId      String?
+  ministry        Ministry?            @relation(fields: [ministryId], references: [id])
+  createdById     String
+  createdBy       User                 @relation("CreatedWorkflowTemplates", fields: [createdById], references: [id])
+  definitions     WorkflowDefinition[]
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
 
   @@index([ministryId])
   @@index([isActive])
@@ -1407,21 +1459,21 @@ model WorkflowTemplate {
 // ─── Workflow Definitions ─────────────────────────────────────────────────────
 
 model WorkflowDefinition {
-  id           String           @id @default(cuid())
-  title        String           @db.VarChar(500)
-  description  String?          @db.Text
-  templateId   String?
-  template     WorkflowTemplate? @relation(fields: [templateId], references: [id])
-  trigger      WorkflowTrigger  @default(MANUAL)
-  isActive     Boolean          @default(true)
-  ministryId   String?
-  ministry     Ministry?        @relation(fields: [ministryId], references: [id])
-  createdById  String
-  createdBy    User             @relation("CreatedWorkflowDefinitions", fields: [createdById], references: [id])
-  steps        WorkflowStep[]
-  instances    WorkflowInstance[]
-  createdAt    DateTime         @default(now())
-  updatedAt    DateTime         @updatedAt
+  id          String             @id @default(cuid())
+  title       String             @db.VarChar(500)
+  description String?            @db.Text
+  templateId  String?
+  template    WorkflowTemplate?  @relation(fields: [templateId], references: [id])
+  trigger     WorkflowTrigger    @default(MANUAL)
+  isActive    Boolean            @default(true)
+  ministryId  String?
+  ministry    Ministry?          @relation(fields: [ministryId], references: [id])
+  createdById String
+  createdBy   User               @relation("CreatedWorkflowDefinitions", fields: [createdById], references: [id])
+  steps       WorkflowStep[]
+  instances   WorkflowInstance[]
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
 
   @@index([ministryId])
   @@index([isActive])
@@ -1431,23 +1483,23 @@ model WorkflowDefinition {
 // ─── Workflow Steps ───────────────────────────────────────────────────────────
 
 model WorkflowStep {
-  id             String             @id @default(cuid())
+  id             String               @id @default(cuid())
   definitionId   String
-  definition     WorkflowDefinition @relation(fields: [definitionId], references: [id], onDelete: Cascade)
+  definition     WorkflowDefinition   @relation(fields: [definitionId], references: [id], onDelete: Cascade)
   order          Int
-  name           String             @db.VarChar(255)
-  description    String?            @db.Text
-  roleId         String?            // role required to approve this step
-  assigneeId     String?            // specific user assigned
-  assignee       User?              @relation("WorkflowStepAssignees", fields: [assigneeId], references: [id])
-  durationHours  Int?               // SLA
-  allowDelegate  Boolean            @default(true)
-  allowEscalate  Boolean            @default(true)
-  requireComment Boolean            @default(false)
-  requireSign    Boolean            @default(false)
+  name           String               @db.VarChar(255)
+  description    String?              @db.Text
+  roleId         String? // role required to approve this step
+  assigneeId     String? // specific user assigned
+  assignee       User?                @relation("WorkflowStepAssignees", fields: [assigneeId], references: [id])
+  durationHours  Int? // SLA
+  allowDelegate  Boolean              @default(true)
+  allowEscalate  Boolean              @default(true)
+  requireComment Boolean              @default(false)
+  requireSign    Boolean              @default(false)
   assignments    WorkflowAssignment[]
-  createdAt      DateTime           @default(now())
-  updatedAt      DateTime           @updatedAt
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
 
   @@unique([definitionId, order])
   @@index([definitionId])
@@ -1457,33 +1509,33 @@ model WorkflowStep {
 // ─── Workflow Instances ───────────────────────────────────────────────────────
 
 model WorkflowInstance {
-  id             String             @id @default(cuid())
-  definitionId   String
-  definition     WorkflowDefinition @relation(fields: [definitionId], references: [id])
-  title          String             @db.VarChar(500)
-  description    String?            @db.Text
-  status         WorkflowStatus     @default(DRAFT)
-  currentStep    Int                @default(0)
-  totalSteps     Int                @default(0)
-  initiatorId    String
-  initiator      User               @relation("InitiatedWorkflows", fields: [initiatorId], references: [id])
-  documentId     String?            // optional linked document
-  metadata       Json               @default("{}")
-  startedAt      DateTime?
-  completedAt    DateTime?
-  cancelledAt    DateTime?
-  cancelledById  String?
-  cancelledBy    User?              @relation("CancelledWorkflows", fields: [cancelledById], references: [id])
-  dueAt          DateTime?
-  deletedAt      DateTime?
-  assignments    WorkflowAssignment[]
-  approvals      WorkflowApproval[]
-  comments       WorkflowComment[]
-  history        WorkflowHistory[]
-  tasks          Task[]
-  signatures     DigitalSignature[]
-  createdAt      DateTime           @default(now())
-  updatedAt      DateTime           @updatedAt
+  id            String               @id @default(cuid())
+  definitionId  String
+  definition    WorkflowDefinition   @relation(fields: [definitionId], references: [id])
+  title         String               @db.VarChar(500)
+  description   String?              @db.Text
+  status        WorkflowStatus       @default(DRAFT)
+  currentStep   Int                  @default(0)
+  totalSteps    Int                  @default(0)
+  initiatorId   String
+  initiator     User                 @relation("InitiatedWorkflows", fields: [initiatorId], references: [id])
+  documentId    String? // optional linked document
+  metadata      Json                 @default("{}")
+  startedAt     DateTime?
+  completedAt   DateTime?
+  cancelledAt   DateTime?
+  cancelledById String?
+  cancelledBy   User?                @relation("CancelledWorkflows", fields: [cancelledById], references: [id])
+  dueAt         DateTime?
+  deletedAt     DateTime?
+  assignments   WorkflowAssignment[]
+  approvals     WorkflowApproval[]
+  comments      WorkflowComment[]
+  history       WorkflowHistory[]
+  tasks         Task[]
+  signatures    DigitalSignature[]
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
 
   @@index([status])
   @@index([initiatorId])
@@ -1496,21 +1548,21 @@ model WorkflowInstance {
 // ─── Workflow Assignments (per-step per-instance) ─────────────────────────────
 
 model WorkflowAssignment {
-  id           String           @id @default(cuid())
-  instanceId   String
-  instance     WorkflowInstance @relation(fields: [instanceId], references: [id], onDelete: Cascade)
-  stepId       String
-  step         WorkflowStep     @relation(fields: [stepId], references: [id])
-  assigneeId   String
-  assignee     User             @relation("WorkflowAssignments", fields: [assigneeId], references: [id])
-  stepOrder    Int
-  status       StepStatus       @default(PENDING)
-  dueAt        DateTime?
-  notifiedAt   DateTime?
-  completedAt  DateTime?
-  approval     WorkflowApproval?
-  createdAt    DateTime         @default(now())
-  updatedAt    DateTime         @updatedAt
+  id          String            @id @default(cuid())
+  instanceId  String
+  instance    WorkflowInstance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  stepId      String
+  step        WorkflowStep      @relation(fields: [stepId], references: [id])
+  assigneeId  String
+  assignee    User              @relation("WorkflowAssignments", fields: [assigneeId], references: [id])
+  stepOrder   Int
+  status      StepStatus        @default(PENDING)
+  dueAt       DateTime?
+  notifiedAt  DateTime?
+  completedAt DateTime?
+  approval    WorkflowApproval?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
 
   @@index([instanceId])
   @@index([assigneeId])
@@ -1521,22 +1573,22 @@ model WorkflowAssignment {
 // ─── Workflow Approvals ───────────────────────────────────────────────────────
 
 model WorkflowApproval {
-  id             String               @id @default(cuid())
-  instanceId     String
-  instance       WorkflowInstance     @relation(fields: [instanceId], references: [id], onDelete: Cascade)
-  assignmentId   String               @unique
-  assignment     WorkflowAssignment   @relation(fields: [assignmentId], references: [id])
-  approverId     String
-  approver       User                 @relation("WorkflowApprovals", fields: [approverId], references: [id])
-  decision       ApprovalDecisionEnum
-  comment        String?              @db.Text
-  delegatedToId  String?
-  delegatedTo    User?                @relation("DelegatedApprovals", fields: [delegatedToId], references: [id])
-  stepOrder      Int
-  decidedAt      DateTime             @default(now())
-  signature      DigitalSignature?
-  createdAt      DateTime             @default(now())
-  updatedAt      DateTime             @updatedAt
+  id            String               @id @default(cuid())
+  instanceId    String
+  instance      WorkflowInstance     @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  assignmentId  String               @unique
+  assignment    WorkflowAssignment   @relation(fields: [assignmentId], references: [id])
+  approverId    String
+  approver      User                 @relation("WorkflowApprovals", fields: [approverId], references: [id])
+  decision      ApprovalDecisionEnum
+  comment       String?              @db.Text
+  delegatedToId String?
+  delegatedTo   User?                @relation("DelegatedApprovals", fields: [delegatedToId], references: [id])
+  stepOrder     Int
+  decidedAt     DateTime             @default(now())
+  signature     DigitalSignature?
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
 
   @@index([instanceId])
   @@index([approverId])
@@ -1546,19 +1598,19 @@ model WorkflowApproval {
 // ─── Workflow Comments ────────────────────────────────────────────────────────
 
 model WorkflowComment {
-  id         String           @id @default(cuid())
+  id         String            @id @default(cuid())
   instanceId String
-  instance   WorkflowInstance @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  instance   WorkflowInstance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
   authorId   String
-  author     User             @relation("WorkflowComments", fields: [authorId], references: [id])
-  content    String           @db.Text
+  author     User              @relation("WorkflowComments", fields: [authorId], references: [id])
+  content    String            @db.Text
   replyToId  String?
-  replyTo    WorkflowComment? @relation("WorkflowReplies", fields: [replyToId], references: [id])
+  replyTo    WorkflowComment?  @relation("WorkflowReplies", fields: [replyToId], references: [id])
   replies    WorkflowComment[] @relation("WorkflowReplies")
-  isInternal Boolean          @default(false)
+  isInternal Boolean           @default(false)
   deletedAt  DateTime?
-  createdAt  DateTime         @default(now())
-  updatedAt  DateTime         @updatedAt
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
 
   @@index([instanceId])
   @@index([authorId])
@@ -1587,22 +1639,22 @@ model WorkflowHistory {
 // ─── Digital Signatures ───────────────────────────────────────────────────────
 
 model DigitalSignature {
-  id           String            @id @default(cuid())
-  instanceId   String
-  instance     WorkflowInstance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
-  approvalId   String?           @unique
-  approval     WorkflowApproval? @relation(fields: [approvalId], references: [id])
-  signerId     String
-  signer       User              @relation("DigitalSignatures", fields: [signerId], references: [id])
-  signedAt     DateTime          @default(now())
-  ipAddress    String?           @db.VarChar(45)
-  userAgent    String?           @db.VarChar(500)
-  certificateRef String?         @db.VarChar(255) // future PKI
-  qrToken      String            @unique @default(cuid()) // QR verification
-  revokedAt    DateTime?
-  revokedById  String?
-  revokedBy    User?             @relation("RevokedSignatures", fields: [revokedById], references: [id])
-  createdAt    DateTime          @default(now())
+  id             String            @id @default(cuid())
+  instanceId     String
+  instance       WorkflowInstance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  approvalId     String?           @unique
+  approval       WorkflowApproval? @relation(fields: [approvalId], references: [id])
+  signerId       String
+  signer         User              @relation("DigitalSignatures", fields: [signerId], references: [id])
+  signedAt       DateTime          @default(now())
+  ipAddress      String?           @db.VarChar(45)
+  userAgent      String?           @db.VarChar(500)
+  certificateRef String?           @db.VarChar(255) // future PKI
+  qrToken        String            @unique @default(cuid()) // QR verification
+  revokedAt      DateTime?
+  revokedById    String?
+  revokedBy      User?             @relation("RevokedSignatures", fields: [revokedById], references: [id])
+  createdAt      DateTime          @default(now())
 
   @@index([instanceId])
   @@index([signerId])
@@ -1613,27 +1665,28 @@ model DigitalSignature {
 // ─── Tasks ────────────────────────────────────────────────────────────────────
 
 model Task {
-  id           String       @id @default(cuid())
-  title        String       @db.VarChar(500)
-  description  String?      @db.Text
-  status       TaskStatus   @default(TODO)
-  priority     TaskPriority @default(MEDIUM)
-  assigneeId   String?
-  assignee     User?        @relation("AssignedTasks", fields: [assigneeId], references: [id])
-  createdById  String
-  createdBy    User         @relation("CreatedTasks", fields: [createdById], references: [id])
-  instanceId   String?
-  instance     WorkflowInstance? @relation(fields: [instanceId], references: [id])
-  documentId   String?
-  dueAt        DateTime?
-  completedAt  DateTime?
-  cancelledAt  DateTime?
-  deletedAt    DateTime?
-  tags         String[]     @default([])
-  comments     TaskComment[]
-  attachments  TaskAttachment[]
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
+  id                String             @id @default(cuid())
+  title             String             @db.VarChar(500)
+  description       String?            @db.Text
+  status            TaskStatus         @default(TODO)
+  priority          TaskPriority       @default(MEDIUM)
+  assigneeId        String?
+  assignee          User?              @relation("AssignedTasks", fields: [assigneeId], references: [id])
+  createdById       String
+  createdBy         User               @relation("CreatedTasks", fields: [createdById], references: [id])
+  instanceId        String?
+  instance          WorkflowInstance?  @relation(fields: [instanceId], references: [id])
+  documentId        String?
+  dueAt             DateTime?
+  completedAt       DateTime?
+  cancelledAt       DateTime?
+  deletedAt         DateTime?
+  tags              String[]           @default([])
+  comments          TaskComment[]
+  attachments       TaskAttachment[]
+  meetingActionItem MeetingActionItem?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
 
   @@index([assigneeId])
   @@index([status])
@@ -1646,15 +1699,15 @@ model Task {
 // ─── Task Comments ────────────────────────────────────────────────────────────
 
 model TaskComment {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   taskId    String
-  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  task      Task      @relation(fields: [taskId], references: [id], onDelete: Cascade)
   authorId  String
-  author    User     @relation("TaskComments", fields: [authorId], references: [id])
-  content   String   @db.Text
+  author    User      @relation("TaskComments", fields: [authorId], references: [id])
+  content   String    @db.Text
   deletedAt DateTime?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   @@index([taskId])
   @@map("task_comments")
@@ -1676,4 +1729,403 @@ model TaskAttachment {
 
   @@index([taskId])
   @@map("task_attachments")
+}
+
+// =============================================================================
+// CALENDAR, MEETINGS & EVENTS (v0.9.0)
+// =============================================================================
+
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
+enum CalendarScope {
+  PERSONAL
+  TEAM
+  DEPARTMENT
+  MINISTRY
+  PROVINCE
+  NATIONAL
+}
+
+enum EventStatus {
+  TENTATIVE
+  CONFIRMED
+  CANCELLED
+}
+
+enum MeetingStatus {
+  DRAFT
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  POSTPONED
+}
+
+enum MeetingType {
+  REGULAR
+  EMERGENCY
+  CABINET
+  MINISTERIAL
+  COMMITTEE
+  WORKING_GROUP
+  BILATERAL
+  TRILATERAL
+  VIRTUAL
+  HYBRID
+}
+
+enum MeetingClassification {
+  PUBLIC
+  INTERNAL
+  CONFIDENTIAL
+  SECRET
+}
+
+enum ParticipantRole {
+  ORGANIZER
+  REQUIRED
+  OPTIONAL
+  PRESENTER
+  OBSERVER
+  SECRETARY
+}
+
+enum RsvpStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  TENTATIVE
+  DELEGATED
+}
+
+enum AttendanceStatus {
+  ABSENT
+  PRESENT
+  LATE
+  EXCUSED
+  DELEGATED
+}
+
+enum RecurrenceFrequency {
+  DAILY
+  WEEKLY
+  MONTHLY
+  YEARLY
+}
+
+enum ResourceType {
+  MEETING_ROOM
+  PROJECTOR
+  VEHICLE
+  FACILITY
+  EQUIPMENT
+}
+
+enum ReminderChannel {
+  IN_APP
+  EMAIL
+  SMS
+}
+
+// ─── Recurring Rule ───────────────────────────────────────────────────────────
+
+model RecurringRule {
+  id          String              @id @default(cuid())
+  frequency   RecurrenceFrequency
+  interval    Int                 @default(1) // every N freq units
+  daysOfWeek  Int[]               @default([]) // 0=Sun … 6=Sat
+  dayOfMonth  Int? // 1-31
+  monthOfYear Int? // 1-12
+  untilDate   DateTime?
+  occurrences Int? // max occurrences
+  events      CalendarEvent[]
+  createdAt   DateTime            @default(now())
+
+  @@map("recurring_rules")
+}
+
+// ─── Calendar Event ───────────────────────────────────────────────────────────
+
+model CalendarEvent {
+  id               String                @id @default(cuid())
+  title            String                @db.VarChar(500)
+  description      String?               @db.Text
+  location         String?               @db.VarChar(500)
+  onlineMeetingUrl String?               @db.VarChar(2000)
+  startAt          DateTime
+  endAt            DateTime
+  allDay           Boolean               @default(false)
+  timezone         String                @default("Africa/Kinshasa") @db.VarChar(100)
+  status           EventStatus           @default(CONFIRMED)
+  scope            CalendarScope         @default(PERSONAL)
+  classification   MeetingClassification @default(INTERNAL)
+  color            String?               @db.VarChar(20) // hex color for UI
+
+  // Owner / organizer
+  createdById String
+  createdBy   User   @relation("CreatedEvents", fields: [createdById], references: [id])
+
+  // Scoping relations (optional — set for team/dept/ministry/province events)
+  ministryId   String?
+  ministry     Ministry?   @relation(fields: [ministryId], references: [id])
+  departmentId String?
+  department   Department? @relation(fields: [departmentId], references: [id])
+  divisionId   String?
+  division     Division?   @relation(fields: [divisionId], references: [id])
+  provinceId   String?
+  province     Province?   @relation(fields: [provinceId], references: [id])
+
+  // Recurrence
+  recurringRuleId String?
+  recurringRule   RecurringRule?  @relation(fields: [recurringRuleId], references: [id])
+  parentEventId   String? // for exception instances of a recurrence
+  parentEvent     CalendarEvent?  @relation("RecurringInstances", fields: [parentEventId], references: [id])
+  instances       CalendarEvent[] @relation("RecurringInstances")
+
+  // Linked meeting (when event IS a meeting)
+  meeting Meeting?
+
+  // Reminders
+  reminders EventReminder[]
+
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([createdById])
+  @@index([startAt, endAt])
+  @@index([ministryId])
+  @@index([departmentId])
+  @@index([provinceId])
+  @@index([scope])
+  @@index([status])
+  @@map("calendar_events")
+}
+
+// ─── Event Reminder ───────────────────────────────────────────────────────────
+
+model EventReminder {
+  id            String          @id @default(cuid())
+  eventId       String
+  event         CalendarEvent   @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  userId        String
+  user          User            @relation("EventReminders", fields: [userId], references: [id])
+  minutesBefore Int // 15, 60, 1440 (24h), etc.
+  channel       ReminderChannel @default(IN_APP)
+  sentAt        DateTime?
+  createdAt     DateTime        @default(now())
+
+  @@index([eventId])
+  @@index([userId])
+  @@index([sentAt])
+  @@map("event_reminders")
+}
+
+// ─── Meeting ──────────────────────────────────────────────────────────────────
+
+model Meeting {
+  id               String                @id @default(cuid())
+  eventId          String                @unique
+  event            CalendarEvent         @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  title            String                @db.VarChar(500)
+  description      String?               @db.Text
+  location         String?               @db.VarChar(500)
+  onlineMeetingUrl String?               @db.VarChar(2000)
+  meetingType      MeetingType           @default(REGULAR)
+  status           MeetingStatus         @default(SCHEDULED)
+  classification   MeetingClassification @default(INTERNAL)
+
+  // Organizer
+  organizerId String
+  organizer   User   @relation("OrganizedMeetings", fields: [organizerId], references: [id])
+
+  // Room booking
+  roomId String?
+  room   Room?   @relation(fields: [roomId], references: [id])
+
+  // Linked document (meeting brief, for reference)
+  briefDocumentId String?
+
+  // Participants
+  participants MeetingParticipant[]
+
+  // Agenda
+  agendaItems MeetingAgendaItem[]
+
+  // Minutes
+  minutes MeetingMinutes?
+
+  // Action items (tasks generated from meeting)
+  actionItems MeetingActionItem[]
+
+  // Attachments
+  attachments MeetingAttachment[]
+
+  // Workflow for approval (e.g. minutes approval)
+  workflowInstanceId String?
+
+  metadata     Json      @default("{}")
+  cancelledAt  DateTime?
+  cancelReason String?   @db.Text
+  completedAt  DateTime?
+  deletedAt    DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([organizerId])
+  @@index([status])
+  @@index([meetingType])
+  @@index([roomId])
+  @@map("meetings")
+}
+
+// ─── Meeting Participant ──────────────────────────────────────────────────────
+
+model MeetingParticipant {
+  id               String            @id @default(cuid())
+  meetingId        String
+  meeting          Meeting           @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  userId           String
+  user             User              @relation("MeetingParticipations", fields: [userId], references: [id])
+  role             ParticipantRole   @default(REQUIRED)
+  rsvpStatus       RsvpStatus        @default(PENDING)
+  attendanceStatus AttendanceStatus?
+  rsvpAt           DateTime?
+  delegatedToId    String?
+  delegatedTo      User?             @relation("DelegatedParticipations", fields: [delegatedToId], references: [id])
+  reminderSentAt   DateTime?
+  note             String?           @db.VarChar(500)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  @@unique([meetingId, userId])
+  @@index([meetingId])
+  @@index([userId])
+  @@index([rsvpStatus])
+  @@map("meeting_participants")
+}
+
+// ─── Meeting Agenda Item ──────────────────────────────────────────────────────
+
+model MeetingAgendaItem {
+  id               String   @id @default(cuid())
+  meetingId        String
+  meeting          Meeting  @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  order            Int
+  title            String   @db.VarChar(500)
+  description      String?  @db.Text
+  presenterId      String?
+  presenter        User?    @relation("AgendaPresenters", fields: [presenterId], references: [id])
+  durationMinutes  Int?
+  supportingDocs   String[] @default([]) // document IDs
+  expectedDecision String?  @db.Text
+  completed        Boolean  @default(false)
+  notes            String?  @db.Text // minutes for this item
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([meetingId])
+  @@map("meeting_agenda_items")
+}
+
+// ─── Meeting Minutes ──────────────────────────────────────────────────────────
+
+model MeetingMinutes {
+  id                 String    @id @default(cuid())
+  meetingId          String    @unique
+  meeting            Meeting   @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  documentId         String?   @unique // linked GovSphere Writer document
+  authorId           String
+  author             User      @relation("MeetingMinutesAuthor", fields: [authorId], references: [id])
+  content            String?   @db.Text // rich text fallback when no document
+  isDraft            Boolean   @default(true)
+  publishedAt        DateTime?
+  publishedById      String?
+  publishedBy        User?     @relation("MeetingMinutesPublisher", fields: [publishedById], references: [id])
+  workflowInstanceId String? // minutes approval workflow
+  versionHistory     Json      @default("[]")
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  @@index([meetingId])
+  @@map("meeting_minutes")
+}
+
+// ─── Meeting Action Item ──────────────────────────────────────────────────────
+
+model MeetingActionItem {
+  id           String   @id @default(cuid())
+  meetingId    String
+  meeting      Meeting  @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  taskId       String   @unique // linked Task
+  task         Task     @relation(fields: [taskId], references: [id])
+  agendaItemId String?
+  sourceNote   String?  @db.VarChar(1000)
+  createdAt    DateTime @default(now())
+
+  @@index([meetingId])
+  @@map("meeting_action_items")
+}
+
+// ─── Meeting Attachment ───────────────────────────────────────────────────────
+
+model MeetingAttachment {
+  id           String   @id @default(cuid())
+  meetingId    String
+  meeting      Meeting  @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  uploadedById String
+  uploadedBy   User     @relation("MeetingAttachments", fields: [uploadedById], references: [id])
+  filename     String   @db.VarChar(500)
+  mimeType     String   @db.VarChar(100)
+  sizeBytes    Int
+  storageKey   String   @db.VarChar(1000)
+  documentId   String? // linked GovSphere document (if applicable)
+  createdAt    DateTime @default(now())
+
+  @@index([meetingId])
+  @@map("meeting_attachments")
+}
+
+// ─── Room / Resource ──────────────────────────────────────────────────────────
+
+model Room {
+  id          String        @id @default(cuid())
+  name        String        @db.VarChar(200)
+  code        String?       @db.VarChar(50) // e.g. "SALLE-A", "VEH-01"
+  type        ResourceType  @default(MEETING_ROOM)
+  capacity    Int?
+  location    String?       @db.VarChar(500)
+  description String?       @db.Text
+  amenities   String[]      @default([]) // "projector", "whiteboard", etc.
+  ministryId  String?
+  ministry    Ministry?     @relation(fields: [ministryId], references: [id])
+  isActive    Boolean       @default(true)
+  bookings    RoomBooking[]
+  meetings    Meeting[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([ministryId])
+  @@index([type])
+  @@map("rooms")
+}
+
+// ─── Room Booking ─────────────────────────────────────────────────────────────
+
+model RoomBooking {
+  id          String    @id @default(cuid())
+  roomId      String
+  room        Room      @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  bookedById  String
+  bookedBy    User      @relation("RoomBookings", fields: [bookedById], references: [id])
+  startAt     DateTime
+  endAt       DateTime
+  purpose     String?   @db.VarChar(500)
+  eventId     String? // linked calendar event
+  cancelledAt DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@index([roomId, startAt, endAt])
+  @@index([bookedById])
+  @@map("room_bookings")
 }

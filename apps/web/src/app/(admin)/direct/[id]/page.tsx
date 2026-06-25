@@ -1,15 +1,16 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { use } from "react";
 import { useSession } from "next-auth/react";
+import { use } from "react";
 
-import { AdminTopBar } from "@/components/layout/AdminTopBar";
-import { ChatWindow } from "@/components/collaboration/ChatWindow";
 import type { ChatMessage } from "@/components/collaboration/ChatWindow";
+import type { PresenceStatus } from "@/components/collaboration/PresenceBadge";
+
+import { ChatWindow } from "@/components/collaboration/ChatWindow";
 import { MessageComposer } from "@/components/collaboration/MessageComposer";
 import { PresenceBadge } from "@/components/collaboration/PresenceBadge";
-import type { PresenceStatus } from "@/components/collaboration/PresenceBadge";
+import { AdminTopBar } from "@/components/layout/AdminTopBar";
 import { PageSpinner } from "@/components/ui/Spinner";
 import { apiGet, apiPost } from "@/lib/api";
 
@@ -65,8 +66,7 @@ export default function DirectMessagePage({ params }: { params: Promise<{ id: st
   });
 
   const send = useMutation({
-    mutationFn: (content: string) =>
-      apiPost(`/v1/conversations/${id}/messages`, { content }),
+    mutationFn: (content: string) => apiPost(`/v1/conversations/${id}/messages`, { content }),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ["dm-messages", id] });
       void apiPost(`/v1/conversations/${id}/read`, {});
@@ -82,11 +82,19 @@ export default function DirectMessagePage({ params }: { params: Promise<{ id: st
   });
 
   if (convLoading) {
-    return <div className="flex h-full items-center justify-center"><PageSpinner /></div>;
+    return (
+      <div className="flex h-full items-center justify-center">
+        <PageSpinner />
+      </div>
+    );
   }
 
   if (!conv) {
-    return <div className="flex h-full items-center justify-center"><p className="text-sm text-slate-500">Conversation introuvable.</p></div>;
+    return (
+      <div className="flex h-full items-center justify-center">
+        <p className="text-sm text-slate-500">Conversation introuvable.</p>
+      </div>
+    );
   }
 
   const isDirect = conv.type === "DIRECT";
@@ -110,14 +118,12 @@ export default function DirectMessagePage({ params }: { params: Promise<{ id: st
         actions={presence ? <PresenceBadge status={presence.status} showLabel /> : undefined}
       />
 
-      <ChatWindow
-        messages={messages}
-        currentUserId={myId}
-        isLoading={msgsLoading}
-      />
+      <ChatWindow messages={messages} currentUserId={myId} isLoading={msgsLoading} />
 
       <MessageComposer
-        onSend={async (content) => { await send.mutateAsync(content); }}
+        onSend={async (content) => {
+          await send.mutateAsync(content);
+        }}
         placeholder={`Message ${isDirect ? (otherUser?.displayName ?? "") : title}`}
       />
     </div>

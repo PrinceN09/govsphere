@@ -62,9 +62,7 @@ function MessageBubble({
   onDelete?: () => void;
 }) {
   if (message.deletedAt) {
-    return (
-      <span className="text-xs italic text-slate-400">[Message supprimé]</span>
-    );
+    return <span className="text-xs italic text-slate-400">[Message supprimé]</span>;
   }
 
   // Group reactions by emoji
@@ -130,11 +128,12 @@ function MessageBubble({
       {/* Metadata */}
       <div className="mt-0.5 flex items-center gap-1">
         <span className="text-[10px] text-slate-400">
-          {new Date(message.createdAt).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}
+          {new Date(message.createdAt).toLocaleTimeString("fr-FR", {
+            hour: "2-digit",
+            minute: "2-digit",
+          })}
         </span>
-        {message.editedAt && (
-          <span className="text-[10px] text-slate-400 italic">· modifié</span>
-        )}
+        {message.editedAt && <span className="text-[10px] text-slate-400 italic">· modifié</span>}
         {(message._count?.replies ?? 0) > 0 && (
           <span className="text-[10px] text-primary-600">
             · {message._count?.replies} réponse{(message._count?.replies ?? 0) > 1 ? "s" : ""}
@@ -203,7 +202,10 @@ export function ChatWindow({
             const isOwn = msg.sender.id === currentUserId;
 
             return (
-              <div key={msg.id} className={`flex items-start gap-2.5 ${isOwn ? "flex-row-reverse" : ""}`}>
+              <div
+                key={msg.id}
+                className={`flex items-start gap-2.5 ${isOwn ? "flex-row-reverse" : ""}`}
+              >
                 {/* Avatar — only show when sender changes */}
                 {!isSameSender ? (
                   <Avatar name={msg.sender.displayName} url={msg.sender.avatarUrl} />
@@ -214,7 +216,9 @@ export function ChatWindow({
                 <div className={`max-w-[75%] ${isOwn ? "items-end" : "items-start"} flex flex-col`}>
                   {/* Sender name — only show when sender changes */}
                   {!isSameSender && (
-                    <span className={`mb-0.5 text-xs font-medium text-slate-600 ${isOwn ? "text-right" : ""}`}>
+                    <span
+                      className={`mb-0.5 text-xs font-medium text-slate-600 ${isOwn ? "text-right" : ""}`}
+                    >
                       {isOwn ? "Vous" : msg.sender.displayName}
                     </span>
                   )}

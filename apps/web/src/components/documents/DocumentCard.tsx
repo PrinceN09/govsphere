@@ -6,19 +6,35 @@ import { ClassificationBadge } from "./ClassificationBadge";
 
 type Classification = "PUBLIC" | "INTERNAL" | "CONFIDENTIAL" | "SECRET";
 type DocumentStatus = "DRAFT" | "REVIEW" | "APPROVED" | "PUBLISHED" | "ARCHIVED";
-type DocumentType = "MEMO" | "REPORT" | "CIRCULAR" | "LETTER" | "SPEECH" | "DECREE" | "DIRECTIVE" | "NOTE" | "OTHER";
+type DocumentType =
+  | "MEMO"
+  | "REPORT"
+  | "CIRCULAR"
+  | "LETTER"
+  | "SPEECH"
+  | "DECREE"
+  | "DIRECTIVE"
+  | "NOTE"
+  | "OTHER";
 
 const TYPE_LABELS: Record<DocumentType, string> = {
-  MEMO: "Mémo", REPORT: "Rapport", CIRCULAR: "Circulaire", LETTER: "Lettre",
-  SPEECH: "Discours", DECREE: "Décret", DIRECTIVE: "Directive", NOTE: "Note", OTHER: "Autre",
+  MEMO: "Mémo",
+  REPORT: "Rapport",
+  CIRCULAR: "Circulaire",
+  LETTER: "Lettre",
+  SPEECH: "Discours",
+  DECREE: "Décret",
+  DIRECTIVE: "Directive",
+  NOTE: "Note",
+  OTHER: "Autre",
 };
 
 const STATUS_CONFIG: Record<DocumentStatus, { label: string; dot: string }> = {
-  DRAFT:     { label: "Brouillon",  dot: "bg-slate-400" },
-  REVIEW:    { label: "En révision", dot: "bg-amber-400" },
-  APPROVED:  { label: "Approuvé",   dot: "bg-blue-500" },
-  PUBLISHED: { label: "Publié",     dot: "bg-emerald-500" },
-  ARCHIVED:  { label: "Archivé",    dot: "bg-slate-300" },
+  DRAFT: { label: "Brouillon", dot: "bg-slate-400" },
+  REVIEW: { label: "En révision", dot: "bg-amber-400" },
+  APPROVED: { label: "Approuvé", dot: "bg-blue-500" },
+  PUBLISHED: { label: "Publié", dot: "bg-emerald-500" },
+  ARCHIVED: { label: "Archivé", dot: "bg-slate-300" },
 };
 
 export interface DocumentSummary {
@@ -39,7 +55,11 @@ interface Props {
 }
 
 function fmtDate(iso: string) {
-  return new Date(iso).toLocaleDateString("fr-FR", { day: "2-digit", month: "short", year: "numeric" });
+  return new Date(iso).toLocaleDateString("fr-FR", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
 }
 
 export function DocumentCard({ doc }: Props) {
@@ -70,16 +90,19 @@ export function DocumentCard({ doc }: Props) {
         <span>{fmtDate(doc.updatedAt)}</span>
       </div>
 
-      {doc.ministry && (
-        <p className="mt-1.5 text-[11px] text-slate-400">{doc.ministry.name}</p>
-      )}
+      {doc.ministry && <p className="mt-1.5 text-[11px] text-slate-400">{doc.ministry.name}</p>}
 
       <div className="mt-2 flex items-center justify-between">
         <p className="text-[11px] text-slate-400">par {doc.author.displayName}</p>
         {doc.tags.length > 0 && (
           <div className="flex gap-1">
             {doc.tags.slice(0, 3).map((t) => (
-              <span key={t} className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] text-slate-600">{t}</span>
+              <span
+                key={t}
+                className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] text-slate-600"
+              >
+                {t}
+              </span>
             ))}
           </div>
         )}

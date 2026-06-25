@@ -3,11 +3,12 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { use } from "react";
 
+import type { ChatMessage } from "@/components/collaboration/ChatWindow";
+
+import { ChatWindow } from "@/components/collaboration/ChatWindow";
+import { MessageComposer } from "@/components/collaboration/MessageComposer";
 import { AdminTopBar } from "@/components/layout/AdminTopBar";
 import { Badge } from "@/components/ui/Badge";
-import { ChatWindow } from "@/components/collaboration/ChatWindow";
-import type { ChatMessage } from "@/components/collaboration/ChatWindow";
-import { MessageComposer } from "@/components/collaboration/MessageComposer";
 import { PageSpinner } from "@/components/ui/Spinner";
 import { apiDelete, apiGet, apiPost } from "@/lib/api";
 
@@ -43,29 +44,44 @@ export default function ChannelPage({ params }: { params: Promise<{ id: string }
 
   const sendMsg = useMutation({
     mutationFn: (content: string) => apiPost(`/v1/channels/${id}/messages`, { content }),
-    onSuccess: () => { void qc.invalidateQueries({ queryKey: ["channel-messages", id] }); },
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["channel-messages", id] });
+    },
   });
 
   const reactMsg = useMutation({
     mutationFn: ({ messageId, emoji }: { messageId: string; emoji: string }) =>
       apiPost(`/v1/messages/${messageId}/reactions`, { emoji }),
-    onSuccess: () => { void qc.invalidateQueries({ queryKey: ["channel-messages", id] }); },
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["channel-messages", id] });
+    },
   });
 
   const deleteMsg = useMutation({
     mutationFn: (messageId: string) => apiDelete(`/v1/messages/${messageId}`),
-    onSuccess: () => { void qc.invalidateQueries({ queryKey: ["channel-messages", id] }); },
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["channel-messages", id] });
+    },
   });
 
   if (channelLoading) {
-    return <div className="flex h-full items-center justify-center"><PageSpinner /></div>;
+    return (
+      <div className="flex h-full items-center justify-center">
+        <PageSpinner />
+      </div>
+    );
   }
 
   if (!channel) {
-    return <div className="flex h-full items-center justify-center"><p className="text-sm text-slate-500">Canal introuvable.</p></div>;
+    return (
+      <div className="flex h-full items-center justify-center">
+        <p className="text-sm text-slate-500">Canal introuvable.</p>
+      </div>
+    );
   }
 
-  const typeLabel = channel.type === "ANNOUNCEMENT" ? "Annonces" : channel.type === "PRIVATE" ? "Privé" : "Public";
+  const typeLabel =
+    channel.type === "ANNOUNCEMENT" ? "Annonces" : channel.type === "PRIVATE" ? "Privé" : "Public";
   const messages = messagesData?.data ?? [];
 
   return (
@@ -73,11 +89,7 @@ export default function ChannelPage({ params }: { params: Promise<{ id: string }
       <AdminTopBar
         title={`# ${channel.name}`}
         subtitle={channel.description ?? `${channel.memberCount} membres · ${typeLabel}`}
-        actions={
-          <Badge variant={channel.type === "PUBLIC" ? "blue" : "gray"}>
-            {typeLabel}
-          </Badge>
-        }
+        actions={<Badge variant={channel.type === "PUBLIC" ? "blue" : "gray"}>{typeLabel}</Badge>}
       />
 
       <ChatWindow
@@ -89,7 +101,9 @@ export default function ChannelPage({ params }: { params: Promise<{ id: string }
       />
 
       <MessageComposer
-        onSend={async (content) => { await sendMsg.mutateAsync(content); }}
+        onSend={async (content) => {
+          await sendMsg.mutateAsync(content);
+        }}
         placeholder={`Message # ${channel.name}`}
         disabled={channel.type === "ANNOUNCEMENT"}
       />

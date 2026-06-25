@@ -1,19 +1,28 @@
 "use client";
 
-import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
-
-import { AdminTopBar } from "@/components/layout/AdminTopBar";
-import { DocumentCard } from "@/components/documents/DocumentCard";
-import { ClassificationBadge } from "@/components/documents/ClassificationBadge";
-import { PageSpinner } from "@/components/ui/Spinner";
-import { apiGet } from "@/lib/api";
+import { useState } from "react";
 
 import type { DocumentSummary } from "@/components/documents/DocumentCard";
 
+import { ClassificationBadge } from "@/components/documents/ClassificationBadge";
+import { DocumentCard } from "@/components/documents/DocumentCard";
+import { AdminTopBar } from "@/components/layout/AdminTopBar";
+import { PageSpinner } from "@/components/ui/Spinner";
+import { apiGet } from "@/lib/api";
+
 type DocStatus = "DRAFT" | "REVIEW" | "APPROVED" | "PUBLISHED" | "ARCHIVED";
-type DocType = "MEMO" | "REPORT" | "CIRCULAR" | "LETTER" | "SPEECH" | "DECREE" | "DIRECTIVE" | "NOTE" | "OTHER";
+type DocType =
+  | "MEMO"
+  | "REPORT"
+  | "CIRCULAR"
+  | "LETTER"
+  | "SPEECH"
+  | "DECREE"
+  | "DIRECTIVE"
+  | "NOTE"
+  | "OTHER";
 
 interface ListResponse {
   data: DocumentSummary[];
@@ -67,7 +76,15 @@ export default function DocumentsPage() {
             href="/admin/documents/new"
             className="inline-flex items-center gap-1.5 rounded-lg bg-primary-600 px-3 py-1.5 text-sm font-medium text-white shadow-sm hover:bg-primary-700 transition-colors"
           >
-            <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2"><path d="M8 3v10M3 8h10" strokeLinecap="round"/></svg>
+            <svg
+              className="h-4 w-4"
+              viewBox="0 0 16 16"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <path d="M8 3v10M3 8h10" strokeLinecap="round" />
+            </svg>
             Nouveau document
           </Link>
         }
@@ -88,18 +105,29 @@ export default function DocumentsPage() {
             onChange={(e) => setStatus(e.target.value as DocStatus | "ALL")}
             className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm focus:border-primary-500 focus:outline-none"
           >
-            {STATUSES.map((s) => <option key={s.key} value={s.key}>{s.label}</option>)}
+            {STATUSES.map((s) => (
+              <option key={s.key} value={s.key}>
+                {s.label}
+              </option>
+            ))}
           </select>
           <select
             value={type}
             onChange={(e) => setType(e.target.value as DocType | "ALL")}
             className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm focus:border-primary-500 focus:outline-none"
           >
-            {TYPES.map((t) => <option key={t.key} value={t.key}>{t.label}</option>)}
+            {TYPES.map((t) => (
+              <option key={t.key} value={t.key}>
+                {t.label}
+              </option>
+            ))}
           </select>
 
           <div className="ml-auto flex items-center gap-2 text-sm text-slate-500">
-            <Link href="/admin/documents/shared-with-me" className="text-primary-600 hover:underline">
+            <Link
+              href="/admin/documents/shared-with-me"
+              className="text-primary-600 hover:underline"
+            >
               Partagés avec moi
             </Link>
             <span>·</span>
@@ -140,8 +168,18 @@ export default function DocumentsPage() {
 
 function DocumentsIcon() {
   return (
-    <svg className="mx-auto h-12 w-12 text-slate-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2z" strokeLinecap="round" strokeLinejoin="round"/>
+    <svg
+      className="mx-auto h-12 w-12 text-slate-300"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+    >
+      <path
+        d="M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2z"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }

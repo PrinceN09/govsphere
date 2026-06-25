@@ -214,6 +214,39 @@ function QueueListIcon() {
   );
 }
 
+function CalendarDaysIcon() {
+  return (
+    <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+      <path d="M5.25 12a.75.75 0 01.75-.75h.01a.75.75 0 01.75.75v.01a.75.75 0 01-.75.75H6a.75.75 0 01-.75-.75V12zM6 13.25a.75.75 0 00-.75.75v.01c0 .414.336.75.75.75h.01a.75.75 0 00.75-.75V14a.75.75 0 00-.75-.75H6zM7.25 12a.75.75 0 01.75-.75h.01a.75.75 0 01.75.75v.01a.75.75 0 01-.75.75H8a.75.75 0 01-.75-.75V12zM8 13.25a.75.75 0 00-.75.75v.01c0 .414.336.75.75.75h.01a.75.75 0 00.75-.75V14A.75.75 0 008 13.25H8zM9.25 10a.75.75 0 01.75-.75h.01a.75.75 0 01.75.75v.01a.75.75 0 01-.75.75H10a.75.75 0 01-.75-.75V10zM10 11.25a.75.75 0 00-.75.75v.01c0 .414.336.75.75.75h.01a.75.75 0 00.75-.75V12a.75.75 0 00-.75-.75H10zM9.25 12a.75.75 0 01.75-.75h.01a.75.75 0 01.75.75v.01a.75.75 0 01-.75.75H10a.75.75 0 01-.75-.75V12zM10 13.25a.75.75 0 00-.75.75v.01c0 .414.336.75.75.75h.01a.75.75 0 00.75-.75V14a.75.75 0 00-.75-.75H10zM11.25 12a.75.75 0 01.75-.75h.01a.75.75 0 01.75.75v.01a.75.75 0 01-.75.75H12a.75.75 0 01-.75-.75V12zM12 13.25a.75.75 0 00-.75.75v.01c0 .414.336.75.75.75h.01a.75.75 0 00.75-.75V14a.75.75 0 00-.75-.75H12z" />
+      <path
+        fillRule="evenodd"
+        d="M6.75 2.25A.75.75 0 017.5 3v1.5h5V3A.75.75 0 0114 3v1.5h.25A2.75 2.75 0 0117 7.25v9.5A2.75 2.75 0 0114.25 19.5H5.75A2.75 2.75 0 013 16.75v-9.5A2.75 2.75 0 015.75 4.5H6V3a.75.75 0 01.75-.75zm-1 5.5c-.69 0-1.25.56-1.25 1.25v7.5c0 .69.56 1.25 1.25 1.25h8.5c.69 0 1.25-.56 1.25-1.25v-7.5c0-.69-.56-1.25-1.25-1.25H5.75z"
+        clipRule="evenodd"
+      />
+    </svg>
+  );
+}
+
+function VideoCameraIcon() {
+  return (
+    <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+      <path d="M3.25 4A2.25 2.25 0 001 6.25v7.5A2.25 2.25 0 003.25 16h7.5A2.25 2.25 0 0013 13.75v-7.5A2.25 2.25 0 0010.75 4h-7.5zM19 4.75a.75.75 0 00-1.28-.53l-3 3a.75.75 0 00-.22.53v4.5c0 .199.079.39.22.53l3 3a.75.75 0 001.28-.53V4.75z" />
+    </svg>
+  );
+}
+
+function PlusCircleIcon() {
+  return (
+    <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+      <path
+        fillRule="evenodd"
+        d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-11.25a.75.75 0 00-1.5 0v2.5h-2.5a.75.75 0 000 1.5h2.5v2.5a.75.75 0 001.5 0v-2.5h2.5a.75.75 0 000-1.5h-2.5v-2.5z"
+        clipRule="evenodd"
+      />
+    </svg>
+  );
+}
+
 // ─── Nav items ────────────────────────────────────────────────────────────────
 
 const NAV_SECTION_MAIN: NavItem[] = [
@@ -333,6 +366,27 @@ const NAV_SECTION_WORKFLOW: NavItem[] = [
     label: "Tâches",
     icon: <QueueListIcon />,
     permission: PERMS.TASK_READ,
+  },
+];
+
+const NAV_SECTION_CALENDAR: NavItem[] = [
+  {
+    href: "/admin/calendar",
+    label: "Calendrier",
+    icon: <CalendarDaysIcon />,
+    permission: PERMS.CALENDAR_READ,
+  },
+  {
+    href: "/admin/meetings",
+    label: "Réunions",
+    icon: <VideoCameraIcon />,
+    permission: PERMS.MEETING_READ,
+  },
+  {
+    href: "/admin/meetings/new",
+    label: "Planifier une réunion",
+    icon: <PlusCircleIcon />,
+    permission: PERMS.MEETING_CREATE,
   },
 ];
 
@@ -473,6 +527,17 @@ export function AdminSidebar({ mobileOpen = false, onMobileClose }: AdminSidebar
             <NavGroup label="Workflows & Approbations">
               <NavSection
                 items={filterItems(NAV_SECTION_WORKFLOW)}
+                pathname={pathname}
+                isActive={isActive}
+              />
+            </NavGroup>
+          )}
+
+          {/* Calendrier & Réunions */}
+          {filterItems(NAV_SECTION_CALENDAR).length > 0 && (
+            <NavGroup label="Calendrier & Réunions">
+              <NavSection
+                items={filterItems(NAV_SECTION_CALENDAR)}
                 pathname={pathname}
                 isActive={isActive}
               />
