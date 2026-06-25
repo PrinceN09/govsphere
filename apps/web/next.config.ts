@@ -4,6 +4,10 @@ const nextConfig: NextConfig = {
   // Enable React strict mode for better development experience
   reactStrictMode: true,
 
+  // Standalone output bundles the server and all dependencies into .next/standalone.
+  // Required for the production Docker image (multi-stage copy from standalone dir).
+  output: "standalone",
+
   // Transpile internal monorepo packages
   transpilePackages: [
     "@govsphere/ui",

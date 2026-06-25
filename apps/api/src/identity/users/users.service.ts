@@ -469,7 +469,7 @@ export class UsersService {
       select: SAFE_USER_SELECT,
     });
 
-    this.permissionsService.invalidateCache(targetUserId);
+    void this.permissionsService.invalidateCache(targetUserId);
 
     this.auditService.log({
       userId: archivedBy.id,
@@ -521,7 +521,7 @@ export class UsersService {
         where: { userId: targetUserId, isActive: true },
         data: { isActive: false, revokedAt: new Date() },
       });
-      this.permissionsService.invalidateCache(targetUserId);
+      void this.permissionsService.invalidateCache(targetUserId);
     }
 
     const action =

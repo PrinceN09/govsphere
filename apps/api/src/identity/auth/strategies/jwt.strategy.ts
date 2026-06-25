@@ -3,6 +3,7 @@ import { ConfigService } from "@nestjs/config";
 import { PassportStrategy } from "@nestjs/passport";
 import { ExtractJwt, Strategy } from "passport-jwt";
 
+import { RedisService } from "../../../infrastructure/redis/redis.service";
 import { PrismaService } from "../../../prisma/prisma.service";
 import { PermissionsService } from "../../permissions/permissions.service";
 
@@ -14,6 +15,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, "jwt") {
     private readonly configService: ConfigService,
     private readonly prisma: PrismaService,
     private readonly permissionsService: PermissionsService,
+    private readonly redis: RedisService,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -24,7 +26,21 @@ export class JwtStrategy extends PassportStrategy(Strategy, "jwt") {
   }
 
   async validate(payload: AccessTokenPayload): Promise<AuthenticatedUser> {
-    // Verify user still exists and is active
+    // ── Blacklist check (Redis) ───────────────────────────────────────────────
+    // Fast path: if the JTI was blacklisted on logout, reject immediately
+    // without hitting the database. Falls back to DB-only check if Redis is down.
+    if (payload.jti) {
+      const blacklisted = await this.redis.isTokenBlacklisted(payload.jti).catch(() => false); // Redis unavailable — let DB session check handle it
+
+      if (blacklisted) {
+        throw new UnauthorizedException({
+          error: "TOKEN_REVOKED",
+          message: "Token has been revoked",
+        });
+      }
+    }
+
+    // ── DB user check ─────────────────────────────────────────────────────────
     const user = await this.prisma.user.findUnique({
       where: { id: payload.sub },
       select: {
@@ -47,7 +63,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, "jwt") {
       });
     }
 
-    // Resolve current permissions (cached by PermissionsService)
+    // ── Permission resolution (Redis-cached) ─────────────────────────────────
     const permissions = await this.permissionsService.resolvePermissionsForUser(user.id);
 
     return {

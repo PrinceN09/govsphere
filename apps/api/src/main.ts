@@ -40,8 +40,37 @@ async function bootstrap(): Promise<void> {
   // ── Security middleware ────────────────────────────────────────────────────
   app.use(
     helmet({
-      contentSecurityPolicy: nodeEnv === "production",
+      // Explicit CSP: API only serves JSON — no scripts, no frames, no media.
+      // Tighten in production; relax only what the Swagger UI requires in dev.
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'none'"],
+          scriptSrc: nodeEnv === "production" ? ["'none'"] : ["'self'", "'unsafe-inline'"],
+          styleSrc: nodeEnv === "production" ? ["'none'"] : ["'self'", "'unsafe-inline'"],
+          imgSrc: ["'self'", "data:"],
+          connectSrc: ["'self'"],
+          fontSrc: ["'none'"],
+          objectSrc: ["'none'"],
+          mediaSrc: ["'none'"],
+          frameSrc: ["'none'"],
+          frameAncestors: ["'none'"],
+          baseUri: ["'self'"],
+          formAction: ["'self'"],
+          upgradeInsecureRequests: nodeEnv === "production" ? [] : null,
+        },
+      },
       crossOriginEmbedderPolicy: nodeEnv === "production",
+      crossOriginOpenerPolicy: { policy: "same-origin" },
+      crossOriginResourcePolicy: { policy: "same-site" },
+      // Strict-Transport-Security: 2 years for production API
+      hsts:
+        nodeEnv === "production"
+          ? { maxAge: 63_072_000, includeSubDomains: true, preload: true }
+          : false,
+      referrerPolicy: { policy: "strict-origin-when-cross-origin" },
+      noSniff: true,
+      xssFilter: true,
+      hidePoweredBy: true,
     }),
   );
 

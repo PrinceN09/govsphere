@@ -131,7 +131,7 @@ export class RolesService {
       });
     }
 
-    this.permissionsService.invalidateCache(targetUserId);
+    void this.permissionsService.invalidateCache(targetUserId);
 
     this.auditService.log({
       userId: assignedBy.id,
@@ -232,7 +232,7 @@ export class RolesService {
       data: { isActive: false },
     });
 
-    this.permissionsService.invalidateCache(targetUserId);
+    void this.permissionsService.invalidateCache(targetUserId);
 
     this.auditService.log({
       userId: revokedBy.id,

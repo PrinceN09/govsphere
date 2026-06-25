@@ -5,6 +5,7 @@ import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import * as bcrypt from "bcryptjs";
 
+import { RedisService } from "../../infrastructure/redis/redis.service";
 import { PrismaService } from "../../prisma/prisma.service";
 import { AuditService } from "../audit/audit.service";
 import { PermissionsService } from "../permissions/permissions.service";
@@ -84,6 +85,7 @@ export class AuthService {
     private readonly auditService: AuditService,
     private readonly permissionsService: PermissionsService,
     private readonly sessionsService: SessionsService,
+    private readonly redis: RedisService,
   ) {}
 
   // ---------------------------------------------------------------------------
@@ -313,6 +315,16 @@ export class AuthService {
       where: { id: sessionId, userId },
       data: { isActive: false, revokedAt: new Date() },
     });
+
+    // Blacklist the access token JTI in Redis so in-flight tokens are immediately
+    // invalidated even within their remaining 15-minute lifetime.
+    if (accessTokenJti) {
+      const ACCESS_TOKEN_TTL_S = 15 * 60; // 15 minutes — must match issueTokenPair expiresIn
+      await this.redis.blacklistToken(accessTokenJti, ACCESS_TOKEN_TTL_S).catch(() => {
+        // Non-fatal: session is already revoked in DB; blacklist is a belt-and-suspenders measure
+        this.logger.warn("Failed to blacklist JTI in Redis on logout", { jti: accessTokenJti });
+      });
+    }
 
     this.auditService.log({
       userId,

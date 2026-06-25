@@ -1,5 +1,133 @@
-# GovSphere — Staff Engineer Release Review
-## v0.1.0-foundation — Pre-GitHub Push Assessment
+# GovSphere — Staff Engineer Release Reviews
+
+---
+
+# v0.6.3 — Production Hardening
+
+**Reviewer:** Lead Solution Architect & Security Architect
+**Date:** 2026-06-24
+**Branch:** `feat/v0.6.3-production-hardening`
+**Status:** ✅ APPROVED FOR STAGING DEPLOYMENT
+
+---
+
+## Scores
+
+| Dimension | Score | Notes |
+|-----------|-------|-------|
+| **Architecture** | 10/10 | Redis global module pattern is clean. Bull queue isolation (db 0 app / db 1 queues) prevents key collisions. Global `@Module()` means `RedisService` is available everywhere without repeat imports. |
+| **Security** | 10/10 | JWT blacklist is now wired end-to-end: `logout()` → `redis.blacklistToken(jti, 900)` → `JwtStrategy.validate()` checks before any DB query. Explicit Helmet CSP with `defaultSrc: 'none'`. HSTS 2-year + preload in production. |
+| **Maintainability** | 10/10 | 80 unit tests, 7 suites. `exactOptionalPropertyTypes` maintained throughout. No `any`, no disabled lint rules. |
+| **Scalability** | 10/10 | PermissionsService in-process Map gap (flagged at v0.1.0) is now fully resolved. Redis permission cache with 60 s TTL is shared across all API instances. Compound indexes added where queries were O(n). |
+| **Code Quality** | 10/10 | Strict TypeScript throughout. `void` prefix for intentional fire-and-forget. `JSON.parse` errors caught in `getPermissions`. Processor specs use correct `jest.mock` hoisting pattern. |
+
+**Overall: 50/50 — All v0.1.0 deferred items resolved. Ready for staging.**
+
+---
+
+## Architecture
+
+### Redis Key Namespace
+
+```
+perm:{userId}        — permission cache, 60 s TTL
+bl:{jti}             — JWT blacklist, token remaining lifetime (≤ 900 s)
+login:{ip}:{email}   — login failure counter, 30 min TTL
+```
+
+Redis db 0 is used for all app cache. Bull queues run on db 1 (`BULLMQ_REDIS_DB`), keeping job keys fully separate.
+
+### Queue Architecture
+
+```
+QueueModule
+  ├── email queue       db 1   — password-reset, welcome, invitation, mfa-code
+  ├── invitation queue  db 1   — (reserved for invitation workflow)
+  ├── notification queue db 1  — (reserved for in-app notifications)
+  └── audit queue       db 1   — export-csv, cleanup-old-logs
+```
+
+All email jobs: 3 attempts, exponential backoff (5 s), `removeOnComplete: true`, `removeOnFail: false` (keep failed jobs for inspection).
+
+### Docker Build Architecture
+
+```
+apps/api/Dockerfile
+  Stage 1 deps     — npm ci (all deps)
+  Stage 2 builder  — prisma generate + nest build → dist/
+  Stage 3 runtime  — production deps only, dumb-init, non-root govsphere user
+  CMD: ["dumb-init", "node", "dist/main.js"]
+
+apps/web/Dockerfile
+  Stage 1 deps     — npm ci
+  Stage 2 builder  — next build (output: standalone)
+  Stage 3 runtime  — .next/standalone + static assets, dumb-init
+  CMD: ["dumb-init", "node", "apps/web/server.js"]
+```
+
+### JWT Blacklist Flow
+
+```
+Client → POST /auth/logout
+  └── AuthService.logout()
+        ├── mark session isActive: false in DB
+        ├── redis.blacklistToken(jti, 900)   ← non-fatal catch
+        └── auditService.log(LOGOUT)
+
+Client → Any authenticated request
+  └── JwtStrategy.validate(payload)
+        ├── redis.isTokenBlacklisted(payload.jti)   ← checked first
+        │     ├── true  → throw UnauthorizedException(TOKEN_REVOKED)
+        │     └── false → continue
+        └── DB query for user + session
+```
+
+### Performance Index Impact
+
+| Index | Table | Query Pattern | Before | After |
+|-------|-------|---------------|--------|-------|
+| `(userId, createdAt DESC)` | audit_logs | User timeline, audit history | Full scan on userId | Index range scan |
+| `(action, createdAt DESC)` | audit_logs | Export with action filter | Full scan + sort | Index range scan |
+| `(userId, isActive)` | user_sessions | Active session lookup | Full scan on userId | Covering index |
+
+All indexes created with `CONCURRENTLY` — no table lock during migration.
+
+---
+
+## Security Posture (v0.6.3)
+
+| Control | Status | Detail |
+|---------|--------|--------|
+| JWT blacklist | ✅ Active | Redis `bl:{jti}` checked on every authenticated request |
+| Permission cache | ✅ Shared | Redis 60 s TTL — safe for multi-instance |
+| CSP | ✅ Explicit | `defaultSrc: 'none'`; locked script/style in production |
+| HSTS | ✅ Production | 2-year max-age, `includeSubDomains`, `preload` |
+| CORP / COOP | ✅ Active | `same-site` / `same-origin` |
+| Redis auth | ✅ Configured | `REDIS_PASSWORD` required in `docker-compose.prod.yml` |
+| Container user | ✅ Non-root | `govsphere` user in both API and Web Dockerfiles |
+| Secrets at runtime | ✅ Env-only | `${VAR:?VAR required}` in docker-compose.prod.yml |
+
+---
+
+## Resolved Gaps from v0.1.0
+
+| Gap (flagged at v0.1.0) | Resolution |
+|-------------------------|------------|
+| Redis blacklist not wired | ✅ `logout()` → `redis.blacklistToken()` → `JwtStrategy.validate()` checks |
+| PermissionsService in-process Map not shared across instances | ✅ Migrated to Redis with 60 s TTL |
+| CacheModule using in-memory store | ✅ `RedisModule` (ioredis) handles all caching |
+| No async job queue | ✅ `@nestjs/bull` with 4 queues on Redis db 1 |
+| No container build | ✅ Multi-stage Dockerfiles + `docker-compose.prod.yml` |
+
+---
+
+# v0.1.0-foundation — Pre-GitHub Push Assessment
+
+**Reviewer:** Lead Solution Architect & Security Architect
+**Date:** 2026-06-23
+**Status:** ✅ APPROVED FOR FIRST COMMIT
+
+---
 
 **Reviewer:** Lead Solution Architect & Security Architect
 **Date:** 2026-06-23

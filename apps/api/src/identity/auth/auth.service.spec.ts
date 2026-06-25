@@ -5,6 +5,7 @@ import { Test, type TestingModule } from "@nestjs/testing";
 import * as bcrypt from "bcryptjs";
 
 import { AuthService } from "./auth.service";
+import { RedisService } from "../../infrastructure/redis/redis.service";
 import { PrismaService } from "../../prisma/prisma.service";
 import { AuditService } from "../audit/audit.service";
 import { PermissionsService } from "../permissions/permissions.service";
@@ -139,6 +140,16 @@ describe("AuthService", () => {
         { provide: AuditService, useValue: mockAuditService },
         { provide: PermissionsService, useValue: mockPermissionsService },
         { provide: SessionsService, useValue: mockSessionsService },
+        {
+          provide: RedisService,
+          useValue: {
+            blacklistToken: jest.fn().mockResolvedValue(undefined),
+            isTokenBlacklisted: jest.fn().mockResolvedValue(false),
+            incrementLoginFailures: jest.fn().mockResolvedValue(1),
+            resetLoginFailures: jest.fn().mockResolvedValue(undefined),
+            getLoginFailures: jest.fn().mockResolvedValue(0),
+          },
+        },
       ],
     }).compile();
 

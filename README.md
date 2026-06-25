@@ -196,7 +196,11 @@ Copy `.env.example` to `.env` and configure the following required variables:
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `DATABASE_URL` | ✅ | PostgreSQL connection string |
-| `REDIS_URL` | ✅ | Redis connection string |
+| `REDIS_HOST` | ✅ | Redis host (default: `127.0.0.1`) |
+| `REDIS_PORT` | ✅ | Redis port (default: `6379`) |
+| `REDIS_PASSWORD` | — | Redis password (required in production) |
+| `REDIS_DB` | — | Redis DB index for app cache (default: `0`) |
+| `BULLMQ_REDIS_DB` | — | Redis DB index for Bull queues (default: `1`) |
 | `JWT_PRIVATE_KEY` | ✅ | RS256 private key (PEM, base64-encoded) |
 | `JWT_PUBLIC_KEY` | ✅ | RS256 public key (PEM, base64-encoded) |
 | `MFA_ENCRYPTION_KEY` | ✅ | 32-byte hex key for AES-256-GCM TOTP encryption |
@@ -254,6 +258,34 @@ npm run db:studio
 # Reset the database (⚠️ destroys all data)
 npm run db:reset
 ```
+
+## Production Deployment (Docker)
+
+v0.6.3 ships multi-stage Dockerfiles for both `apps/api` and `apps/web`, plus a production-grade `docker-compose.prod.yml`.
+
+```bash
+# Copy and fill in production secrets
+cp .env.example .env.prod
+# Edit .env.prod — all ${VAR:?VAR required} vars must be set
+
+# Build and start all services
+docker compose -f docker-compose.prod.yml --env-file .env.prod up -d
+
+# Run migrations against the production DB
+docker compose -f docker-compose.prod.yml exec api npx prisma migrate deploy
+```
+
+Services started by `docker-compose.prod.yml`:
+
+| Service | Port | Notes |
+|---------|------|-------|
+| `api` | 4000 | NestJS — non-root `govsphere` user, dumb-init PID 1 |
+| `web` | 3000 | Next.js standalone output |
+| `postgres` | 5432 (internal) | Named volume, healthcheck |
+| `redis` | 6379 (internal) | 512 MB maxmemory, allkeys-lru eviction |
+| `minio` | 9000 (internal) | S3-compatible object storage |
+
+All services run on the internal `govsphere_prod_network`; only `api` and `web` should be exposed via a reverse proxy (nginx/Caddy).
 
 ## Running the Project
 
@@ -395,10 +427,13 @@ Full engineering documentation is in [`docs/`](./docs/):
 | Version | Focus | Status |
 |---------|-------|--------|
 | v0.1.0 | Foundation — monorepo, tooling, Identity Platform | ✅ Complete |
-| v0.2.0 | Channels & Messaging | 🔜 Next |
-| v0.3.0 | File Management | Planned |
-| v0.4.0 | Notifications | Planned |
-| v0.5.0 | Search | Planned |
+| v0.5.0 | Design System & UI Polish | ✅ Complete |
+| v0.6.0 | Employee Lifecycle & Invitation Flow | ✅ Complete |
+| v0.6.1 | Workforce Management & Org Chart | ✅ Complete |
+| v0.6.2 | Security Operations Center | ✅ Complete |
+| v0.6.3 | Production Hardening (Redis, Queues, Docker, CSP) | ✅ Complete |
+| v0.7.0 | Channels & Messaging (Socket.IO) | 🔜 Next |
+| v0.8.0 | File Management (MinIO) | Planned |
 | v1.0.0 | Production Release | Planned |
 
 See [10_Roadmap.md](./docs/10_Roadmap.md) for the complete roadmap.

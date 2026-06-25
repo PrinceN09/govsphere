@@ -7,6 +7,102 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [0.6.3] — 2026-06-24
+
+**Production Hardening.** Redis infrastructure, async job queues, compound performance indexes, multi-stage Docker builds, and security hardening (JWT blacklist, explicit CSP, HSTS). 80 unit tests across 7 suites.
+
+### Added
+
+**Redis Infrastructure (`apps/api`)**
+- `RedisModule` — `@Global()` ioredis module with configurable host/port/db/password, lazy-connect disabled, exponential backoff retry strategy, READONLY + ECONNRESET reconnect-on-error
+- `RedisService` — typed wrapper: permission cache (`perm:{userId}`, 60 s TTL), JWT blacklist (`bl:{jti}`, token-lifetime TTL), login rate-limit counters (`login:{ip}:{email}`, 30 min TTL), generic `get/set/del/exists/ttl`, health `ping()`
+- `RedisHealthIndicator` — extends `@nestjs/terminus` `HealthIndicator`; added to `GET /health/ready` and exposed at `GET /health/redis`
+- Migrated `PermissionsService` from in-process `Map` to Redis with 60 s TTL, graceful fallback to DB on Redis error
+
+**Queue System (`apps/api`)**
+- `QueueModule` — `@nestjs/bull` wired with BullModule; Redis db 1 for Bull (separate from app cache on db 0)
+- Four queues: `email`, `invitation`, `notification`, `audit` (constants in `queues.ts`)
+- `EmailProcessor` — nodemailer handlers for `password-reset`, `welcome`, `invitation`, `mfa-code`; all email templates in French
+- `AuditExportProcessor` — `export-csv` (Prisma count + filter), `cleanup-old-logs` (deleteMany with configurable retention days)
+- `EmailQueueService` — enqueueing service with `attempts: 3`, exponential backoff (5 s), `removeOnComplete: true`
+
+**Performance Indexes (`packages/database`)**
+- `AuditLog`: compound `@@index([userId, createdAt])` and `@@index([action, createdAt])`
+- `UserSession`: compound `@@index([userId, isActive])`
+- Migration `20260624230000_v0_6_3_performance_indexes` using `CREATE INDEX CONCURRENTLY IF NOT EXISTS` (no table locks)
+
+**Docker & Infrastructure**
+- `apps/api/Dockerfile` — 3-stage: `deps` (npm ci) → `builder` (prisma generate + nest build) → `runtime` (dumb-init, non-root `govsphere` user)
+- `apps/web/Dockerfile` — 3-stage using Next.js `output: "standalone"`
+- `docker-compose.prod.yml` — all services: postgres, redis (512 MB maxmemory, allkeys-lru), minio, api, web; internal `govsphere_prod_network`; health checks on every service; secrets via `${VAR:?VAR required}` syntax
+
+**Testing**
+- `redis.service.spec.ts` — 20 tests: generic ops, permission cache (hit/miss/corrupt JSON), JWT blacklist, login rate-limit (first-call expire, subsequent no-expire, reset), ping, lifecycle
+- `permissions.service.spec.ts` — rewritten: 11 tests covering Redis cache hit, miss, error fallback, deduplication, empty set, non-fatal write failure, invalidation
+- `security.service.spec.ts` — 7 tests: `revokeSessionById` (success + NotFoundException), `revokeAllSessionsForUser` (count 3, count 0), `findAllSessions` (paginated with meta)
+- `email.processor.spec.ts` — 9 tests: each email handler verifies recipient + content, lifecycle hooks (onActive, onCompleted, onFailed)
+- `audit-export.processor.spec.ts` — 5 tests: export with filters, full export, cleanup with config retention, cleanup with job retention, onFailed hook
+
+**Total: 80 unit tests across 7 suites, all passing.**
+
+### Changed
+
+**Security Hardening (`apps/api`)**
+- `auth.service.ts` — `logout()` blacklists access token JTI in Redis (`bl:{jti}`, 15 min TTL); non-fatal on Redis failure
+- `jwt.strategy.ts` — `validate()` checks `redis.isTokenBlacklisted(payload.jti)` before DB query; throws `TOKEN_REVOKED` `UnauthorizedException` if blacklisted
+- `main.ts` — explicit Helmet CSP directives (`defaultSrc: 'none'`, locked `scriptSrc/styleSrc` in production), `crossOriginOpenerPolicy: same-origin`, `crossOriginResourcePolicy: same-site`, HSTS 2-year with `includeSubDomains` + `preload` (production only)
+
+**Next.js (`apps/web`)**
+- `next.config.ts` — added `output: "standalone"` (required for multi-stage Docker build)
+
+### Fixed
+- `getPermissions` in `RedisService` now catches `JSON.parse` errors for corrupted cache entries and returns `null` (cache miss semantics)
+- `invalidateCache` in `PermissionsService` is now `async`; all callers in `roles.service.ts` and `users.service.ts` use `void` prefix for intentional fire-and-forget
+
+---
+
+## [0.6.2] — 2026-06-24
+
+**Security Operations Center.** Session management, audit center, employee security tab, and security dashboard with real-time threat indicators.
+
+### Added
+- `SecurityModule` — dashboard endpoint, session revocation (single + all), user security profile, login history
+- `AuditController` — CSV export with `Content-Disposition` header, severity filter query param
+- `/admin/security` — Security Dashboard: active sessions count, recent events, threat level indicator
+- `/admin/security/sessions` — Session Management: list all active sessions, revoke single or all for a user
+- `/admin/audit` — Audit Center: filterable event log with severity badge, export to CSV
+- Employee profile `/admin/employees/[id]` — Security tab: MFA status, active sessions, login history, password age
+
+---
+
+## [0.6.1] — 2026-06-24
+
+**Workforce Management.** Transfer tracking, position history, org chart, and workforce dashboard.
+
+### Added
+- `WorkforceTransfer` Prisma model + `TRANSFER`, `POSITION_CHANGE` audit actions
+- `WorkforceModule` — `POST /v1/workforce/transfer`, `GET /v1/users/:id/transfers`, `POST /v1/workforce/position-change`
+- `GET /v1/users/:id/role-history` and `GET /v1/users/:id/effective-permissions` on RolesModule
+- `GET /v1/users/:id/timeline` — unified timeline merging audit events, transfers, and role changes
+- `/admin/employees/[id]/timeline` — chronological event timeline page
+- `/admin/org-chart` — interactive organization tree with expand/collapse
+- `/admin/workforce` — workforce dashboard: pending transfers, recent moves, headcount by ministry
+
+---
+
+## [0.6.0] — 2026-06-24
+
+**Employee Lifecycle & Identity Platform.** Full employee onboarding/offboarding, invitation flow, session management, and RBAC expansion.
+
+### Added
+- Prisma schema: `Employee` lifecycle fields (`onboardingStatus`, `startDate`, `endDate`), `Invitation` model, `UserSession` model
+- `EmployeesModule` — onboarding CRUD, invitation send/accept, lifecycle state machine
+- Employee profile `GET /v1/employees/:id` with all relations (role history, assignment, ministry, department)
+- `/admin/employees` — employees list with Create Employee form + Invite flow
+- `/admin/employees/[id]` — employee profile: Overview, Roles, Workforce, Security tabs
+
+---
+
 ## [0.5.0] — 2026-06-24
 
 **Design System & UI Polish.** Premium GovSphere design system with DRC national identity, dark navy sidebar, authority-gold active indicator, sharp corners throughout, and a fully rebuilt component library.

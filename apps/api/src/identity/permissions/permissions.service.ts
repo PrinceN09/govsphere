@@ -1,29 +1,53 @@
+/**
+ * GovSphere — Permissions Service
+ *
+ * Resolves the full permission set for a user based on their active role assignments.
+ *
+ * Caching strategy (v0.6.3+):
+ *   - Redis key: perm:{userId}  TTL: 60 s
+ *   - On hit: return cached string[] immediately (no DB round-trip)
+ *   - On miss: query DB, write to Redis, return result
+ *   - On role change: call invalidateCache(userId) to evict the key
+ *   - Resilient: if Redis is unreachable, falls back to direct DB query
+ */
+
 import { Injectable, Logger } from "@nestjs/common";
 
+import { RedisService } from "../../infrastructure/redis/redis.service";
 import { PrismaService } from "../../prisma/prisma.service";
+
+/** TTL for the Redis permission cache entry (seconds). */
+const CACHE_TTL_SECONDS = 60;
 
 @Injectable()
 export class PermissionsService {
   private readonly logger = new Logger(PermissionsService.name);
 
-  // In-process cache: userId → permissions[]
-  // Cleared on role assignment changes.
-  private readonly cache = new Map<string, { permissions: string[]; cachedAt: number }>();
-  private readonly CACHE_TTL_MS = 60_000; // 1 minute
-
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly redis: RedisService,
+  ) {}
 
   /**
    * Resolve all permissions for a user based on their active role assignments.
    * Also falls back to the legacy User.role enum field for quick bootstrap.
    */
   async resolvePermissionsForUser(userId: string): Promise<string[]> {
-    const cached = this.cache.get(userId);
-    if (cached && Date.now() - cached.cachedAt < this.CACHE_TTL_MS) {
-      return cached.permissions;
+    // ── Cache hit ────────────────────────────────────────────────────────────
+    try {
+      const cached = await this.redis.getPermissions(userId);
+      if (cached !== null) {
+        return cached;
+      }
+    } catch (err) {
+      // Redis unavailable — degrade gracefully, continue to DB query
+      this.logger.warn("Redis unavailable for permission cache lookup, falling back to DB", {
+        userId,
+        err: err instanceof Error ? err.message : String(err),
+      });
     }
 
-    // Get all active role assignments for this user
+    // ── DB query ─────────────────────────────────────────────────────────────
     const assignments = await this.prisma.userRoleAssignment.findMany({
       where: {
         userId,
@@ -71,13 +95,31 @@ export class PermissionsService {
     }
 
     const permissions = Array.from(permissionSet);
-    this.cache.set(userId, { permissions, cachedAt: Date.now() });
+
+    // ── Cache write ──────────────────────────────────────────────────────────
+    try {
+      await this.redis.setPermissions(userId, permissions, CACHE_TTL_SECONDS);
+    } catch (err) {
+      // Cache write failure is non-fatal — log and continue
+      this.logger.warn("Failed to write permission cache to Redis", {
+        userId,
+        err: err instanceof Error ? err.message : String(err),
+      });
+    }
+
     return permissions;
   }
 
-  /** Invalidate cache when a user's roles change. */
-  invalidateCache(userId: string): void {
-    this.cache.delete(userId);
+  /** Invalidate the Redis permission cache when a user's roles change. */
+  async invalidateCache(userId: string): Promise<void> {
+    try {
+      await this.redis.invalidatePermissions(userId);
+    } catch (err) {
+      this.logger.warn("Failed to invalidate permission cache", {
+        userId,
+        err: err instanceof Error ? err.message : String(err),
+      });
+    }
   }
 
   /** List all permissions in the system. */

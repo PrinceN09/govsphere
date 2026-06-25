@@ -574,6 +574,7 @@ model UserSession {
   @@index([refreshTokenJti])
   @@index([tokenFamily])
   @@index([isActive])
+  @@index([userId, isActive]) // compound: active sessions per user (v0.6.3)
   @@map("user_sessions")
 }
 
@@ -853,5 +854,8 @@ model AuditLog {
   @@index([action])
   @@index([createdAt])
   @@index([entityType, entityId])
+  // Compound indexes for common dashboard/filter query patterns (v0.6.3 performance)
+  @@index([userId, createdAt])
+  @@index([action, createdAt])
   @@map("audit_logs")
 }

@@ -23,6 +23,7 @@ import { IdentityModule } from "./identity/identity.module";
 import { CacheModule } from "./infrastructure/cache/cache.module";
 import { EventsModule } from "./infrastructure/events/events.module";
 import { QueueModule } from "./infrastructure/queue/queue.module";
+import { RedisModule } from "./infrastructure/redis/redis.module";
 import { StorageModule } from "./infrastructure/storage/storage.module";
 import { PrismaModule } from "./prisma/prisma.module";
 
@@ -53,8 +54,9 @@ import { PrismaModule } from "./prisma/prisma.module";
 
     // ── Infrastructure ───────────────────────────────────────────────────────
     LoggingModule, // Global Pino-based structured logger
-    CacheModule, // Redis-backed cache (in-memory in v0.1)
-    QueueModule, // BullMQ job queues (scaffold — activated Sprint 2)
+    RedisModule, // Global ioredis client — permission cache, JWT blacklist, rate-limit counters
+    CacheModule, // NestJS CacheModule (in-memory L1; backed by RedisModule in future)
+    QueueModule, // Bull job queues (email, invitation, notification, audit)
     StorageModule, // MinIO file storage (scaffold — activated Sprint 3)
     EventsModule, // Domain event system (scaffold — activated Sprint 2)
 
