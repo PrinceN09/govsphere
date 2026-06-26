@@ -1,12 +1,10 @@
 <div align="center">
 
-<img src="docs/assets/govsphere-logo.png" alt="Prinodia Workspace" width="120" />
+<img src="apps/web/public/brand/logo.svg" alt="Prinodia Workspace" width="180" />
 
 # Prinodia Workspace
 
-**The Digital Operating System for Government**
-
-_République Démocratique du Congo_
+**One Workspace. Every Organization.**
 
 [![License: Proprietary](https://img.shields.io/badge/License-Proprietary-red.svg)](./LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.5-blue.svg)](https://www.typescriptlang.org/)
@@ -21,24 +19,70 @@ _République Démocratique du Congo_
 
 ---
 
-## Overview
+Prinodia Workspace is a modern, multilingual digital workspace developed by Prinodia that enables governments, enterprises, educational institutions, healthcare organizations, NGOs, churches, and other organizations to collaborate, manage operations, and work securely from anywhere.
 
-Prinodia Workspace is a secure, auditable, multilingual digital workspace built exclusively for the
-Government of the Democratic Republic of Congo. It replaces fragmented, insecure communication tools
-(WhatsApp, personal email) with a unified platform that enforces role-based access control,
-organizational hierarchy, and immutable audit logging across all government ministries, departments,
-and divisions.
+It unifies communication, document management, workforce management, digital approvals, executive management, meetings, scheduling, and security into a single integrated platform available across Web, Desktop, and Mobile.
 
-Prinodia Workspace is not a generic SaaS product. It is purpose-built for the DRC government's organizational
-structure — from the central administration down to field divisions — with full support for five
-national languages and compliance with government data sovereignty requirements.
+## Core Modules
+
+- Dashboard & Analytics
+- Workforce & Human Resources
+- Organization Management
+- Documents & Knowledge Management
+- Collaboration & Messaging
+- Calendar & Scheduling
+- Meetings & Events
+- Tasks & Projects
+- Digital Workflows & Approvals
+- Executive Office & Cabinet Management
+- Security Center & Audit
+- Notifications
+- AI Assistant _(Coming Soon)_
+
+## Supported Platforms
+
+- Web
+- Windows
+- macOS
+- Android
+- iOS
+
+## Supported Organizations
+
+- Government Ministries
+- Public Institutions
+- Private Companies
+- Small & Medium Businesses
+- Universities & Schools
+- Healthcare Organizations
+- NGOs & Non-Profit Organizations
+- Churches & Faith-Based Organizations
+
+## Languages
+
+**Currently Supported**
+
+- English
+- Français
+
+**Planned**
+
+- Español
+- Português
+- Lingala
+- Swahili
+- Kikongo
+- Tshiluba
+
+## About Prinodia
+
+Prinodia is a technology company focused on building secure, scalable, multilingual software that empowers organizations through digital transformation.
+
+Our mission is to simplify collaboration, improve operational efficiency, and provide modern digital tools that help organizations work better together.
 
 ## Vision
 
-Every government worker in the DRC — from a ministry director to a field division employee —
-operates within a single, secure, auditable digital environment. Communication is structured, access
-is scoped to organizational level, every sensitive action is logged, and no data ever leaves
-sovereign infrastructure.
+To become the leading multilingual digital workspace platform for governments, enterprises, and organizations across Africa and around the world.
 
 ## Core Features
 
