@@ -1,5 +1,5 @@
 /**
- * GovSphere — Calendar Prisma Type Shim (v0.9.0)
+ * Prinodia Workspace — Calendar Prisma Type Shim (v0.9.0)
  *
  * Provides typed delegate interfaces for the new calendar models so that
  * the API compiles before the user runs `npx prisma generate` on the host.

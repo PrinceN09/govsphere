@@ -1,5 +1,5 @@
 /**
- * GovSphere — ExecutiveService (v1.0.0)
+ * Prinodia Workspace — ExecutiveService (v1.0.0)
  *
  * Manages Executive Offices, staff, announcements, and the executive dashboard.
  * Reuses existing AuditService, PrismaService, CalendarModule, WorkflowsModule.

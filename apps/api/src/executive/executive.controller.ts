@@ -1,5 +1,5 @@
 /**
- * GovSphere — ExecutiveController (v1.0.0)
+ * Prinodia Workspace — ExecutiveController (v1.0.0)
  *
  * REST API for Executive Office & Cabinet Management.
  *

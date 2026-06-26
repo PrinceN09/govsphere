@@ -1,5 +1,5 @@
 /**
- * GovSphere — Built-in Workflow Templates (v0.8.1)
+ * Prinodia Workspace — Built-in Workflow Templates (v0.8.1)
  *
  * 10 government workflow templates that can be used to seed or scaffold
  * new workflow definitions. `isSystem = true` marks them as read-only originals.

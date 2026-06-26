@@ -5,7 +5,7 @@ const config: Config = {
   darkMode: "class",
   theme: {
     extend: {
-      // ─── Sharp corners — GovSphere design principle ──────────────────────────
+      // ─── Sharp corners — Prinodia Workspace design principle ──────────────────────────
       borderRadius: {
         none: "0px",
         sm: "2px",

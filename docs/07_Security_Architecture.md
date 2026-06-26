@@ -1,4 +1,4 @@
-# GovSphere — Security Architecture
+# Prinodia Workspace — Security Architecture
 
 **Document Version:** 1.0  
 **Status:** Approved  
@@ -9,7 +9,7 @@
 
 ## 1. Security Philosophy
 
-GovSphere protects **state secrets**. The threat model is not an individual hacker — it is
+Prinodia Workspace protects **state secrets**. The threat model is not an individual hacker — it is
 nation-state actors, corporate espionage, insider threats, and the systemic risk of government
 communication being exposed. The security architecture is designed accordingly:
 
@@ -27,7 +27,7 @@ communication being exposed. The security architecture is designed accordingly:
 
 ### 2.1 Identity Providers
 
-GovSphere supports three authentication paths:
+Prinodia Workspace supports three authentication paths:
 
 | Path                        | Users                  | Method                          |
 | --------------------------- | ---------------------- | ------------------------------- |
@@ -322,8 +322,8 @@ Users can view and revoke individual sessions from their security settings page:
 ```
 Active Sessions:
   ✅ Web — Chrome on macOS — 192.168.1.100 — Now (current)
-  ✅ Mobile — GovSphere Android — 192.168.1.105 — 2 hours ago
-  ✅ Desktop — GovSphere Desktop Windows — 10.0.0.55 — Yesterday
+  ✅ Mobile — Prinodia Workspace Android — 192.168.1.105 — 2 hours ago
+  ✅ Desktop — Prinodia Workspace Desktop Windows — 10.0.0.55 — Yesterday
   [Revoke] [Revoke] [Revoke]
   [Revoke All Other Sessions]
 ```
@@ -504,7 +504,7 @@ Archives:  zip, rar, 7z, tar, gz (scanned before access)
 
 ### 11.1 DRC Data Protection
 
-GovSphere is designed to comply with future DRC data protection legislation and to meet the
+Prinodia Workspace is designed to comply with future DRC data protection legislation and to meet the
 requirements of any government data classification framework:
 
 - All data is stored within the DRC or in government-approved facilities

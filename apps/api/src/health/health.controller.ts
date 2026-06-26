@@ -1,5 +1,5 @@
 /**
- * GovSphere — Health Check Controller
+ * Prinodia Workspace — Health Check Controller
  *
  * Endpoints:
  *   GET /health        — Basic liveness (always 200 if the process is running)

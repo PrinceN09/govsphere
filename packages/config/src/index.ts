@@ -1,5 +1,5 @@
 /**
- * @govsphere/config
+ * @prinodia/config
  *
  * Shared configuration schemas and environment variable validation.
  * Uses Zod for runtime validation.
@@ -11,7 +11,7 @@ import { z } from "zod";
 
 export const baseEnvSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "staging", "production"]).default("development"),
-  APP_NAME: z.string().default("GovSphere"),
+  APP_NAME: z.string().default("Prinodia Workspace"),
   APP_URL: z.string().url().default("http://localhost:3000"),
   API_URL: z.string().url().default("http://localhost:4000"),
 });
@@ -64,7 +64,7 @@ export const apiEnvSchema = baseEnvSchema
     SMTP_HOST: z.string().default("localhost"),
     SMTP_PORT: z.coerce.number().default(1025),
     SMTP_FROM_EMAIL: z.string().email().default("noreply@govsphere.gouv.cd"),
-    SMTP_FROM_NAME: z.string().default("GovSphere"),
+    SMTP_FROM_NAME: z.string().default("Prinodia Workspace"),
   });
 
 export type ApiEnv = z.infer<typeof apiEnvSchema>;
@@ -74,7 +74,7 @@ export const webEnvSchema = baseEnvSchema.extend({
   NEXTAUTH_SECRET: z.string().min(32, "NEXTAUTH_SECRET must be at least 32 characters"),
   NEXT_PUBLIC_API_URL: z.string().url().default("http://localhost:4000"),
   NEXT_PUBLIC_WS_URL: z.string().default("ws://localhost:4000"),
-  NEXT_PUBLIC_APP_NAME: z.string().default("GovSphere"),
+  NEXT_PUBLIC_APP_NAME: z.string().default("Prinodia Workspace"),
   NEXT_PUBLIC_APP_VERSION: z.string().default("0.1.0"),
 });
 

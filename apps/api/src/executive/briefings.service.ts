@@ -1,5 +1,5 @@
 /**
- * GovSphere — BriefingsService (v1.0.0)
+ * Prinodia Workspace — BriefingsService (v1.0.0)
  *
  * Executive briefings: daily, weekly, cabinet, emergency.
  * Supports rich text content, approval workflow, version history.

@@ -1,12 +1,12 @@
 # ADR-004 — Use Next.js 15 for the Web Application
 
-**Status:** Accepted **Date:** 2026-06 **Deciders:** GovSphere Engineering Team
+**Status:** Accepted **Date:** 2026-06 **Deciders:** Prinodia Workspace Engineering Team
 
 ---
 
 ## Context
 
-GovSphere requires a web application that:
+Prinodia Workspace requires a web application that:
 
 - Supports five languages (fr, en, ln, sw, lua) with server-side i18n
 - Can render dashboard pages server-side for performance on slower connections
@@ -53,7 +53,7 @@ The web app lives at `apps/web/` in the monorepo. It consumes the NestJS API at 
 - `next-intl` provides server-side i18n for all 5 languages with type-safe translation keys
 - Turborepo has a first-class `next` pipeline task — incremental builds work out of the box
 - File-based routing mirrors the government portal's navigation structure
-- `@govsphere/ui` shared component library is consumed directly from the monorepo
+- `@prinodia/ui` shared component library is consumed directly from the monorepo
 
 **Negative:**
 

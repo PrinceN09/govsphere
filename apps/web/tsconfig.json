@@ -12,12 +12,12 @@
     // so the bundler picks up changes without a build step.
     "paths": {
       "@/*": ["./src/*"],
-      "@govsphere/ui": ["../../packages/ui/src/index.ts"],
-      "@govsphere/types": ["../../packages/types/src/index.ts"],
-      "@govsphere/i18n": ["../../packages/i18n/src/index.ts"],
-      "@govsphere/config": ["../../packages/config/src/index.ts"],
-      "@govsphere/auth": ["../../packages/auth/src/index.ts"],
-      "@govsphere/utils": ["../../packages/utils/src/index.ts"]
+      "@prinodia/ui": ["../../packages/ui/src/index.ts"],
+      "@prinodia/types": ["../../packages/types/src/index.ts"],
+      "@prinodia/i18n": ["../../packages/i18n/src/index.ts"],
+      "@prinodia/config": ["../../packages/config/src/index.ts"],
+      "@prinodia/auth": ["../../packages/auth/src/index.ts"],
+      "@prinodia/utils": ["../../packages/utils/src/index.ts"]
     },
     "allowJs": true,
     "isolatedModules": true

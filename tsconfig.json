@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  // ─── GovSphere TypeScript Base Config ────────────────────────────────────────
+  // ─── Prinodia Workspace TypeScript Base Config ────────────────────────────────────────
   // This file contains ONLY shared strict compiler settings.
   // It deliberately omits `module` and `moduleResolution` because the correct
   // values differ between targets:

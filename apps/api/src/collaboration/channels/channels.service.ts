@@ -1,5 +1,5 @@
 /**
- * GovSphere — ChannelsService
+ * Prinodia Workspace — ChannelsService
  *
  * Manages government-scoped channels (PUBLIC, PRIVATE, ANNOUNCEMENT).
  * RBAC is enforced at the controller level — this service trusts the caller.

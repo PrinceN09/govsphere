@@ -1,5 +1,5 @@
 /**
- * GovSphere — WorkflowsModule (v0.8.1)
+ * Prinodia Workspace — WorkflowsModule (v0.8.1)
  */
 
 import { BullModule } from "@nestjs/bull";

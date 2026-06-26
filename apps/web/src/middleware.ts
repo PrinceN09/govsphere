@@ -1,5 +1,5 @@
 /**
- * GovSphere middleware
+ * Prinodia Workspace middleware
  *
  * Runs on every request. Responsibilities:
  * 1. Protects /admin/* routes — redirects unauthenticated users to /login.

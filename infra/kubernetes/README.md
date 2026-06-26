@@ -1,4 +1,4 @@
-# GovSphere — Kubernetes
+# Prinodia Workspace — Kubernetes
 
 Kubernetes manifests for production deployment.
 

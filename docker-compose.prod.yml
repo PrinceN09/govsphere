@@ -1,5 +1,5 @@
 # =============================================================================
-# GovSphere — Docker Compose (Production)
+# Prinodia Workspace — Docker Compose (Production)
 # =============================================================================
 # Services:
 #   - PostgreSQL    — primary database
@@ -11,8 +11,8 @@
 #
 # Usage:
 #   Build images first:
-#     docker build -f apps/api/Dockerfile -t govsphere-api:latest .
-#     docker build -f apps/web/Dockerfile -t govsphere-web:latest .
+#     docker build -f apps/api/Dockerfile -t prinodia-api:latest .
+#     docker build -f apps/web/Dockerfile -t prinodia-web:latest .
 #
 #   Start:
 #     docker compose -f docker-compose.prod.yml up -d
@@ -24,7 +24,7 @@
 # IMPORTANT: All secrets must be provided via an .env.prod file or
 # Docker secrets — never commit production credentials to this file.
 
-name: govsphere-prod
+name: prinodia-prod
 
 services:
   # ---------------------------------------------------------------------------
@@ -32,23 +32,23 @@ services:
   # ---------------------------------------------------------------------------
   postgres:
     image: postgres:17-alpine
-    container_name: govsphere_postgres_prod
+    container_name: prinodia_postgres_prod
     restart: always
     environment:
       POSTGRES_USER: ${POSTGRES_USER:?POSTGRES_USER required}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD required}
-      POSTGRES_DB: ${POSTGRES_DB:-govsphere_db}
+      POSTGRES_DB: ${POSTGRES_DB:-prinodia_db}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
       test:
-        ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-govsphere} -d ${POSTGRES_DB:-govsphere_db}"]
+        ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-prinodia} -d ${POSTGRES_DB:-prinodia_db}"]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 20s
     networks:
-      - govsphere_network
+      - prinodia_network
     # Do NOT expose port 5432 externally in production
 
   # ---------------------------------------------------------------------------
@@ -56,7 +56,7 @@ services:
   # ---------------------------------------------------------------------------
   redis:
     image: redis:7-alpine
-    container_name: govsphere_redis_prod
+    container_name: prinodia_redis_prod
     restart: always
     command: >
       redis-server
@@ -74,7 +74,7 @@ services:
       retries: 5
       start_period: 10s
     networks:
-      - govsphere_network
+      - prinodia_network
     # Do NOT expose port 6379 externally in production
 
   # ---------------------------------------------------------------------------
@@ -82,7 +82,7 @@ services:
   # ---------------------------------------------------------------------------
   minio:
     image: minio/minio:RELEASE.2024-07-16T23-46-41Z
-    container_name: govsphere_minio_prod
+    container_name: prinodia_minio_prod
     restart: always
     command: server /data --console-address ":9001"
     environment:
@@ -97,15 +97,15 @@ services:
       retries: 5
       start_period: 30s
     networks:
-      - govsphere_network
+      - prinodia_network
     # Do NOT expose MinIO S3 or console port externally — proxy through API
 
   # ---------------------------------------------------------------------------
-  # GovSphere API — NestJS backend
+  # Prinodia Workspace API — NestJS backend
   # ---------------------------------------------------------------------------
   api:
-    image: govsphere-api:latest
-    container_name: govsphere_api_prod
+    image: prinodia-api:latest
+    container_name: prinodia_api_prod
     restart: always
     depends_on:
       postgres:
@@ -118,7 +118,7 @@ services:
       APP_URL: ${APP_URL:?APP_URL required}
       API_URL: ${API_URL:?API_URL required}
 
-      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-govsphere_db}
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-prinodia_db}
 
       REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
       REDIS_HOST: redis
@@ -146,8 +146,8 @@ services:
       SMTP_SECURE: ${SMTP_SECURE:-true}
       SMTP_USER: ${SMTP_USER:-}
       SMTP_PASSWORD: ${SMTP_PASSWORD:-}
-      SMTP_FROM_NAME: ${SMTP_FROM_NAME:-GovSphere}
-      SMTP_FROM_EMAIL: ${SMTP_FROM_EMAIL:-noreply@govsphere.gouv.cd}
+      SMTP_FROM_NAME: ${SMTP_FROM_NAME:-Prinodia Workspace}
+      SMTP_FROM_EMAIL: ${SMTP_FROM_EMAIL:-noreply@prinodia.gouv.cd}
 
       LOG_LEVEL: ${LOG_LEVEL:-info}
       AUDIT_LOG_RETENTION_DAYS: ${AUDIT_LOG_RETENTION_DAYS:-365}
@@ -158,16 +158,16 @@ services:
       retries: 3
       start_period: 30s
     networks:
-      - govsphere_network
+      - prinodia_network
     ports:
       - "4000:4000" # Remove this and proxy via nginx in production
 
   # ---------------------------------------------------------------------------
-  # GovSphere Web — Next.js frontend
+  # Prinodia Workspace Web — Next.js frontend
   # ---------------------------------------------------------------------------
   web:
-    image: govsphere-web:latest
-    container_name: govsphere_web_prod
+    image: prinodia-web:latest
+    container_name: prinodia_web_prod
     restart: always
     depends_on:
       api:
@@ -185,7 +185,7 @@ services:
       retries: 3
       start_period: 30s
     networks:
-      - govsphere_network
+      - prinodia_network
     ports:
       - "3000:3000" # Remove this and proxy via nginx in production
 
@@ -193,8 +193,8 @@ services:
 # Networks
 # =============================================================================
 networks:
-  govsphere_network:
-    name: govsphere_prod_network
+  prinodia_network:
+    name: prinodia_prod_network
     driver: bridge
 
 # =============================================================================
@@ -202,8 +202,8 @@ networks:
 # =============================================================================
 volumes:
   postgres_data:
-    name: govsphere_postgres_prod_data
+    name: prinodia_postgres_prod_data
   redis_data:
-    name: govsphere_redis_prod_data
+    name: prinodia_redis_prod_data
   minio_data:
-    name: govsphere_minio_prod_data
+    name: prinodia_minio_prod_data

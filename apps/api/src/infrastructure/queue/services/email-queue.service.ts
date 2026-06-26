@@ -1,5 +1,5 @@
 /**
- * GovSphere — Email Queue Service
+ * Prinodia Workspace — Email Queue Service
  *
  * Injectable service that enqueues email jobs.
  * Import this wherever you need to send an email — never call nodemailer directly

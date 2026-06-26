@@ -1,4 +1,4 @@
-# GovSphere — DevOps Architecture
+# Prinodia Workspace — DevOps Architecture
 
 **Document Version:** 1.0  
 **Status:** Approved  
@@ -8,7 +8,7 @@
 
 ## 1. Philosophy
 
-DevOps at GovSphere follows three principles:
+DevOps at Prinodia Workspace follows three principles:
 
 - **Reproducible environments** — Development, staging, and production are identical. "Works on my
   machine" is never an acceptable answer.
@@ -619,7 +619,7 @@ Scenario 3: Security breach
 ## 10. Future: Kubernetes Migration
 
 The initial production deployment uses ECS Fargate for simplicity. When traffic and team size
-justify the complexity, GovSphere will migrate to Kubernetes (EKS):
+justify the complexity, Prinodia Workspace will migrate to Kubernetes (EKS):
 
 ```
 ECS Fargate (v0.x - v1.x)

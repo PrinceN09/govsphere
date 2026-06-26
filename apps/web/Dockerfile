@@ -1,11 +1,11 @@
 # =============================================================================
-# GovSphere Web — Production Dockerfile
+# Prinodia Workspace Web — Production Dockerfile
 # =============================================================================
 # Multi-stage build using Next.js standalone output.
 # next.config.ts must have: output: "standalone"
 #
 # Build context: repo root
-#   docker build -f apps/web/Dockerfile -t govsphere-web .
+#   docker build -f apps/web/Dockerfile -t prinodia-web .
 # =============================================================================
 
 # ── Stage 1: Install dependencies ─────────────────────────────────────────────
@@ -35,8 +35,8 @@ FROM node:20-alpine AS runtime
 
 RUN apk add --no-cache dumb-init
 
-RUN addgroup --system --gid 1001 govsphere \
- && adduser  --system --uid 1001 --ingroup govsphere govsphere
+RUN addgroup --system --gid 1001 prinodia \
+ && adduser  --system --uid 1001 --ingroup prinodia prinodia
 
 WORKDIR /app
 
@@ -45,14 +45,14 @@ ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 
 # Next.js standalone server bundle
-COPY --from=builder --chown=govsphere:govsphere \
+COPY --from=builder --chown=prinodia:prinodia \
   /app/apps/web/.next/standalone ./
-COPY --from=builder --chown=govsphere:govsphere \
+COPY --from=builder --chown=prinodia:prinodia \
   /app/apps/web/.next/static ./apps/web/.next/static
-COPY --from=builder --chown=govsphere:govsphere \
+COPY --from=builder --chown=prinodia:prinodia \
   /app/apps/web/public ./apps/web/public
 
-USER govsphere
+USER prinodia
 
 EXPOSE 3000
 

@@ -11,7 +11,7 @@ import { UsersModule } from "./users/users.module";
 import { WorkforceModule } from "./workforce/workforce.module";
 
 /**
- * Identity Platform — the security foundation of GovSphere.
+ * Identity Platform — the security foundation of Prinodia Workspace.
  *
  * Encapsulates all authentication, authorization, session management,
  * MFA, audit logging, and user lifecycle management.

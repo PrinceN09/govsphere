@@ -13,7 +13,7 @@ concurrency:
 env:
   NODE_VERSION: "20"
   # Test-only environment — no real secrets
-  DATABASE_URL: postgresql://govsphere:test@localhost:5432/govsphere_test
+  DATABASE_URL: postgresql://prinodia:test@localhost:5432/prinodia_test
   REDIS_URL: redis://localhost:6379
   JWT_PRIVATE_KEY: ${{ secrets.CI_JWT_PRIVATE_KEY }}
   JWT_PUBLIC_KEY: ${{ secrets.CI_JWT_PUBLIC_KEY }}
@@ -75,9 +75,9 @@ jobs:
       postgres:
         image: postgres:17-alpine
         env:
-          POSTGRES_USER: govsphere
+          POSTGRES_USER: prinodia
           POSTGRES_PASSWORD: test
-          POSTGRES_DB: govsphere_test
+          POSTGRES_DB: prinodia_test
         options: >-
           --health-cmd pg_isready
           --health-interval 10s

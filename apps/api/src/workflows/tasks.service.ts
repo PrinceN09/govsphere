@@ -1,5 +1,5 @@
 /**
- * GovSphere — TasksService (v0.8.1)
+ * Prinodia Workspace — TasksService (v0.8.1)
  *
  * Uses WorkflowDb type shim until `prisma generate` regenerates the client.
  */

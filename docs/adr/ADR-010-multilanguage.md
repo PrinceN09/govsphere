@@ -1,6 +1,6 @@
 # ADR-010 — Support 5 National Languages
 
-**Status:** Accepted **Date:** 2026-06 **Deciders:** GovSphere Engineering Team, DRC Government IT
+**Status:** Accepted **Date:** 2026-06 **Deciders:** Prinodia Workspace Engineering Team, DRC Government IT
 Authority
 
 ---
@@ -25,7 +25,7 @@ reduces adoption.
 
 ## Decision
 
-GovSphere will support **5 languages**: French (default), English, Lingala, Kiswahili, and Tshiluba.
+Prinodia Workspace will support **5 languages**: French (default), English, Lingala, Kiswahili, and Tshiluba.
 
 **Implementation:**
 

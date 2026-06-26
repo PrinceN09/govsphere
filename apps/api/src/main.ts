@@ -1,5 +1,5 @@
 /**
- * GovSphere API — NestJS Bootstrap
+ * Prinodia Workspace API — NestJS Bootstrap
  * Government of the Democratic Republic of Congo
  *
  * Startup sequence:
@@ -95,7 +95,7 @@ async function bootstrap(): Promise<void> {
   // ── Swagger (dev / staging only) ──────────────────────────────────────────
   if (nodeEnv !== "production") {
     const swaggerConfig = new DocumentBuilder()
-      .setTitle("GovSphere API")
+      .setTitle("Prinodia Workspace API")
       .setDescription(
         "Secure collaboration platform for the Government of the Democratic Republic of Congo. " +
           "All endpoints require authentication (Bearer JWT) unless marked @Public().",
@@ -121,7 +121,7 @@ async function bootstrap(): Promise<void> {
   }
 
   await app.listen(port);
-  pinoLogger.log(`GovSphere API running on port ${port}`, {
+  pinoLogger.log(`Prinodia Workspace API running on port ${port}`, {
     nodeEnv,
     port,
     appUrl,

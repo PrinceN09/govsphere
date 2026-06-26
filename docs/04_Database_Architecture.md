@@ -1,4 +1,4 @@
-# GovSphere — Database Architecture
+# Prinodia Workspace — Database Architecture
 
 **Document Version:** 1.0  
 **Status:** Approved  
@@ -9,7 +9,7 @@
 
 ## 1. Overview
 
-GovSphere uses **PostgreSQL 17** as its primary relational database, managed through **Prisma 5** as
+Prinodia Workspace uses **PostgreSQL 17** as its primary relational database, managed through **Prisma 5** as
 the ORM. The database is designed to be the authoritative source of truth for all government
 collaboration data.
 
@@ -74,7 +74,7 @@ indexed.
 
 ## 3. Complete Target Database Design
 
-The following represents the full database design that GovSphere will grow into across migrations.
+The following represents the full database design that Prinodia Workspace will grow into across migrations.
 **This is a blueprint — not a single migration.**
 
 ### 3.1 Entity Relationship Overview

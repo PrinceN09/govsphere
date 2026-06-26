@@ -1,4 +1,4 @@
-# GovSphere — Staff Engineer Release Reviews
+# Prinodia Workspace — Staff Engineer Release Reviews
 
 ---
 
@@ -357,5 +357,5 @@ Before `git push origin main --tags`:
 
 ---
 
-_GovSphere Foundation Hardening complete. All 14 phases executed. Repository is production-grade for
+_Prinodia Workspace Foundation Hardening complete. All 14 phases executed. Repository is production-grade for
 v0.1.0-foundation._

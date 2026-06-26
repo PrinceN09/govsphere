@@ -1,5 +1,5 @@
 /**
- * GovSphere — Permissions Service
+ * Prinodia Workspace — Permissions Service
  *
  * Resolves the full permission set for a user based on their active role assignments.
  *

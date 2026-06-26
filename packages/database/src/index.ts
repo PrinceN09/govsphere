@@ -1,7 +1,7 @@
 /**
- * @govsphere/database
+ * @prinodia/database
  *
- * Prisma client singleton for GovSphere.
+ * Prisma client singleton for Prinodia Workspace.
  * Re-exports the Prisma client and all generated types.
  */
 

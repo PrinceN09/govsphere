@@ -1,5 +1,5 @@
 /**
- * GovSphere — Workflow Web Types (v0.8.1)
+ * Prinodia Workspace — Workflow Web Types (v0.8.1)
  * Shared types for the workflow UI layer.
  */
 

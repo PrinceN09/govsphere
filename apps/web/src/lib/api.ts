@@ -1,5 +1,5 @@
 /**
- * GovSphere API Client
+ * Prinodia Workspace API Client
  *
  * Axios instance pre-configured for the NestJS API.
  * - Attaches Authorization header from session.

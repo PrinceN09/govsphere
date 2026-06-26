@@ -1,5 +1,5 @@
 /**
- * GovSphere — PresenceService
+ * Prinodia Workspace — PresenceService
  *
  * Live presence is ephemeral and stored entirely in Redis.
  * The only thing persisted to PostgreSQL is User.lastSeenAt.

@@ -199,12 +199,12 @@ export default function DashboardPage() {
         <div className="border border-slate-200 bg-white">
           <div className="border-b border-slate-100 px-5 py-3">
             <p className="text-xs font-semibold uppercase tracking-label text-slate-500">
-              À propos de GovSphere
+              À propos de Prinodia Workspace
             </p>
           </div>
           <div className="px-5 py-4">
             <p className="text-sm text-slate-600 leading-relaxed">
-              GovSphere est la plateforme centralisée de gestion de la structure gouvernementale de
+              Prinodia Workspace est la plateforme centralisée de gestion de la structure gouvernementale de
               la RDC. Gérez les <span className="font-semibold text-slate-800">26 provinces</span>,
               les <span className="font-semibold text-slate-800">36 ministères</span>, leurs
               départements, divisions, postes et le personnel gouvernemental depuis un espace de

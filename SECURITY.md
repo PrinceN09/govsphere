@@ -2,7 +2,7 @@
 
 ## Supported Versions
 
-GovSphere applies security patches to the most recent minor release only.
+Prinodia Workspace applies security patches to the most recent minor release only.
 
 | Version         | Supported |
 | --------------- | --------- |
@@ -13,7 +13,7 @@ GovSphere applies security patches to the most recent minor release only.
 
 **Do not report security vulnerabilities through public GitHub issues.**
 
-Security issues in GovSphere may expose sensitive government data or authentication systems. We take
+Security issues in Prinodia Workspace may expose sensitive government data or authentication systems. We take
 all reports seriously and will respond promptly.
 
 ### Responsible Disclosure
@@ -83,5 +83,5 @@ Key security properties:
 
 ## Bug Bounty
 
-GovSphere does not currently operate a public bug bounty program. Researchers who responsibly
+Prinodia Workspace does not currently operate a public bug bounty program. Researchers who responsibly
 disclose valid vulnerabilities will be credited (with their consent) in the release notes.

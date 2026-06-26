@@ -1,5 +1,5 @@
 /**
- * GovSphere — ConversationsService
+ * Prinodia Workspace — ConversationsService
  *
  * Manages direct messages (1:1) and group conversations.
  * Separate from org Channels — these are personal, not scoped to a ministry.

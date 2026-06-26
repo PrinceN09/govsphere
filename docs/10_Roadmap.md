@@ -1,4 +1,4 @@
-# GovSphere — Product Roadmap
+# Prinodia Workspace — Product Roadmap
 
 **Document Version:** 1.0  
 **Status:** Approved  
@@ -8,7 +8,7 @@
 
 ## Overview
 
-GovSphere is built in four major phases across seven version milestones. Each milestone has a clear
+Prinodia Workspace is built in four major phases across seven version milestones. Each milestone has a clear
 objective and gates the start of the next. No milestone begins until the prior milestone is stable,
 tested, and reviewed.
 
@@ -137,7 +137,7 @@ and send messages.
 
 ## v1.0 — MVP (Production-Ready)
 
-**Objective:** GovSphere is ready for real government users. The platform is secure, stable,
+**Objective:** Prinodia Workspace is ready for real government users. The platform is secure, stable,
 performant, and internationalized.
 
 **Milestone Gate:** Third-party security audit passed. 99.9% uptime maintained for 30 days in
@@ -259,7 +259,7 @@ pilot users onboarded.
 
 ## v3.0 — Video, Voice & Calendar
 
-**Objective:** GovSphere becomes the complete government communication platform. Replaces Zoom,
+**Objective:** Prinodia Workspace becomes the complete government communication platform. Replaces Zoom,
 Skype, and Calendly for internal use.
 
 **Milestone Gate:** 1,000+ concurrent video meeting participants tested successfully.
@@ -288,7 +288,7 @@ Skype, and Calendly for internal use.
 
 ## v4.0 — Intelligence Platform
 
-**Objective:** GovSphere applies AI and workflow automation to make government more efficient.
+**Objective:** Prinodia Workspace applies AI and workflow automation to make government more efficient.
 
 **Milestone Gate:** Pilot ministry reports measurable reduction in document processing time.
 

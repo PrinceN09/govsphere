@@ -1,0 +1,8 @@
+<!-- PLACEHOLDER: Replace with final Prinodia Workspace logo artwork -->
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="60" viewBox="0 0 200 60">
+  <rect width="200" height="60" fill="#1e3a5f"/>
+  <rect x="4" y="4" width="8" height="52" fill="#2563eb"/>
+  <rect x="14" y="4" width="8" height="52" fill="#f59e0b"/>
+  <rect x="24" y="4" width="8" height="52" fill="#dc2626"/>
+  <text x="40" y="38" font-family="sans-serif" font-size="18" font-weight="bold" fill="white">Prinodia Workspace</text>
+</svg>

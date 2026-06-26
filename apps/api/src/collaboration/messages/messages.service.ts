@@ -1,5 +1,5 @@
 /**
- * GovSphere — MessagesService
+ * Prinodia Workspace — MessagesService
  *
  * Handles channel messages: send, edit, delete (soft), react, pin, search.
  * Cursor pagination uses (channelId, createdAt DESC, id) for stability.

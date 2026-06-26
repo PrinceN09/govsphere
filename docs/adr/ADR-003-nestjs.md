@@ -1,12 +1,12 @@
 # ADR-003 — Use NestJS 10 for the API Layer
 
-**Status:** Accepted **Date:** 2026-06 **Deciders:** GovSphere Engineering Team
+**Status:** Accepted **Date:** 2026-06 **Deciders:** Prinodia Workspace Engineering Team
 
 ---
 
 ## Context
 
-GovSphere requires a backend API that:
+Prinodia Workspace requires a backend API that:
 
 - Serves a REST API to web, desktop, and mobile clients
 - Handles WebSocket connections for real-time messaging and presence

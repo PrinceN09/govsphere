@@ -1,12 +1,12 @@
 # ADR-008 — Use Socket.IO for Real-Time Communication
 
-**Status:** Accepted **Date:** 2026-06 **Deciders:** GovSphere Engineering Team
+**Status:** Accepted **Date:** 2026-06 **Deciders:** Prinodia Workspace Engineering Team
 
 ---
 
 ## Context
 
-GovSphere requires real-time features:
+Prinodia Workspace requires real-time features:
 
 - Message delivery (new messages appear instantly in channels)
 - Typing indicators

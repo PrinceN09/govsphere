@@ -1,5 +1,5 @@
 /**
- * GovSphere — Queue Name Constants
+ * Prinodia Workspace — Queue Name Constants
  *
  * Centralized queue/job name registry to avoid magic strings.
  * Import these constants in both producers (enqueue) and consumers (@Processor).

@@ -1,4 +1,4 @@
-# GovSphere — Engineering Standards
+# Prinodia Workspace — Engineering Standards
 
 **Document Version:** 1.0  
 **Status:** Approved  
@@ -8,7 +8,7 @@
 
 ## 1. Purpose
 
-This document defines the non-negotiable engineering standards for the GovSphere platform. Every
+This document defines the non-negotiable engineering standards for the Prinodia Workspace platform. Every
 engineer — regardless of seniority — follows these standards. Consistency, readability, and
 maintainability are valued over personal preference or clever shortcuts.
 
@@ -282,7 +282,7 @@ export class LoginDto {
 
 ### App Router
 
-GovSphere uses the Next.js App Router (not Pages Router).
+Prinodia Workspace uses the Next.js App Router (not Pages Router).
 
 ```
 apps/web/src/app/
@@ -416,7 +416,7 @@ docs/api-authentication-guide
 
 ### Commit Message Format
 
-GovSphere follows the Conventional Commits specification:
+Prinodia Workspace follows the Conventional Commits specification:
 
 ```
 <type>(<scope>): <description>

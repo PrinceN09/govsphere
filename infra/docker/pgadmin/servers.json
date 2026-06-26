@@ -1,8 +1,8 @@
 {
   "Servers": {
     "1": {
-      "Name": "GovSphere Dev",
-      "Group": "GovSphere",
+      "Name": "Prinodia Workspace Dev",
+      "Group": "Prinodia Workspace",
       "Host": "postgres",
       "Port": 5432,
       "MaintenanceDB": "govsphere_db",

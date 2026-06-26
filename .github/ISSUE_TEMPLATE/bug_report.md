@@ -1,6 +1,6 @@
 ---
 name: Bug Report
-about: Report a defect or unexpected behavior in GovSphere
+about: Report a defect or unexpected behavior in Prinodia Workspace
 title: "[BUG] "
 labels: bug, needs-triage
 assignees: ""
@@ -26,7 +26,7 @@ What actually happened.
 
 ## Environment
 
-- **GovSphere Version**: (e.g., v0.1.0)
+- **Prinodia Workspace Version**: (e.g., v0.1.0)
 - **App**: [ ] Web [ ] API [ ] Desktop [ ] Mobile
 - **Browser / OS** (if applicable):
 - **Node.js version**:

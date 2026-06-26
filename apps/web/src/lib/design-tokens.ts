@@ -1,5 +1,5 @@
 /**
- * GovSphere design tokens — TypeScript constants.
+ * Prinodia Workspace design tokens — TypeScript constants.
  *
  * Use these when you need raw values in JS (e.g. inline styles, canvas, charts).
  * For Tailwind classes, use the configured colour names directly.

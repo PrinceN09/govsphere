@@ -1,4 +1,4 @@
-# GovSphere — UI Design System
+# Prinodia Workspace — UI Design System
 
 **Document Version:** 1.0  
 **Status:** Approved  
@@ -9,7 +9,7 @@
 
 ## 1. Design Philosophy
 
-GovSphere's visual design is **purposeful, calm, and authoritative**. It must communicate trust,
+Prinodia Workspace's visual design is **purposeful, calm, and authoritative**. It must communicate trust,
 security, and institutional gravitas without feeling bureaucratic or cold. The design takes
 inspiration from:
 
@@ -18,7 +18,7 @@ inspiration from:
 - **Microsoft Teams** — enterprise-grade information density, familiar government users
 - **GOV.UK Design System** — accessible-first, plain language, functional beauty
 
-GovSphere's identity is **uniquely its own** — rooted in the DRC's identity with a color system
+Prinodia Workspace's identity is **uniquely its own** — rooted in the DRC's identity with a color system
 inspired by the Congolese flag (azure blue, yellow, red) while being modern enough to sit alongside
 any enterprise software.
 
@@ -28,7 +28,7 @@ any enterprise software.
 
 ### 2.1 Brand Colors
 
-The GovSphere brand palette is derived from the flag of the Democratic Republic of Congo.
+The Prinodia Workspace brand palette is derived from the flag of the Democratic Republic of Congo.
 
 ```css
 /* ─── PRIMARY — Royal Azure Blue (Flag) ──────────────────────────────── */
@@ -188,7 +188,7 @@ self-hostable — no Google Fonts CDN dependency in production.
 
 ## 4. Spacing System
 
-GovSphere uses an **8-point grid system**. All spacing values are multiples of 4px.
+Prinodia Workspace uses an **8-point grid system**. All spacing values are multiples of 4px.
 
 ```css
 --space-1: 0.25rem; /* 4px  */
@@ -216,7 +216,7 @@ GovSphere uses an **8-point grid system**. All spacing values are multiples of 4
 │  SIDEBAR (240px fixed)         │  MAIN CONTENT                  │
 │  bg: gov-blue-900              │                                 │
 │                                │  ┌───────────────────────────┐ │
-│  [GovSphere Logo]              │  │  CHANNEL HEADER (56px)    │ │
+│  [Prinodia Workspace Logo]              │  │  CHANNEL HEADER (56px)    │ │
 │  ────────────────              │  └───────────────────────────┘ │
 │  MINISTRY                      │                                 │
 │  ├── # général                 │  ┌───────────────────────────┐ │
@@ -335,7 +335,7 @@ Unread count:    bg-danger text-white text-label-xs rounded-full min-w-[18px] h-
 
 ## 7. Dark Theme
 
-GovSphere ships with both Light and Dark themes. The theme respects `prefers-color-scheme` by
+Prinodia Workspace ships with both Light and Dark themes. The theme respects `prefers-color-scheme` by
 default and can be overridden by user preference.
 
 ### 7.1 Dark Theme Key Surfaces

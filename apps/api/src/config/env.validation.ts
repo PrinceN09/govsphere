@@ -1,5 +1,5 @@
 /**
- * GovSphere — Environment Variable Validation
+ * Prinodia Workspace — Environment Variable Validation
  *
  * Uses Zod to validate all required environment variables at startup.
  * The application WILL NOT START if required variables are missing or invalid.
@@ -12,7 +12,7 @@ const envSchema = z.object({
   // ── Application ────────────────────────────────────────────────────────────
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
   PORT: z.coerce.number().int().positive().default(4000),
-  APP_NAME: z.string().min(1).default("GovSphere"),
+  APP_NAME: z.string().min(1).default("Prinodia Workspace"),
   APP_URL: z.string().url().default("http://localhost:3000"),
   API_URL: z.string().url().default("http://localhost:4000"),
 
@@ -57,7 +57,7 @@ const envSchema = z.object({
       (v) => !v.startsWith("CHANGE_ME"),
       "MFA_ENCRYPTION_KEY must be set to a real 64-char hex key",
     ),
-  MFA_ISSUER: z.string().default("GovSphere"),
+  MFA_ISSUER: z.string().default("Prinodia Workspace"),
 
   // ── MinIO ──────────────────────────────────────────────────────────────────
   MINIO_ENDPOINT: z.string().min(1).default("localhost"),
@@ -82,7 +82,7 @@ const envSchema = z.object({
   SMTP_SECURE: z.coerce.boolean().default(false),
   SMTP_USER: z.string().optional(),
   SMTP_PASSWORD: z.string().optional(),
-  SMTP_FROM_NAME: z.string().default("GovSphere"),
+  SMTP_FROM_NAME: z.string().default("Prinodia Workspace"),
   SMTP_FROM_EMAIL: z.string().email().default("noreply@govsphere.gouv.cd"),
 
   // ── Security ───────────────────────────────────────────────────────────────
@@ -119,7 +119,7 @@ export function validateEnv(config: Record<string, unknown>): EnvConfig {
       .join("\n");
 
     console.error(
-      `\n❌ GovSphere failed to start — invalid environment configuration:\n\n${errors}\n\n` +
+      `\n❌ Prinodia Workspace failed to start — invalid environment configuration:\n\n${errors}\n\n` +
         `Fix the above variables in your .env file and restart the server.\n`,
     );
 

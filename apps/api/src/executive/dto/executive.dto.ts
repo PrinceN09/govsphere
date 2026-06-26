@@ -1,5 +1,5 @@
 /**
- * GovSphere — ExecutiveModule DTOs (v1.0.0)
+ * Prinodia Workspace — ExecutiveModule DTOs (v1.0.0)
  */
 
 import {

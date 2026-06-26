@@ -1,4 +1,4 @@
-# GovSphere — Product Requirements
+# Prinodia Workspace — Product Requirements
 
 **Document Version:** 1.0  
 **Status:** Approved  

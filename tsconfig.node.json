@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  // ─── GovSphere Node.js / Backend TypeScript Config ───────────────────────────
+  // ─── Prinodia Workspace Node.js / Backend TypeScript Config ───────────────────────────
   // Extended by: apps/api, packages/database, packages/types, packages/config,
   //              packages/auth, packages/utils, packages/i18n
   //

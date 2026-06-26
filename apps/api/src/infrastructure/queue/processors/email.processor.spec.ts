@@ -29,7 +29,7 @@ const mockConfigService = {
       "mail.host": "localhost",
       "mail.port": 1025,
       "mail.secure": false,
-      "mail.from.name": "GovSphere Test",
+      "mail.from.name": "Prinodia Workspace Test",
       "mail.from.email": "test@govsphere.gouv.cd",
     };
     return config[key];

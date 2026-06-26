@@ -1,5 +1,5 @@
 /**
- * GovSphere — Cache Module
+ * Prinodia Workspace — Cache Module
  *
  * Wraps NestJS CacheModule with Redis store.
  * Used for:

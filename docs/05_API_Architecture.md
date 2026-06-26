@@ -1,4 +1,4 @@
-# GovSphere — API Architecture
+# Prinodia Workspace — API Architecture
 
 **Document Version:** 1.0  
 **Status:** Approved  
@@ -9,7 +9,7 @@
 
 ## 1. API Design Philosophy
 
-The GovSphere API follows **REST principles with pragmatic extensions**. The API is:
+The Prinodia Workspace API follows **REST principles with pragmatic extensions**. The API is:
 
 - **Versioned** — breaking changes are never made to existing versions
 - **Consistent** — every endpoint follows the same patterns for pagination, filtering, errors, and
@@ -165,7 +165,7 @@ All errors follow a consistent structure:
 
 ### 4.1 Strategy
 
-GovSphere uses **URL-based versioning** (not header-based or query-string-based):
+Prinodia Workspace uses **URL-based versioning** (not header-based or query-string-based):
 
 ```
 /v1/users       ← Current stable API
@@ -420,7 +420,7 @@ All incoming data is validated through:
 1. **DTO classes** with `class-validator` decorators
 2. **Global `ValidationPipe`** with `whitelist: true` (strips unknown fields) and
    `forbidNonWhitelisted: true`
-3. **Zod schemas** in `@govsphere/config` for environment variables
+3. **Zod schemas** in `@prinodia/config` for environment variables
 4. **Prisma** as the final safety net for DB-level constraints
 
 ### 9.2 DTO Example
@@ -429,7 +429,7 @@ All incoming data is validated through:
 // create-message.dto.ts
 import { IsString, IsNotEmpty, MaxLength, IsOptional, IsEnum } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
-import { MessageType } from "@govsphere/types";
+import { MessageType } from "@prinodia/types";
 
 export class CreateMessageDto {
   @ApiProperty({ example: "Bonjour à tous", maxLength: 10000 })

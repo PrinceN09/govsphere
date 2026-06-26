@@ -1,5 +1,5 @@
 /**
- * NextAuth configuration for GovSphere.
+ * NextAuth configuration for Prinodia Workspace.
  *
  * Strategy:
  * - Two CredentialsProviders:
@@ -17,7 +17,7 @@
 
 import Credentials from "next-auth/providers/credentials";
 
-import type { UserRole } from "@govsphere/types";
+import type { UserRole } from "@prinodia/types";
 import type { AuthOptions, User } from "next-auth";
 import type { JWT } from "next-auth/jwt";
 
@@ -136,7 +136,7 @@ export const authOptions: AuthOptions = {
     // ── 1. Standard credential login ─────────────────────────────────────────
     Credentials({
       id: "credentials",
-      name: "GovSphere",
+      name: "Prinodia Workspace",
       credentials: {
         credential: { label: "Matricule or Email", type: "text" },
         password: { label: "Password", type: "password" },
@@ -199,7 +199,7 @@ export const authOptions: AuthOptions = {
     // ── 2. MFA verification ───────────────────────────────────────────────────
     Credentials({
       id: "mfa",
-      name: "GovSphere MFA",
+      name: "Prinodia Workspace MFA",
       credentials: {
         challengeToken: { label: "Challenge Token", type: "text" },
         code: { label: "TOTP Code", type: "text" },

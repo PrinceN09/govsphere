@@ -1,6 +1,6 @@
-# Contributing to GovSphere
+# Contributing to Prinodia Workspace
 
-Thank you for contributing to GovSphere — the Digital Operating System for the Government of the
+Thank you for contributing to Prinodia Workspace — the Digital Operating System for the Government of the
 DRC.
 
 ## Prerequisites

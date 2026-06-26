@@ -54,7 +54,7 @@ export class MfaService {
     // Hold in memory — not persisted until verify-setup is called
     this.pendingSetup.set(userId, { secret, expiresAt: Date.now() + 10 * 60 * 1000 });
 
-    const otpauthUri = authenticator.keyuri(user.email, "GovSphere", secret);
+    const otpauthUri = authenticator.keyuri(user.email, "Prinodia Workspace", secret);
 
     // Try to generate QR code — gracefully degrade if qrcode package unavailable
     let qrCode = `data:text/plain;base64,${Buffer.from(otpauthUri).toString("base64")}`;

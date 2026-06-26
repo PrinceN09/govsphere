@@ -1,5 +1,5 @@
 /**
- * GovSphere — Calendar & Meetings DTOs (v0.9.0)
+ * Prinodia Workspace — Calendar & Meetings DTOs (v0.9.0)
  */
 
 import {

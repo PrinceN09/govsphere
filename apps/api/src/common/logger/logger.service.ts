@@ -1,5 +1,5 @@
 /**
- * GovSphere — Structured Logger Service
+ * Prinodia Workspace — Structured Logger Service
  *
  * Wraps pino for structured JSON logging with:
  *   - Request ID correlation (set per-request from X-Request-ID header or UUID)

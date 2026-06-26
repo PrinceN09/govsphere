@@ -1,7 +1,7 @@
-# GovSphere — Documentation Index
+# Prinodia Workspace — Documentation Index
 
 This directory contains all engineering, architecture, and operational documentation for the
-GovSphere platform.
+Prinodia Workspace platform.
 
 ## Core Engineering Documents
 
@@ -46,7 +46,7 @@ alternatives considered, and consequences.
 
 ## How to Use This Documentation
 
-**New to GovSphere?** Start with [01 — Product Vision](./01_Product_Vision.md) and
+**New to Prinodia Workspace?** Start with [01 — Product Vision](./01_Product_Vision.md) and
 [03 — System Architecture](./03_System_Architecture.md).
 
 **Setting up locally?** See the [README](../README.md#local-development) at the repository root.

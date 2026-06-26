@@ -1,5 +1,5 @@
 /**
- * GovSphere — Events Module
+ * Prinodia Workspace — Events Module
  *
  * Placeholder for internal domain event system.
  * Will be used for decoupled event handling across the platform:

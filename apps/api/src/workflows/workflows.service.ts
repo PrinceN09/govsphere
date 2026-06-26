@@ -1,5 +1,5 @@
 /**
- * GovSphere — WorkflowsService (v0.8.1)
+ * Prinodia Workspace — WorkflowsService (v0.8.1)
  *
  * Full approval engine: start / cancel / approve / reject / request-changes /
  * delegate / escalate / return. Digital signatures, comments, audit events.

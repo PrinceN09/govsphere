@@ -1,6 +1,6 @@
-# @govsphere/api
+# @prinodia/api
 
-NestJS backend API — REST + WebSocket for GovSphere.
+NestJS backend API — REST + WebSocket for Prinodia Workspace.
 
 ## Stack
 

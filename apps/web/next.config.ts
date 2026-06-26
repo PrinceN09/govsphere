@@ -10,12 +10,12 @@ const nextConfig: NextConfig = {
 
   // Transpile internal monorepo packages
   transpilePackages: [
-    "@govsphere/ui",
-    "@govsphere/types",
-    "@govsphere/i18n",
-    "@govsphere/config",
-    "@govsphere/auth",
-    "@govsphere/utils",
+    "@prinodia/ui",
+    "@prinodia/types",
+    "@prinodia/i18n",
+    "@prinodia/config",
+    "@prinodia/auth",
+    "@prinodia/utils",
   ],
 
   // Internationalization handled by next-intl middleware

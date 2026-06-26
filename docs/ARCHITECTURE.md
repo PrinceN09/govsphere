@@ -1,4 +1,4 @@
-# GovSphere — Architecture Overview
+# Prinodia Workspace — Architecture Overview
 
 ## System Design
 

@@ -1,6 +1,6 @@
-# @govsphere/desktop
+# @prinodia/desktop
 
-GovSphere Desktop Application — planned for a future phase.
+Prinodia Workspace Desktop Application — planned for a future phase.
 
 ## Technology: Tauri (Rust + WebView)
 

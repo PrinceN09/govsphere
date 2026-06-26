@@ -1,5 +1,5 @@
 /**
- * GovSphere API — Configuration barrel
+ * Prinodia Workspace API — Configuration barrel
  *
  * All typed configuration modules are exported from here.
  * Import into AppModule via ConfigModule.forRoot({ load: [...] }).

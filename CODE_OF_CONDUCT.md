@@ -2,7 +2,7 @@
 
 ## Our Standards
 
-GovSphere is built by and for the people of the Democratic Republic of Congo. All contributors —
+Prinodia Workspace is built by and for the people of the Democratic Republic of Congo. All contributors —
 whether government employees, partner organizations, or technical staff — are expected to:
 
 - Communicate respectfully and professionally
@@ -21,7 +21,7 @@ whether government employees, partner organizations, or technical staff — are 
 
 ## Enforcement
 
-Violations should be reported to the GovSphere Engineering Lead at engineering@govsphere.gouv.cd.
+Violations should be reported to the Prinodia Workspace Engineering Lead at engineering@govsphere.gouv.cd.
 All reports are confidential.
 
 Violations may result in removal from the project and, where applicable, referral to the relevant
@@ -30,4 +30,4 @@ government authority.
 ## Scope
 
 This Code of Conduct applies to all project spaces — GitHub, internal communication channels,
-meetings, and any other forum related to GovSphere.
+meetings, and any other forum related to Prinodia Workspace.

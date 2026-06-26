@@ -1,5 +1,5 @@
 /**
- * GovSphere — WorkflowsController (v0.8.1)
+ * Prinodia Workspace — WorkflowsController (v0.8.1)
  *
  * Base: v1/workflows
  */

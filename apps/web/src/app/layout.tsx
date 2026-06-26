@@ -10,7 +10,7 @@ import type { Metadata } from "next";
 const inter = Inter({ subsets: ["latin"], display: "swap" });
 
 export const metadata: Metadata = {
-  title: { default: "GovSphere", template: "%s · GovSphere" },
+  title: { default: "Prinodia Workspace", template: "%s · Prinodia Workspace" },
   description:
     "Plateforme sécurisée de collaboration interne pour le Gouvernement de la République Démocratique du Congo.",
 };

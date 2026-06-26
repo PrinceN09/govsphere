@@ -1,5 +1,5 @@
 {
-  "name": "@govsphere/web",
+  "name": "@prinodia/web",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -12,12 +12,12 @@
     "clean": "rm -rf .next out dist"
   },
   "dependencies": {
-    "@govsphere/auth": "*",
-    "@govsphere/config": "*",
-    "@govsphere/i18n": "*",
-    "@govsphere/types": "*",
-    "@govsphere/ui": "*",
-    "@govsphere/utils": "*",
+    "@prinodia/auth": "*",
+    "@prinodia/config": "*",
+    "@prinodia/i18n": "*",
+    "@prinodia/types": "*",
+    "@prinodia/ui": "*",
+    "@prinodia/utils": "*",
     "@hookform/resolvers": "^3.9.0",
     "@radix-ui/react-avatar": "^1.1.0",
     "@radix-ui/react-checkbox": "^1.1.0",

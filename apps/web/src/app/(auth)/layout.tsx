@@ -13,10 +13,10 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         {/* Logo block */}
         <div className="flex flex-col items-center border-b border-slate-100 px-8 py-6">
           <div className="flex h-10 w-10 items-center justify-center bg-primary-600">
-            <span className="text-lg font-black text-white leading-none">G</span>
+            <span className="text-lg font-black text-white leading-none">P</span>
           </div>
           <p className="mt-3 text-[11px] font-bold uppercase tracking-widest text-slate-400">
-            GovSphere
+            Prinodia Workspace
           </p>
         </div>
 

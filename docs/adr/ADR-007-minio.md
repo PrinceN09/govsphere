@@ -1,12 +1,12 @@
 # ADR-007 — Use MinIO for File Storage
 
-**Status:** Accepted **Date:** 2026-06 **Deciders:** GovSphere Engineering Team
+**Status:** Accepted **Date:** 2026-06 **Deciders:** Prinodia Workspace Engineering Team
 
 ---
 
 ## Context
 
-GovSphere will handle government documents, images, attachments, and user avatars. The file storage
+Prinodia Workspace will handle government documents, images, attachments, and user avatars. The file storage
 system must:
 
 - Store file content outside the primary database (performance and cost)
@@ -28,7 +28,7 @@ binary content is stored in MinIO.
 
 **AWS S3:**
 
-- Rejected for on-premise deployment requirement. GovSphere must be deployable in the DRC on
+- Rejected for on-premise deployment requirement. Prinodia Workspace must be deployable in the DRC on
   government-controlled infrastructure. S3 is available for cloud deployments (MinIO is
   S3-compatible, so the switch is a config change).
 

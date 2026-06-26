@@ -1,12 +1,12 @@
 # ADR-001 — Use PostgreSQL 17 as the Primary Database
 
-**Status:** Accepted **Date:** 2026-06 **Deciders:** GovSphere Engineering Team
+**Status:** Accepted **Date:** 2026-06 **Deciders:** Prinodia Workspace Engineering Team
 
 ---
 
 ## Context
 
-GovSphere requires a primary database to store structured government data: users, organizational
+Prinodia Workspace requires a primary database to store structured government data: users, organizational
 hierarchy (ministries, departments, divisions), messages, channels, files metadata, audit logs, and
 RBAC role assignments.
 

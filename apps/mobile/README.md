@@ -1,6 +1,6 @@
-# @govsphere/mobile
+# @prinodia/mobile
 
-GovSphere Mobile Application — planned for a future phase.
+Prinodia Workspace Mobile Application — planned for a future phase.
 
 ## Technology: React Native (Expo)
 

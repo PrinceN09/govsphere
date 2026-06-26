@@ -1,5 +1,5 @@
 /**
- * GovSphere — Storage Module
+ * Prinodia Workspace — Storage Module
  *
  * Provides MinIO (S3-compatible) file storage.
  * All uploaded files go through this module — never stored in PostgreSQL.

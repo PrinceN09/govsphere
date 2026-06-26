@@ -1,5 +1,5 @@
 /**
- * GovSphere — Redis Health Indicator
+ * Prinodia Workspace — Redis Health Indicator
  *
  * Used by HealthController to verify Redis is reachable.
  * Sends PING; expects PONG within the terminus timeout window.

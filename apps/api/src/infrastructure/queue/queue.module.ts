@@ -1,5 +1,5 @@
 /**
- * GovSphere — Queue Module (v0.6.3)
+ * Prinodia Workspace — Queue Module (v0.6.3)
  *
  * Wires @nestjs/bull (Bull v4, backed by ioredis) with 4 queues:
  *

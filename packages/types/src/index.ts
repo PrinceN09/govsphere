@@ -1,7 +1,7 @@
 /**
- * @govsphere/types
+ * @prinodia/types
  *
- * Shared TypeScript types and interfaces for GovSphere.
+ * Shared TypeScript types and interfaces for Prinodia Workspace.
  * All domain types, enums, and DTOs are defined here.
  */
 

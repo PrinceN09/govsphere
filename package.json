@@ -1,8 +1,8 @@
 {
-  "name": "govsphere",
+  "name": "prinodia-workspace",
   "version": "0.1.0",
   "private": true,
-  "description": "GovSphere — Secure Government Collaboration Platform for the DRC",
+  "description": "Prinodia Workspace — Secure Government Collaboration Platform for the DRC",
   "workspaces": [
     "apps/*",
     "packages/*"

@@ -1,5 +1,5 @@
 /**
- * GovSphere — MeetingsService (v0.9.0)
+ * Prinodia Workspace — MeetingsService (v0.9.0)
  *
  * Full meeting lifecycle: create → schedule → run → complete → minutes → action items.
  * Integrates with Task system, Workflow engine, and Audit platform.

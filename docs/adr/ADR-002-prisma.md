@@ -1,12 +1,12 @@
 # ADR-002 — Use Prisma 5 as the ORM
 
-**Status:** Accepted **Date:** 2026-06 **Deciders:** GovSphere Engineering Team
+**Status:** Accepted **Date:** 2026-06 **Deciders:** Prinodia Workspace Engineering Team
 
 ---
 
 ## Context
 
-GovSphere's API layer needs to interact with a PostgreSQL database in a type-safe, maintainable way.
+Prinodia Workspace's API layer needs to interact with a PostgreSQL database in a type-safe, maintainable way.
 The team writes TypeScript exclusively. The ORM must:
 
 - Produce typed query results that reflect the schema

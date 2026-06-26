@@ -1,5 +1,5 @@
 /**
- * GovSphere — Database Seed
+ * Prinodia Workspace — Database Seed
  * Seeds the default roles and permissions for the identity platform.
  * Run with: npx prisma db seed
  */
@@ -287,7 +287,7 @@ const ROLES: Array<{
     name: "SUPER_ADMIN",
     displayName: "Super Administrator",
     weight: 100,
-    description: "Full system access. Reserved for GovSphere platform engineers.",
+    description: "Full system access. Reserved for Prinodia Workspace platform engineers.",
     permissions: PERMISSIONS.map((p) => p.key), // all permissions
   },
   {
@@ -486,7 +486,7 @@ const ROLES: Array<{
 // MAIN SEED
 // ---------------------------------------------------------------------------
 async function main(): Promise<void> {
-  console.log("🌱 GovSphere — Seeding identity platform...");
+  console.log("🌱 Prinodia Workspace — Seeding identity platform...");
 
   // 1. Upsert all permissions
   console.log(`  → Seeding ${PERMISSIONS.length} permissions...`);
@@ -547,7 +547,7 @@ async function main(): Promise<void> {
   // Password is read from SEED_ADMIN_PASSWORD env var.
   // Falls back to a placeholder — must be rotated before production use.
   const adminEmail = "superadmin@govsphere.cd";
-  const rawPassword = process.env["SEED_ADMIN_PASSWORD"] ?? "GovSphere@Admin1!";
+  const rawPassword = process.env["SEED_ADMIN_PASSWORD"] ?? "Prinodia Workspace@Admin1!";
   const passwordHash = await bcrypt.hash(rawPassword, 12);
 
   await prisma.user.upsert({

@@ -1,5 +1,5 @@
 /**
- * GovSphere — Executive Office & Cabinet Management types (v1.0.0)
+ * Prinodia Workspace — Executive Office & Cabinet Management types (v1.0.0)
  */
 
 // ─── Enums ────────────────────────────────────────────────────────────────────

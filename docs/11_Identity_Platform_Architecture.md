@@ -1,4 +1,4 @@
-# GovSphere — Identity Platform Architecture
+# Prinodia Workspace — Identity Platform Architecture
 
 **Document Version:** 1.0  
 **Status:** Approved for Implementation  
@@ -31,7 +31,7 @@
 
 ### Why Identity Is the Foundation
 
-GovSphere is a platform where ministers discuss national policy, department heads share classified
+Prinodia Workspace is a platform where ministers discuss national policy, department heads share classified
 circulars, and civil servants collaborate on sensitive government operations. Every feature —
 messaging, file sharing, channels, meetings — depends on one absolute prerequisite: **we must know
 who you are, and we must be certain**.
@@ -48,7 +48,7 @@ The Identity Platform is therefore not just a login screen. It is the enforcemen
 - **Accountability** — record every action you take
 - **Session integrity** — ensure your credential is valid for the duration of every request
 
-No feature in GovSphere is built until the Identity Platform is in place and hardened. This is a
+No feature in Prinodia Workspace is built until the Identity Platform is in place and hardened. This is a
 deliberate engineering decision: all other modules — Channels, Messages, Files, Search — are built
 on top of the identity layer and delegate every access decision to it.
 
@@ -210,12 +210,12 @@ Created by admin → PENDING
 
 ### 5.1 Role Definitions
 
-GovSphere uses a hierarchical role system. Higher role weight includes all permissions of lower
+Prinodia Workspace uses a hierarchical role system. Higher role weight includes all permissions of lower
 roles in the same organizational scope, plus additional permissions.
 
 | Role               | Weight | Scope             | Description                                                                                                             |
 | ------------------ | ------ | ----------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| `SUPER_ADMIN`      | 100    | System-wide       | Full access to everything. Reserved for GovSphere platform engineers and the DRC IT authority. Maximum 3 accounts.      |
+| `SUPER_ADMIN`      | 100    | System-wide       | Full access to everything. Reserved for Prinodia Workspace platform engineers and the DRC IT authority. Maximum 3 accounts.      |
 | `GOVERNMENT_ADMIN` | 90     | Cross-ministry    | Can manage all ministries. Assigned to IT administrators and senior government officials.                               |
 | `MINISTRY_ADMIN`   | 70     | Ministry          | Full access within their assigned ministry. Can manage departments, divisions, users, and channels within the ministry. |
 | `DEPARTMENT_ADMIN` | 50     | Department        | Full access within their assigned department. Can manage divisions and users within the department.                     |
@@ -383,7 +383,7 @@ Exception (overrides membership requirement):
 
 ### 7.1 Token Architecture
 
-GovSphere uses two-token authentication: a short-lived access token and a long-lived refresh token.
+Prinodia Workspace uses two-token authentication: a short-lived access token and a long-lived refresh token.
 
 #### Access Token
 
@@ -532,7 +532,7 @@ Period:     30 seconds
 Digits:     6
 Tolerance:  ±1 period (accepts codes from current and adjacent windows for clock skew)
 Library:    otplib (Node.js)
-QR format:  otpauth://totp/GovSphere:{email}?secret={base32secret}&issuer=GovSphere
+QR format:  otpauth://totp/Prinodia Workspace:{email}?secret={base32secret}&issuer=Prinodia Workspace
 ```
 
 **Compatible apps:** Google Authenticator, Microsoft Authenticator, Authy, 1Password, Aegis
@@ -927,7 +927,7 @@ model UserSession {
 model UserDevice {
   id          String    @id @default(cuid())
   userId      String
-  name        String    // "Chrome on macOS", "GovSphere Android"
+  name        String    // "Chrome on macOS", "Prinodia Workspace Android"
   platform    String    // "web" | "desktop" | "mobile"
   fingerprint String    // device fingerprint hash
   trusted     Boolean   @default(false)
@@ -1211,7 +1211,7 @@ Response 200:
 {
   "secret": "JBSWY3DPEHPK3PXP",    // Base32 secret
   "qrCode": "data:image/png;base64,...",
-  "otpauthUri": "otpauth://totp/GovSphere:jean.mbeki@finances.gouv.cd?secret=..."
+  "otpauthUri": "otpauth://totp/Prinodia Workspace:jean.mbeki@finances.gouv.cd?secret=..."
 }
 ```
 

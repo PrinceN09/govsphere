@@ -1,5 +1,5 @@
 /**
- * GovSphere — RoomsService (v0.9.0)
+ * Prinodia Workspace — RoomsService (v0.9.0)
  *
  * Manages meeting rooms and resources. Prevents double-bookings.
  */

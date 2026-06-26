@@ -1,5 +1,5 @@
 # =============================================================================
-# GovSphere API — Production Dockerfile
+# Prinodia Workspace API — Production Dockerfile
 # =============================================================================
 # Multi-stage build:
 #   1. deps    — install production dependencies (node_modules, no devDeps)
@@ -7,7 +7,7 @@
 #   3. runtime — minimal image: node + dist + node_modules (no build tools)
 #
 # Build context: repo root (needed for shared packages in /packages)
-#   docker build -f apps/api/Dockerfile -t govsphere-api .
+#   docker build -f apps/api/Dockerfile -t prinodia-api .
 # =============================================================================
 
 # ── Stage 1: Install ALL dependencies (build + runtime) ──────────────────────
@@ -48,25 +48,25 @@ FROM node:20-alpine AS runtime
 RUN apk add --no-cache dumb-init
 
 # Non-root user for security
-RUN addgroup --system --gid 1001 govsphere \
- && adduser  --system --uid 1001 --ingroup govsphere govsphere
+RUN addgroup --system --gid 1001 prinodia \
+ && adduser  --system --uid 1001 --ingroup prinodia prinodia
 
 WORKDIR /app
 
 ENV NODE_ENV=production
 
 # Copy built output
-COPY --from=builder --chown=govsphere:govsphere /app/apps/api/dist ./dist
-COPY --from=builder --chown=govsphere:govsphere /app/node_modules ./node_modules
-COPY --from=builder --chown=govsphere:govsphere /app/packages/database/prisma ./packages/database/prisma
+COPY --from=builder --chown=prinodia:prinodia /app/apps/api/dist ./dist
+COPY --from=builder --chown=prinodia:prinodia /app/node_modules ./node_modules
+COPY --from=builder --chown=prinodia:prinodia /app/packages/database/prisma ./packages/database/prisma
 
 # Prisma generated client (platform-specific binaries must be in runtime image)
-COPY --from=builder --chown=govsphere:govsphere \
+COPY --from=builder --chown=prinodia:prinodia \
   /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder --chown=govsphere:govsphere \
+COPY --from=builder --chown=prinodia:prinodia \
   /app/node_modules/@prisma ./node_modules/@prisma
 
-USER govsphere
+USER prinodia
 
 EXPOSE 4000
 

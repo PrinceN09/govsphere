@@ -1,6 +1,6 @@
-# GovSphere — Terraform
+# Prinodia Workspace — Terraform
 
-Infrastructure as Code for provisioning GovSphere infrastructure.
+Infrastructure as Code for provisioning Prinodia Workspace infrastructure.
 
 ## Planned Modules
 

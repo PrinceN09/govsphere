@@ -1,5 +1,5 @@
 /**
- * GovSphere — Audit Export Processor
+ * Prinodia Workspace — Audit Export Processor
  *
  * Consumes jobs from the "audit" Bull queue.
  *

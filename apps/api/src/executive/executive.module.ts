@@ -1,5 +1,5 @@
 /**
- * GovSphere — ExecutiveModule (v1.0.0)
+ * Prinodia Workspace — ExecutiveModule (v1.0.0)
  *
  * Executive Office & Cabinet Management Platform.
  * Reuses: AuditModule, PrismaModule, CalendarModule (via exports).

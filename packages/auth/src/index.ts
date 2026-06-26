@@ -1,5 +1,5 @@
 /**
- * @govsphere/auth
+ * @prinodia/auth
  *
  * Authentication utilities, permission checks, and RBAC helpers.
  * These are pure helpers — no NestJS/Next.js dependencies.
@@ -10,7 +10,7 @@
 // 2. isAdmin / isSuperOrGovAdmin call hasRole(role, UserRole.MINISTRY_ADMIN)
 //    which requires the enum to exist at runtime as a JavaScript object.
 //    `import type` erases the import at compile time and causes a runtime error.
-import { UserRole } from "@govsphere/types";
+import { UserRole } from "@prinodia/types";
 import { z } from "zod";
 
 // ─── Role Hierarchy ───────────────────────────────────────────────────────────

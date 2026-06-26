@@ -1,5 +1,5 @@
 /**
- * GovSphere — Redis Service
+ * Prinodia Workspace — Redis Service
  *
  * Typed wrapper around ioredis for use across the application.
  * Provides:

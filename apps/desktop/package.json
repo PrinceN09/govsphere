@@ -1,8 +1,8 @@
 {
-  "name": "@govsphere/desktop",
+  "name": "@prinodia/desktop",
   "version": "0.1.0",
   "private": true,
-  "description": "GovSphere Desktop Application — Tauri (planned)",
+  "description": "Prinodia Workspace Desktop Application — Tauri (planned)",
   "scripts": {
     "dev": "echo 'Desktop app (Tauri) is planned for a future phase'",
     "build": "echo 'Desktop app (Tauri) is planned for a future phase'",

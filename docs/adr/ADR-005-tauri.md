@@ -1,12 +1,12 @@
 # ADR-005 — Use Tauri 2 for the Desktop Application
 
-**Status:** Accepted **Date:** 2026-06 **Deciders:** GovSphere Engineering Team
+**Status:** Accepted **Date:** 2026-06 **Deciders:** Prinodia Workspace Engineering Team
 
 ---
 
 ## Context
 
-GovSphere needs a desktop client for government employees who:
+Prinodia Workspace needs a desktop client for government employees who:
 
 - Work on Windows machines (most DRC government workstations run Windows)
 - Need desktop notifications for messages and alerts

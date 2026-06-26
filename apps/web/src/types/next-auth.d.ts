@@ -1,8 +1,8 @@
-import type { UserRole } from "@govsphere/types";
+import type { UserRole } from "@prinodia/types";
 import type { DefaultSession, DefaultJWT } from "next-auth";
 
 /**
- * Augments the built-in NextAuth types to carry GovSphere-specific fields.
+ * Augments the built-in NextAuth types to carry Prinodia Workspace-specific fields.
  * Session.user mirrors the fields stored in the JWT by auth.ts callbacks.
  */
 

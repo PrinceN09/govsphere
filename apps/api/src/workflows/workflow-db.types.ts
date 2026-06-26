@@ -1,5 +1,5 @@
 /**
- * GovSphere — Workflow Prisma Type Shim (v0.8.1)
+ * Prinodia Workspace — Workflow Prisma Type Shim (v0.8.1)
  *
  * Provides typed delegate interfaces for the new workflow models so that
  * the API compiles before the user runs `npx prisma generate` on the host.

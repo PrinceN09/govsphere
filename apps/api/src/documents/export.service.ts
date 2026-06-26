@@ -319,7 +319,7 @@ export class ExportService {
       pageSize: "A4",
       pageMargins: [60, 60, 60, 60],
       footer: (currentPage: number, pageCount: number) => ({
-        text: `GovSphere — ${classLabel} — Page ${String(currentPage)}/${String(pageCount)}`,
+        text: `Prinodia Workspace — ${classLabel} — Page ${String(currentPage)}/${String(pageCount)}`,
         alignment: "center" as const,
         fontSize: 8,
         color: "#9CA3AF",

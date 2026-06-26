@@ -4,7 +4,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@govsphere/*": ["../../packages/*/src"]
+      "@prinodia/*": ["../../packages/*/src"]
     }
   },
   "include": ["src"],

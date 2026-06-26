@@ -11,11 +11,11 @@
     // relative to this tsconfig file, not the process cwd.
     "baseUrl": ".",
     "paths": {
-      "@govsphere/config": ["../../packages/config/src/index.ts"],
-      "@govsphere/database": ["../../packages/database/src/index.ts"],
-      "@govsphere/types": ["../../packages/types/src/index.ts"],
-      "@govsphere/auth": ["../../packages/auth/src/index.ts"],
-      "@govsphere/utils": ["../../packages/utils/src/index.ts"]
+      "@prinodia/config": ["../../packages/config/src/index.ts"],
+      "@prinodia/database": ["../../packages/database/src/index.ts"],
+      "@prinodia/types": ["../../packages/types/src/index.ts"],
+      "@prinodia/auth": ["../../packages/auth/src/index.ts"],
+      "@prinodia/utils": ["../../packages/utils/src/index.ts"]
     }
   },
   "include": ["src/**/*.ts"],

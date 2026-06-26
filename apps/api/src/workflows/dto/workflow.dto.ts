@@ -1,5 +1,5 @@
 /**
- * GovSphere — Workflow & Approvals DTOs (v0.8.1)
+ * Prinodia Workspace — Workflow & Approvals DTOs (v0.8.1)
  */
 
 import {

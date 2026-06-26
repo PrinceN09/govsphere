@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  // ─── GovSphere React / Browser TypeScript Config ─────────────────────────────
+  // ─── Prinodia Workspace React / Browser TypeScript Config ─────────────────────────────
   // Extended by: apps/web, packages/ui
   //
   // moduleResolution: "Bundler" is the TypeScript 5.0+ setting designed for

@@ -1,5 +1,5 @@
 /**
- * GovSphere — CalendarModule (v0.9.0)
+ * Prinodia Workspace — CalendarModule (v0.9.0)
  */
 
 import { BullModule } from "@nestjs/bull";

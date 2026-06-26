@@ -1,5 +1,5 @@
 /**
- * GovSphere — NotificationsService (Collaboration)
+ * Prinodia Workspace — NotificationsService (Collaboration)
  *
  * Surfaces collaboration notifications: mentions, replies, DMs, announcements.
  * Unread counters are computed at query time — no separate counter columns.

@@ -1,7 +1,7 @@
 /**
- * @govsphere/utils
+ * @prinodia/utils
  *
- * Shared utility functions for GovSphere.
+ * Shared utility functions for Prinodia Workspace.
  * Pure functions with no framework dependencies.
  */
 

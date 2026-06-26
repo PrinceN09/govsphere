@@ -1,4 +1,4 @@
-# GovSphere — System Architecture
+# Prinodia Workspace — System Architecture
 
 **Document Version:** 1.0  
 **Status:** Approved  
@@ -9,7 +9,7 @@
 
 ## 1. Architecture Overview
 
-GovSphere follows a **layered, service-oriented monorepo architecture** designed for high
+Prinodia Workspace follows a **layered, service-oriented monorepo architecture** designed for high
 availability, horizontal scalability, and security. The system is built as a single Turborepo
 monorepo containing multiple apps and shared packages, deployable as independently scalable services
 in production via Docker/Kubernetes.
@@ -240,7 +240,7 @@ apps/api/src/
 - **Interceptors** — Request logging, response transformation, timeout enforcement
 - **Pipes** — `ValidationPipe` with `class-validator` for all incoming DTOs
 - **Exception Filters** — Standardized error responses across all endpoints
-- **ConfigModule** — Zod-validated environment variables via `@govsphere/config`
+- **ConfigModule** — Zod-validated environment variables via `@prinodia/config`
 
 ---
 

@@ -37,7 +37,7 @@ updates:
       - "dependencies"
       - "automated"
     reviewers:
-      - "govsphere-engineering"
+      - "prinodia-engineering"
 
   # ── GitHub Actions ─────────────────────────────────────────────────────────
   - package-ecosystem: "github-actions"

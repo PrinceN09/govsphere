@@ -1,5 +1,5 @@
 /**
- * GovSphere — CalendarController + MeetingsController + RoomsController (v0.9.0)
+ * Prinodia Workspace — CalendarController + MeetingsController + RoomsController (v0.9.0)
  *
  * Base paths:
  *   GET/POST /v1/calendar/events

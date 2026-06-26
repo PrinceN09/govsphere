@@ -1,14 +1,14 @@
 # ADR-006 — Use React Native for the Mobile Application
 
-**Status:** Accepted **Date:** 2026-06 **Deciders:** GovSphere Engineering Team
+**Status:** Accepted **Date:** 2026-06 **Deciders:** Prinodia Workspace Engineering Team
 
 ---
 
 ## Context
 
-GovSphere needs a mobile client for government employees who:
+Prinodia Workspace needs a mobile client for government employees who:
 
-- Access GovSphere from Android phones (dominant device in the DRC)
+- Access Prinodia Workspace from Android phones (dominant device in the DRC)
 - Need mobile push notifications for messages and alerts
 - May work in areas with intermittent connectivity
 
@@ -53,7 +53,7 @@ We will use **React Native 0.74** (with Expo) for the mobile application (`apps/
 **Positive:**
 
 - React Native renders native UI components — not a WebView; performs like a real native app
-- Shared business logic, API client, TypeScript types, and i18n with the web app (via `@govsphere/`
+- Shared business logic, API client, TypeScript types, and i18n with the web app (via `@prinodia/`
   packages)
 - Expo simplifies native build configuration and OTA updates
 - React Native is dominant in the African tech ecosystem — easier to hire for locally
@@ -64,7 +64,7 @@ We will use **React Native 0.74** (with Expo) for the mobile application (`apps/
 
 - Some native modules require platform-specific code (camera, biometrics, push notifications)
 - Expo managed workflow limits some native customizations
-- React Native performance in animation-heavy UIs can lag behind native, but GovSphere is primarily
+- React Native performance in animation-heavy UIs can lag behind native, but Prinodia Workspace is primarily
   a productivity tool, not a game
 
 ## Implementation Plan

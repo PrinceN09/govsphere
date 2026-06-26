@@ -1,5 +1,5 @@
 /**
- * GovSphere — Calendar & Meetings Web Types (v0.9.0)
+ * Prinodia Workspace — Calendar & Meetings Web Types (v0.9.0)
  *
  * Client-side type definitions for the Calendar & Meetings platform.
  * Mirror of the API response shapes — not importing from @prisma/client.

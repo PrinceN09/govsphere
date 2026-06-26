@@ -1,5 +1,5 @@
 {
-  "name": "@govsphere/api",
+  "name": "@prinodia/api",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -17,11 +17,11 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@govsphere/auth": "*",
-    "@govsphere/config": "*",
-    "@govsphere/database": "*",
-    "@govsphere/types": "*",
-    "@govsphere/utils": "*",
+    "@prinodia/auth": "*",
+    "@prinodia/config": "*",
+    "@prinodia/database": "*",
+    "@prinodia/types": "*",
+    "@prinodia/utils": "*",
     "@nestjs/bull": "^10.2.1",
     "@nestjs/cache-manager": "^2.3.0",
     "@nestjs/common": "^10.3.10",

@@ -1,7 +1,7 @@
 /**
- * @govsphere/ui
+ * @prinodia/ui
  *
- * Shared UI component library for GovSphere.
+ * Shared UI component library for Prinodia Workspace.
  * Components are built on top of Radix UI primitives with Tailwind CSS.
  *
  * Components will be added here as the application is built.

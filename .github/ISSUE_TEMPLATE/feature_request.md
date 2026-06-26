@@ -1,6 +1,6 @@
 ---
 name: Feature Request
-about: Propose a new feature or enhancement for GovSphere
+about: Propose a new feature or enhancement for Prinodia Workspace
 title: "[FEATURE] "
 labels: enhancement, needs-triage
 assignees: ""

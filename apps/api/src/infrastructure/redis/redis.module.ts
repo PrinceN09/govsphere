@@ -1,5 +1,5 @@
 /**
- * GovSphere — Redis Module
+ * Prinodia Workspace — Redis Module
  *
  * Provides a singleton ioredis client and the typed RedisService wrapper.
  * Marked @Global() so any module in the application can inject RedisService

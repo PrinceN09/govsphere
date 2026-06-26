@@ -1,5 +1,5 @@
 /**
- * GovSphere — Email Processor
+ * Prinodia Workspace — Email Processor
  *
  * Consumes jobs from the "email" Bull queue and delivers them via SMTP (nodemailer).
  * Runs out-of-process relative to the HTTP request, so email delivery does not
@@ -69,7 +69,7 @@ export class EmailProcessor {
     const user = this.config.get<string | undefined>("mail.user");
     const pass = this.config.get<string | undefined>("mail.password");
 
-    this.fromName = this.config.get<string>("mail.from.name") ?? "GovSphere";
+    this.fromName = this.config.get<string>("mail.from.name") ?? "Prinodia Workspace";
     this.fromEmail = this.config.get<string>("mail.from.email") ?? "noreply@govsphere.gouv.cd";
 
     this.transporter = nodemailer.createTransport({
@@ -89,7 +89,7 @@ export class EmailProcessor {
     await this.transporter.sendMail({
       from: `"${this.fromName}" <${this.fromEmail}>`,
       to,
-      subject: "Réinitialisation de votre mot de passe GovSphere",
+      subject: "Réinitialisation de votre mot de passe Prinodia Workspace",
       html: `
         <p>Bonjour ${displayName},</p>
         <p>Une demande de réinitialisation de mot de passe a été reçue pour votre compte.</p>
@@ -102,7 +102,7 @@ export class EmailProcessor {
         <p>Ce lien expire dans <strong>${expiresMinutes} minutes</strong>.</p>
         <p>Si vous n'avez pas demandé cette réinitialisation, ignorez cet e-mail.</p>
         <hr/>
-        <p style="color:#6b7280;font-size:12px">GovSphere — Plateforme du Gouvernement de la RDC</p>
+        <p style="color:#6b7280;font-size:12px">Prinodia Workspace — Plateforme du Gouvernement de la RDC</p>
       `,
     });
   }
@@ -114,11 +114,11 @@ export class EmailProcessor {
     await this.transporter.sendMail({
       from: `"${this.fromName}" <${this.fromEmail}>`,
       to,
-      subject: "Bienvenue sur GovSphere",
+      subject: "Bienvenue sur Prinodia Workspace",
       html: `
         <p>Bonjour ${displayName},</p>
         <p>
-          Votre compte GovSphere pour le <strong>${ministryName}</strong> a été créé avec succès.
+          Votre compte Prinodia Workspace pour le <strong>${ministryName}</strong> a été créé avec succès.
         </p>
         <p>
           <a href="${loginUrl}" style="
@@ -127,7 +127,7 @@ export class EmailProcessor {
           ">Accéder à la plateforme</a>
         </p>
         <hr/>
-        <p style="color:#6b7280;font-size:12px">GovSphere — Plateforme du Gouvernement de la RDC</p>
+        <p style="color:#6b7280;font-size:12px">Prinodia Workspace — Plateforme du Gouvernement de la RDC</p>
       `,
     });
   }
@@ -139,11 +139,11 @@ export class EmailProcessor {
     await this.transporter.sendMail({
       from: `"${this.fromName}" <${this.fromEmail}>`,
       to,
-      subject: `Invitation à rejoindre GovSphere — ${ministryName}`,
+      subject: `Invitation à rejoindre Prinodia Workspace — ${ministryName}`,
       html: `
         <p>Bonjour ${displayName},</p>
         <p>
-          <strong>${invitedBy}</strong> vous invite à rejoindre GovSphere pour le compte du
+          <strong>${invitedBy}</strong> vous invite à rejoindre Prinodia Workspace pour le compte du
           <strong>${ministryName}</strong>.
         </p>
         <p>
@@ -154,7 +154,7 @@ export class EmailProcessor {
         </p>
         <p>Ce lien expire dans <strong>${expiresHours} heures</strong>.</p>
         <hr/>
-        <p style="color:#6b7280;font-size:12px">GovSphere — Plateforme du Gouvernement de la RDC</p>
+        <p style="color:#6b7280;font-size:12px">Prinodia Workspace — Plateforme du Gouvernement de la RDC</p>
       `,
     });
   }
@@ -166,7 +166,7 @@ export class EmailProcessor {
     await this.transporter.sendMail({
       from: `"${this.fromName}" <${this.fromEmail}>`,
       to,
-      subject: "Votre code de vérification GovSphere",
+      subject: "Votre code de vérification Prinodia Workspace",
       html: `
         <p>Bonjour ${displayName},</p>
         <p>Votre code de vérification à usage unique est :</p>
@@ -174,7 +174,7 @@ export class EmailProcessor {
         <p>Ce code expire dans <strong>${expiresMinutes} minutes</strong>.</p>
         <p>Ne partagez ce code avec personne.</p>
         <hr/>
-        <p style="color:#6b7280;font-size:12px">GovSphere — Plateforme du Gouvernement de la RDC</p>
+        <p style="color:#6b7280;font-size:12px">Prinodia Workspace — Plateforme du Gouvernement de la RDC</p>
       `,
     });
   }

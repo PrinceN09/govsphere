@@ -1,5 +1,5 @@
 /**
- * GovSphere — CalendarService (v0.9.0)
+ * Prinodia Workspace — CalendarService (v0.9.0)
  *
  * Manages calendar events across all scopes (Personal → National).
  * Timezone-aware. Recurring event support.

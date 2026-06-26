@@ -1,8 +1,8 @@
 {
-  "name": "@govsphere/mobile",
+  "name": "@prinodia/mobile",
   "version": "0.1.0",
   "private": true,
-  "description": "GovSphere Mobile Application — React Native (planned)",
+  "description": "Prinodia Workspace Mobile Application — React Native (planned)",
   "scripts": {
     "dev": "echo 'Mobile app (React Native) is planned for a future phase'",
     "build": "echo 'Mobile app (React Native) is planned for a future phase'",

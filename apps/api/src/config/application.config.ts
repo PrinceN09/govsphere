@@ -34,7 +34,7 @@ export const applicationConfig = registerAs(
   (): ApplicationConfig => ({
     nodeEnv: process.env["NODE_ENV"] ?? "development",
     port: parseInt(process.env["PORT"] ?? "4000", 10),
-    appName: process.env["APP_NAME"] ?? "GovSphere",
+    appName: process.env["APP_NAME"] ?? "Prinodia Workspace",
     appUrl: process.env["APP_URL"] ?? "http://localhost:3000",
     apiUrl: process.env["API_URL"] ?? "http://localhost:4000",
     logLevel: process.env["LOG_LEVEL"] ?? "info",
@@ -45,7 +45,7 @@ export const applicationConfig = registerAs(
     },
     mfa: {
       encryptionKey: process.env["MFA_ENCRYPTION_KEY"] ?? "",
-      issuer: process.env["MFA_ISSUER"] ?? "GovSphere",
+      issuer: process.env["MFA_ISSUER"] ?? "Prinodia Workspace",
     },
     i18n: {
       defaultLanguage: (process.env["DEFAULT_LANGUAGE"] as SupportedLanguage) ?? "fr",

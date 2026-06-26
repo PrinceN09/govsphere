@@ -1,5 +1,5 @@
 /**
- * GovSphere — CabinetService (v1.0.0)
+ * Prinodia Workspace — CabinetService (v1.0.0)
  *
  * Cabinet sessions, agenda items, decisions, voting, and implementation tracking.
  */

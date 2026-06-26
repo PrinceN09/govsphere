@@ -1,6 +1,6 @@
-# @govsphere/web
+# @prinodia/web
 
-Next.js 15 web application — the primary interface for GovSphere.
+Next.js 15 web application — the primary interface for Prinodia Workspace.
 
 ## Stack
 

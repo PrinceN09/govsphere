@@ -1,5 +1,5 @@
 /**
- * GovSphere — CorrespondenceService (v1.0.0)
+ * Prinodia Workspace — CorrespondenceService (v1.0.0)
  *
  * Executive correspondence: letters, directives, memos, circulars, notes.
  * Integrates with Documents module and classification system.

@@ -1,8 +1,8 @@
 <div align="center">
 
-<img src="docs/assets/govsphere-logo.png" alt="GovSphere" width="120" />
+<img src="docs/assets/govsphere-logo.png" alt="Prinodia Workspace" width="120" />
 
-# GovSphere
+# Prinodia Workspace
 
 **The Digital Operating System for Government**
 
@@ -23,13 +23,13 @@ _République Démocratique du Congo_
 
 ## Overview
 
-GovSphere is a secure, auditable, multilingual digital workspace built exclusively for the
+Prinodia Workspace is a secure, auditable, multilingual digital workspace built exclusively for the
 Government of the Democratic Republic of Congo. It replaces fragmented, insecure communication tools
 (WhatsApp, personal email) with a unified platform that enforces role-based access control,
 organizational hierarchy, and immutable audit logging across all government ministries, departments,
 and divisions.
 
-GovSphere is not a generic SaaS product. It is purpose-built for the DRC government's organizational
+Prinodia Workspace is not a generic SaaS product. It is purpose-built for the DRC government's organizational
 structure — from the central administration down to field divisions — with full support for five
 national languages and compliance with government data sovereignty requirements.
 
@@ -92,7 +92,7 @@ sovereign infrastructure.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                        GovSphere Platform                       │
+│                        Prinodia Workspace Platform                       │
 │                                                                 │
 │   ┌──────────┐   ┌──────────┐   ┌──────────┐   ┌──────────┐  │
 │   │  Web App │   │ Desktop  │   │  Mobile  │   │ External │  │
@@ -256,7 +256,7 @@ base64 -i jwt-public.pem  | tr -d '\n'   # → JWT_PUBLIC_KEY
 
 ### Database Setup
 
-GovSphere uses PostgreSQL 17 as the primary database. The schema is managed by Prisma.
+Prinodia Workspace uses PostgreSQL 17 as the primary database. The schema is managed by Prisma.
 
 ```bash
 # Generate Prisma client (run after any schema change)
@@ -356,7 +356,7 @@ npm run docker:reset  # Destroy volumes and restart services
 
 ## Testing
 
-GovSphere targets the following coverage thresholds:
+Prinodia Workspace targets the following coverage thresholds:
 
 | Metric     | Target |
 | ---------- | ------ |
@@ -383,7 +383,7 @@ Test files are co-located with their source files (`*.spec.ts`).
 
 ## Authentication
 
-GovSphere uses two authentication methods:
+Prinodia Workspace uses two authentication methods:
 
 **Government employees** log in with:
 
@@ -461,7 +461,7 @@ See [10_Roadmap.md](./docs/10_Roadmap.md) for the complete roadmap.
 
 ## Contributing
 
-GovSphere is an internal government platform. All contributors must:
+Prinodia Workspace is an internal government platform. All contributors must:
 
 1. Be a verified government employee or authorized partner
 2. Follow the [Engineering Standards](./docs/08_Engineering_Standards.md)
@@ -501,5 +501,5 @@ All rights reserved. Unauthorized use, reproduction, or distribution is prohibit
 ---
 
 <div align="center">
-Built for the DRC government by the GovSphere Engineering Team
+Built for the DRC government by the Prinodia Workspace Engineering Team
 </div>

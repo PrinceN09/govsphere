@@ -1,6 +1,6 @@
 # ADR-009 — Authenticate with Matricule Number
 
-**Status:** Accepted **Date:** 2026-06 **Deciders:** GovSphere Engineering Team, DRC Government IT
+**Status:** Accepted **Date:** 2026-06 **Deciders:** Prinodia Workspace Engineering Team, DRC Government IT
 Authority
 
 ---
@@ -57,7 +57,7 @@ the government HR system.
 **SSO with Keycloak or Active Directory:**
 
 - Considered for future use. The current government IT infrastructure does not have a centralized
-  SSO service. GovSphere implements its own credential store now, with a migration path to federated
+  SSO service. Prinodia Workspace implements its own credential store now, with a migration path to federated
   identity once the government establishes a national IdP.
 
 **Storing Matricule as Integer:**
@@ -81,7 +81,7 @@ the government HR system.
 - Matricule format validation (`^\d{1,4}(\.\d{1,4}){1,2}$`) must be kept in sync with the actual HR
   system's format
 - If the government changes the Matricule format, a migration will be needed
-- Users logging in with a Matricule that doesn't exist yet in GovSphere (pre-provisioned) need a
+- Users logging in with a Matricule that doesn't exist yet in Prinodia Workspace (pre-provisioned) need a
   clear error message
 
 ## Security Notes

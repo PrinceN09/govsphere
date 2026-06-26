@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to GovSphere are documented in this file.
+All notable changes to Prinodia Workspace are documented in this file.
 
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/). Versioning follows
 [Semantic Versioning](https://semver.org/).
@@ -151,7 +151,7 @@ session management, and RBAC expansion.
 
 ## [0.5.0] — 2026-06-24
 
-**Design System & UI Polish.** Premium GovSphere design system with DRC national identity, dark navy
+**Design System & UI Polish.** Premium Prinodia Workspace design system with DRC national identity, dark navy
 sidebar, authority-gold active indicator, sharp corners throughout, and a fully rebuilt component
 library.
 
@@ -250,7 +250,7 @@ production-ready authentication, bilingual UI, and RBAC-protected admin pages.
 - JWT callback for server-side access token refresh using stored refresh token
 - Session callback exposing `accessToken`, `permissions[]`, `role`, `ministryId` to all client
   components
-- `next-auth.d.ts` type augmentation for GovSphere-specific session fields
+- `next-auth.d.ts` type augmentation for Prinodia Workspace-specific session fields
 - `middleware.ts` — App Router middleware protecting `/admin/*`, redirecting MFA-pending sessions,
   handling expired sessions
 - `lib/auth.ts` — Full NextAuth options with token refresh, MFA sentinel state,
@@ -331,7 +331,7 @@ production-ready authentication, bilingual UI, and RBAC-protected admin pages.
 
 ## [0.1.0-foundation] — 2026-06-23
 
-**Foundation release.** This release establishes the complete engineering foundation for GovSphere:
+**Foundation release.** This release establishes the complete engineering foundation for Prinodia Workspace:
 monorepo structure, database schema, Identity Platform, CI pipeline, security hardening,
 documentation, and architectural decisions. No business features beyond authentication and identity
 are included.

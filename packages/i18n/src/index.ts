@@ -1,7 +1,7 @@
 /**
- * @govsphere/i18n
+ * @prinodia/i18n
  *
- * Internationalization support for GovSphere.
+ * Internationalization support for Prinodia Workspace.
  * Supported languages: French (fr), English (en), Lingala (ln), Swahili (sw), Tshiluba (lua)
  *
  * French is the default language and the primary language of administration
