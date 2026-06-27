@@ -25,6 +25,7 @@ import { ExecutiveModule } from "./executive/executive.module";
 import { GovernmentModule } from "./government/government.module";
 import { HealthModule } from "./health/health.module";
 import { IdentityModule } from "./identity/identity.module";
+import { MeetModule } from "./meet/meet.module";
 import { CacheModule } from "./infrastructure/cache/cache.module";
 import { EventsModule } from "./infrastructure/events/events.module";
 import { QueueModule } from "./infrastructure/queue/queue.module";
@@ -86,6 +87,7 @@ import { WorkflowsModule } from "./workflows/workflows.module";
     SearchModule, // Global Search — GET /v1/search?q= (v1.1.0)
     PeopleModule, // People Foundation — Org hierarchy, profiles, skills, workload (v1.3.0)
     RealtimeModule, // Real-Time Collaboration Core — WebSocket, Presence, Activity, Notifications (v1.2.0)
+    MeetModule, // Prinodia Meet — Live meetings, recordings, polls, breakout rooms (v1.5.0)
 
     // ── Health ───────────────────────────────────────────────────────────────
     HealthModule, // GET /health, /health/live, /health/ready, /health/db

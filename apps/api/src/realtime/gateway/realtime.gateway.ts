@@ -285,4 +285,223 @@ export class RealtimeGateway implements OnGatewayInit, OnGatewayConnection, OnGa
       createdAt: payload.occurredAt ?? new Date().toISOString(),
     });
   }
+
+  // ─── Meet — Room Management (v1.5.0) ─────────────────────────────────────
+
+  /** Join a live meeting room: socket subscribes to meet:<meetingId> */
+  @UseGuards(WsAuthGuard)
+  @SubscribeMessage("meet_join")
+  async handleMeetJoin(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() payload: { meetingId: string },
+  ): Promise<void> {
+    const meetRoom = `meet:${payload.meetingId}`;
+    await client.join(meetRoom);
+    client.to(meetRoom).emit("meet_participant_joined", {
+      meetingId: payload.meetingId,
+      userId: client.data.userId,
+      displayName: client.data.displayName,
+      joinedAt: new Date().toISOString(),
+    });
+    this.logger.debug(`[Meet] ${client.data.userId} joined ${meetRoom}`);
+  }
+
+  /** Leave a live meeting room */
+  @UseGuards(WsAuthGuard)
+  @SubscribeMessage("meet_leave")
+  async handleMeetLeave(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() payload: { meetingId: string },
+  ): Promise<void> {
+    const meetRoom = `meet:${payload.meetingId}`;
+    await client.leave(meetRoom);
+    client.to(meetRoom).emit("meet_participant_left", {
+      meetingId: payload.meetingId,
+      userId: client.data.userId,
+      leftAt: new Date().toISOString(),
+    });
+  }
+
+  /** Client signals updated media state (mute/video/screen) */
+  @UseGuards(WsAuthGuard)
+  @SubscribeMessage("meet_media_state")
+  handleMeetMediaState(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody()
+    payload: {
+      meetingId: string;
+      isAudioMuted: boolean;
+      isVideoOff: boolean;
+      isScreenSharing: boolean;
+    },
+  ): void {
+    const meetRoom = `meet:${payload.meetingId}`;
+    client.to(meetRoom).emit("meet_media_state", {
+      userId: client.data.userId,
+      ...payload,
+      updatedAt: new Date().toISOString(),
+    });
+  }
+
+  /** WebRTC SDP offer forwarding (peer-to-peer signaling) */
+  @UseGuards(WsAuthGuard)
+  @SubscribeMessage("meet_webrtc_offer")
+  handleWebRtcOffer(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody()
+    payload: { meetingId: string; targetUserId: string; sdp: unknown },
+  ): void {
+    const meetRoom = `meet:${payload.meetingId}`;
+    client.to(meetRoom).emit("meet_webrtc_offer", {
+      fromUserId: client.data.userId,
+      targetUserId: payload.targetUserId,
+      sdp: payload.sdp,
+    });
+  }
+
+  /** WebRTC SDP answer forwarding */
+  @UseGuards(WsAuthGuard)
+  @SubscribeMessage("meet_webrtc_answer")
+  handleWebRtcAnswer(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody()
+    payload: { meetingId: string; targetUserId: string; sdp: unknown },
+  ): void {
+    const meetRoom = `meet:${payload.meetingId}`;
+    client.to(meetRoom).emit("meet_webrtc_answer", {
+      fromUserId: client.data.userId,
+      targetUserId: payload.targetUserId,
+      sdp: payload.sdp,
+    });
+  }
+
+  /** ICE candidate forwarding */
+  @UseGuards(WsAuthGuard)
+  @SubscribeMessage("meet_ice_candidate")
+  handleIceCandidate(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody()
+    payload: { meetingId: string; targetUserId: string; candidate: unknown },
+  ): void {
+    const meetRoom = `meet:${payload.meetingId}`;
+    client.to(meetRoom).emit("meet_ice_candidate", {
+      fromUserId: client.data.userId,
+      targetUserId: payload.targetUserId,
+      candidate: payload.candidate,
+    });
+  }
+
+  // ─── Meet — EventBus → Socket.IO broadcast ────────────────────────────────
+
+  @OnEvent(EVENTS.MEET_SESSION_STARTED)
+  handleMeetSessionStarted(
+    payload: import("../events/event-payloads").MeetSessionStartedPayload,
+  ): void {
+    this.server.to(`meet:${payload.meetingId}`).emit("meet_session_started", payload);
+  }
+
+  @OnEvent(EVENTS.MEET_SESSION_ENDED)
+  handleMeetSessionEnded(
+    payload: import("../events/event-payloads").MeetSessionEndedPayload,
+  ): void {
+    this.server.to(`meet:${payload.meetingId}`).emit("meet_session_ended", payload);
+  }
+
+  @OnEvent(EVENTS.MEET_PARTICIPANT_ADMITTED)
+  handleMeetParticipantAdmitted(
+    payload: import("../events/event-payloads").MeetParticipantAdmittedPayload,
+  ): void {
+    this.server.to(`meet:${payload.meetingId}`).emit("meet_participant_admitted", payload);
+  }
+
+  @OnEvent(EVENTS.MEET_PARTICIPANT_MUTED)
+  handleMeetParticipantMuted(
+    payload: import("../events/event-payloads").MeetParticipantMutedPayload,
+  ): void {
+    this.server.to(`meet:${payload.meetingId}`).emit("meet_participant_muted", payload);
+  }
+
+  @OnEvent(EVENTS.MEET_PARTICIPANT_MUTED_ALL)
+  handleMeetAllMuted(
+    payload: import("../events/event-payloads").MeetParticipantMutedPayload,
+  ): void {
+    this.server.to(`meet:${payload.meetingId}`).emit("meet_all_muted", payload);
+  }
+
+  @OnEvent(EVENTS.MEET_HAND_RAISED)
+  handleMeetHandRaised(
+    payload: import("../events/event-payloads").MeetHandPayload,
+  ): void {
+    this.server.to(`meet:${payload.meetingId}`).emit("meet_hand_raised", payload);
+  }
+
+  @OnEvent(EVENTS.MEET_HAND_LOWERED)
+  handleMeetHandLowered(
+    payload: import("../events/event-payloads").MeetHandPayload,
+  ): void {
+    this.server.to(`meet:${payload.meetingId}`).emit("meet_hand_lowered", payload);
+  }
+
+  @OnEvent(EVENTS.MEET_HOST_TRANSFERRED)
+  handleMeetHostTransferred(
+    payload: import("../events/event-payloads").MeetHostTransferredPayload,
+  ): void {
+    this.server.to(`meet:${payload.meetingId}`).emit("meet_host_transferred", payload);
+  }
+
+  @OnEvent(EVENTS.MEET_REACTION)
+  handleMeetReaction(
+    payload: import("../events/event-payloads").MeetReactionPayload,
+  ): void {
+    this.server.to(`meet:${payload.meetingId}`).emit("meet_reaction", payload);
+  }
+
+  @OnEvent(EVENTS.MEET_RECORDING_STARTED)
+  handleMeetRecordingStarted(
+    payload: import("../events/event-payloads").MeetRecordingPayload,
+  ): void {
+    this.server.to(`meet:${payload.meetingId}`).emit("meet_recording_started", payload);
+  }
+
+  @OnEvent(EVENTS.MEET_RECORDING_STOPPED)
+  handleMeetRecordingStopped(
+    payload: import("../events/event-payloads").MeetRecordingPayload,
+  ): void {
+    this.server.to(`meet:${payload.meetingId}`).emit("meet_recording_stopped", payload);
+  }
+
+  @OnEvent(EVENTS.MEET_POLL_STARTED)
+  handleMeetPollStarted(
+    payload: import("../events/event-payloads").MeetPollPayload,
+  ): void {
+    this.server.to(`meet:${payload.meetingId}`).emit("meet_poll_started", payload);
+  }
+
+  @OnEvent(EVENTS.MEET_POLL_CLOSED)
+  handleMeetPollClosed(
+    payload: import("../events/event-payloads").MeetPollPayload,
+  ): void {
+    this.server.to(`meet:${payload.meetingId}`).emit("meet_poll_closed", payload);
+  }
+
+  @OnEvent(EVENTS.MEET_POLL_VOTED)
+  handleMeetPollVoted(
+    payload: import("../events/event-payloads").MeetPollVotedPayload,
+  ): void {
+    this.server.to(`meet:${payload.meetingId}`).emit("meet_poll_voted", payload);
+  }
+
+  @OnEvent(EVENTS.MEET_BREAKOUT_CREATED)
+  handleMeetBreakoutCreated(
+    payload: import("../events/event-payloads").MeetBreakoutPayload,
+  ): void {
+    this.server.to(`meet:${payload.meetingId}`).emit("meet_breakout_created", payload);
+  }
+
+  @OnEvent(EVENTS.MEET_BREAKOUT_CLOSED)
+  handleMeetBreakoutClosed(
+    payload: import("../events/event-payloads").MeetBreakoutPayload,
+  ): void {
+    this.server.to(`meet:${payload.meetingId}`).emit("meet_breakout_closed", payload);
+  }
 }

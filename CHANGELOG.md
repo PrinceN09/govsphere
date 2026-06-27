@@ -7,6 +7,96 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/). Version
 
 ---
 
+## [1.5.0] — 2026-06-28
+
+**Prinodia Meet — Integrated Live Video Meeting Platform.** Deep integration with Calendar,
+Chat, People, Documents, and the Realtime event bus. Extends the v0.9.0 Meeting model additively;
+no existing data, APIs, or migrations are changed.
+
+**Breaking changes:** None. Matricule support preserved. All existing users, permissions, and
+audit logs are unchanged.
+
+### Added
+
+**Schema — `packages/database` (Phase 1)**
+- 5 new enums: `LiveMeetRole` (HOST, CO_HOST, PRESENTER, PARTICIPANT, GUEST), `RecordingStatus`,
+  `PollStatus`, `BreakoutStatus`, `TranscriptStatus`.
+- `Meeting` model extended (+11 additive columns): `channelId`, `joinToken` (unique), `isLocked`,
+  `waitingRoomEnabled`, `maxParticipants`, `recordingEnabled`, `videoEnabled`, `audioEnabled`,
+  `screenShareEnabled`, `liveStartedAt`, `liveEndedAt`.
+- `MeetingParticipant` extended (+9 additive columns): `liveRole`, `joinedAt`, `leftAt`,
+  `isAudioMuted`, `isVideoOff`, `isHandRaised`, `isInWaitingRoom`, `connectionQuality`,
+  `deviceInfo`.
+- 11 new models: `MeetingSession`, `MeetingRecording`, `MeetingTranscript`, `MeetingSummary`,
+  `MeetingPoll`, `MeetingPollOption`, `MeetingPollVote`, `MeetingBreakoutRoom`,
+  `MeetingBreakoutRoomParticipant`, `MeetingReaction`, `MeetingInvite`.
+- `Channel.meetingLinked` back-relation (no column added to channels table).
+- Migration: `20260628000000_v1_5_0_meet_foundation` — fully additive SQL (IF NOT EXISTS,
+  idempotent DO $$ blocks for enums, no deletions).
+
+**API — `apps/api/src/meet` (Phase 2)**
+- `MeetService` — lifecycle: `start`, `end`, `joinMeeting`, `leaveMeeting`, `admitFromWaiting`,
+  `muteParticipant`, `muteAll`, `raiseHand`, `lowerHand`, `transferHost`, `addReaction`,
+  `updateSettings`, `findUpcoming`, `findActive`, `findById`, `findByToken`.
+- `MeetSessionsService` — `list`, `getCurrent`.
+- `MeetRecordingsService` — `start`, `stop`, `update` (PENDING → RECORDING → PROCESSING → READY).
+- `MeetPollsService` — `create`, `start`, `close`, `vote`, `results` (aggregated vote counts +
+  percentages; anonymous mode hides voter IDs).
+- `MeetBreakoutService` — `create`, `join` (capacity check), `leave`, `close`.
+- `MeetInvitesService` — `create`, `validate` (expiry + maxUses check), `revoke`.
+- `MeetSummariesService` — `create` (decisions/actionItems/keyPoints as JSON arrays), `publish`.
+- `MeetController` — 35+ routes under `v1/meet`, all guarded by `JwtAuthGuard`.
+  `assertHostOrOrganizer` guard on all privileged operations.
+- `MeetModule` wired into `AppModule`.
+
+**Realtime — WebSocket events (Phase 3)**
+- 20 MEET_* events added to `event-catalog.ts`:
+  `MEET_SESSION_STARTED`, `MEET_SESSION_ENDED`, `MEET_PARTICIPANT_JOINED`,
+  `MEET_PARTICIPANT_LEFT`, `MEET_PARTICIPANT_ADMITTED`, `MEET_PARTICIPANT_MUTED`,
+  `MEET_PARTICIPANT_MUTED_ALL`, `MEET_HAND_RAISED`, `MEET_HAND_LOWERED`,
+  `MEET_HOST_TRANSFERRED`, `MEET_REACTION`, `MEET_LOCKED`, `MEET_UNLOCKED`,
+  `MEET_RECORDING_STARTED`, `MEET_RECORDING_STOPPED`, `MEET_POLL_STARTED`,
+  `MEET_POLL_CLOSED`, `MEET_POLL_VOTED`, `MEET_BREAKOUT_CREATED`, `MEET_BREAKOUT_CLOSED`.
+- Typed payload interfaces in `event-payloads.ts` + `EventPayloadMap` union extended.
+- `RealtimeGateway` extended with 6 `@SubscribeMessage` handlers (`meet_join`, `meet_leave`,
+  `meet_media_state`, `meet_webrtc_offer`, `meet_webrtc_answer`, `meet_ice_candidate`) and
+  16 `@OnEvent` broadcast handlers that fan-out to `meet:{meetingId}` Socket.IO rooms.
+
+**UI — `apps/web/src/app/(admin)/meet` (Phase 4)**
+- `/admin/meet` — Meet Hub page with URL-driven state (`?meeting=<id>&view=<lobby|live|ended>`).
+- **Hub view**: active meetings (live pulse indicator) + upcoming 7-day list; auto-refreshes
+  every 30 seconds.
+- **Lobby view**: join/start flow, waiting-room badge, participant list with live presence dots,
+  meeting settings preview.
+- **Live view**: video tile grid (1/2/3-col adaptive), participant sidebar, polls sidebar,
+  WebRTC signaling controls (mic, camera, screen share, hand raise, record, mute-all),
+  recording indicator (animated REC badge).
+- **Post-meeting view**: duration/participant/recording stats, recording download links,
+  manual summary textarea, AI summary placeholder card.
+- Canvas Phase 7 extension point: disabled "Ouvrir le Canvas collaboratif" button reserved in
+  the live sidebar for seamless Canvas integration when v1.6.0 ships.
+- `AdminSidebar` — "Meet" nav item added to NAV_SECTION_COLLAB (after Chat).
+
+**Tests (Phase 5)**
+- `meet.service.spec.ts` — 27 unit tests covering all public methods and edge cases.
+- `meet-sessions.service.spec.ts` — 4 unit tests covering `list` and `getCurrent`.
+- All 31 tests pass; `tsc --noEmit` clean on both API and Web.
+
+### Design decisions
+
+- **Additive-only schema**: existing `Meeting`, `MeetingParticipant`, and all Calendar models
+  are extended in-place with nullable/defaulted columns. No rows or constraints are removed.
+- **Dual role system**: `MeetingParticipant.role` (scheduling intent, v0.9.0) coexists with
+  `.liveRole` (live-session role, v1.5.0) without conflict.
+- **Channel FK direction**: `Meeting.channelId` holds the FK; `Channel.meetingLinked` is a
+  back-relation with no column added to the channels table.
+- **Prisma sandbox pattern**: all new service methods use `private get db(): AnyPrisma` to
+  bypass the Prisma binary 403 restriction in the development sandbox.
+- **Canvas Phase 7**: extension point reserved — UI placeholder present, no implementation
+  committed; Canvas builds on this without requiring changes to Meet.
+
+---
+
 ## [1.2.0] — 2026-06-27
 
 **Real-Time Collaboration Core.** Complete WebSocket infrastructure powering Chat, Presence,

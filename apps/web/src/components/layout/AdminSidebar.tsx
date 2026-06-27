@@ -434,6 +434,11 @@ const NAV_SECTION_COLLAB: NavItem[] = [
     icon: <ChatBubbleIcon />,
   },
   {
+    href: "/admin/meet",
+    label: "Meet",
+    icon: <VideoCameraIcon />,
+  },
+  {
     href: "/admin/messages",
     label: "Messages",
     icon: <ChatBubbleIcon />,

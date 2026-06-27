@@ -683,6 +683,15 @@ model User {
   // Chat v1.4.0
   drafts                     Draft[]                   @relation("UserDrafts")
   bookmarks                  Bookmark[]                @relation("UserBookmarks")
+  // Meet v1.5.0
+  meetSessionsHosted         MeetingSession[]          @relation("MeetSessionHost")
+  meetRecordingsStarted      MeetingRecording[]        @relation("MeetRecordingStarter")
+  meetReactions              MeetingReaction[]         @relation("MeetReactions")
+  meetPollVotes              MeetingPollVote[]         @relation("MeetPollVotes")
+  meetPollsCreated           MeetingPoll[]             @relation("MeetPollCreator")
+  meetInvitesCreated         MeetingInvite[]           @relation("MeetInvites")
+  meetBreakoutParticipations MeetingBreakoutRoomParticipant[] @relation("BreakoutParticipant")
+  meetSummariesAuthored      MeetingSummary[]          @relation("MeetSummaryAuthor")
   createdAt                  DateTime                  @default(now())
   updatedAt                  DateTime                  @updatedAt
   deletedAt                  DateTime?
@@ -996,6 +1005,7 @@ model Channel {
   mentions       Mention[]
   files          File[]
   drafts         Draft[]         // v1.4.0
+  meetingLinked  Meeting?        @relation("MeetingChannel") // v1.5.0
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
 
@@ -1966,6 +1976,40 @@ enum AttendanceStatus {
   DELEGATED
 }
 
+// v1.5.0 — Prinodia Meet enums
+enum LiveMeetRole {
+  HOST
+  CO_HOST
+  PRESENTER
+  PARTICIPANT
+  GUEST
+}
+
+enum RecordingStatus {
+  PENDING
+  RECORDING
+  PROCESSING
+  READY
+  FAILED
+}
+
+enum PollStatus {
+  DRAFT
+  ACTIVE
+  CLOSED
+}
+
+enum BreakoutStatus {
+  OPEN
+  CLOSED
+}
+
+enum TranscriptStatus {
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+}
+
 enum RecurrenceFrequency {
   DAILY
   WEEKLY
@@ -2135,10 +2179,34 @@ model Meeting {
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
+  // v1.5.0 — Prinodia Meet live session fields
+  channelId          String?              // linked Chat channel for meeting chat
+  channel            Channel?             @relation("MeetingChannel", fields: [channelId], references: [id])
+  joinToken          String?              @unique @db.VarChar(128)
+  isLocked           Boolean              @default(false)
+  waitingRoomEnabled Boolean              @default(true)
+  maxParticipants    Int?
+  recordingEnabled   Boolean              @default(false)
+  videoEnabled       Boolean              @default(true)
+  audioEnabled       Boolean              @default(true)
+  screenShareEnabled Boolean              @default(true)
+  liveStartedAt      DateTime?
+  liveEndedAt        DateTime?
+  // v1.5.0 relations
+  sessions           MeetingSession[]
+  recordings         MeetingRecording[]
+  transcripts        MeetingTranscript[]
+  summaries          MeetingSummary[]
+  polls              MeetingPoll[]
+  breakoutRooms      MeetingBreakoutRoom[]
+  reactions          MeetingReaction[]
+  invites            MeetingInvite[]
+
   @@index([organizerId])
   @@index([status])
   @@index([meetingType])
   @@index([roomId])
+  @@index([channelId])
   @@map("meetings")
 }
 
@@ -2158,6 +2226,16 @@ model MeetingParticipant {
   delegatedTo      User?             @relation("DelegatedParticipations", fields: [delegatedToId], references: [id])
   reminderSentAt   DateTime?
   note             String?           @db.VarChar(500)
+  // v1.5.0 — live session state
+  liveRole          LiveMeetRole     @default(PARTICIPANT)
+  joinedAt          DateTime?
+  leftAt            DateTime?
+  isAudioMuted      Boolean          @default(false)
+  isVideoOff        Boolean          @default(false)
+  isHandRaised      Boolean          @default(false)
+  isInWaitingRoom   Boolean          @default(false)
+  connectionQuality String?          @db.VarChar(20)
+  deviceInfo        Json             @default("{}")
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
 
@@ -2291,6 +2369,230 @@ model RoomBooking {
   @@index([roomId, startAt, endAt])
   @@index([bookedById])
   @@map("room_bookings")
+}
+
+// =============================================================================
+// PRINODIA MEET — LIVE MEETING MODELS (v1.5.0)
+// =============================================================================
+
+// ─── Meeting Session ──────────────────────────────────────────────────────────
+
+model MeetingSession {
+  id                   String    @id @default(cuid())
+  meetingId            String
+  meeting              Meeting   @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  hostId               String
+  host                 User      @relation("MeetSessionHost", fields: [hostId], references: [id])
+  startedAt            DateTime  @default(now())
+  endedAt              DateTime?
+  durationSeconds      Int?
+  participantCount     Int       @default(0)
+  peakParticipantCount Int       @default(0)
+  roomSid              String?   @db.VarChar(500) // future: LiveKit / Twilio room SID
+  metadata             Json      @default("{}")
+  createdAt            DateTime  @default(now())
+
+  @@index([meetingId])
+  @@index([hostId])
+  @@map("meeting_sessions")
+}
+
+// ─── Meeting Recording ────────────────────────────────────────────────────────
+
+model MeetingRecording {
+  id              String           @id @default(cuid())
+  meetingId       String
+  meeting         Meeting          @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  startedById     String
+  startedBy       User             @relation("MeetRecordingStarter", fields: [startedById], references: [id])
+  status          RecordingStatus  @default(PENDING)
+  storageKey      String?          @db.VarChar(1000)
+  filename        String?          @db.VarChar(500)
+  durationSeconds Int?
+  sizeBytes       BigInt?
+  mimeType        String?          @db.VarChar(100)
+  startedAt       DateTime         @default(now())
+  stoppedAt       DateTime?
+  processedAt     DateTime?
+  downloadUrl     String?          @db.VarChar(2000)
+  expiresAt       DateTime?
+  metadata        Json             @default("{}")
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  transcripts MeetingTranscript[]
+
+  @@index([meetingId])
+  @@index([status])
+  @@map("meeting_recordings")
+}
+
+// ─── Meeting Transcript ───────────────────────────────────────────────────────
+
+model MeetingTranscript {
+  id          String            @id @default(cuid())
+  meetingId   String
+  meeting     Meeting           @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  recordingId String?
+  recording   MeetingRecording? @relation(fields: [recordingId], references: [id])
+  status      TranscriptStatus  @default(IN_PROGRESS)
+  content     String?           @db.Text
+  segments    Json              @default("[]") // [{speakerId, text, startMs, endMs}]
+  language    String            @default("fr") @db.VarChar(10)
+  generatedAt DateTime?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@index([meetingId])
+  @@map("meeting_transcripts")
+}
+
+// ─── Meeting Summary ─────────────────────────────────────────────────────────
+
+model MeetingSummary {
+  id          String   @id @default(cuid())
+  meetingId   String
+  meeting     Meeting  @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  authorId    String?  // null = AI-generated
+  author      User?    @relation("MeetSummaryAuthor", fields: [authorId], references: [id])
+  overview    String?  @db.Text
+  decisions   Json     @default("[]") // [{text, madeBy}]
+  actionItems Json     @default("[]") // [{text, assigneeId, dueDate}]
+  keyPoints   Json     @default("[]") // [string]
+  nextSteps   String?  @db.Text
+  aiGenerated Boolean  @default(false)
+  publishedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([meetingId])
+  @@map("meeting_summaries")
+}
+
+// ─── Meeting Poll ─────────────────────────────────────────────────────────────
+
+model MeetingPoll {
+  id            String     @id @default(cuid())
+  meetingId     String
+  meeting       Meeting    @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  createdById   String
+  createdBy     User       @relation("MeetPollCreator", fields: [createdById], references: [id])
+  question      String     @db.VarChar(1000)
+  status        PollStatus @default(DRAFT)
+  isAnonymous   Boolean    @default(false)
+  allowMultiple Boolean    @default(false)
+  startedAt     DateTime?
+  closedAt      DateTime?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  options MeetingPollOption[]
+  votes   MeetingPollVote[]
+
+  @@index([meetingId])
+  @@map("meeting_polls")
+}
+
+// ─── Meeting Poll Option ──────────────────────────────────────────────────────
+
+model MeetingPollOption {
+  id     String            @id @default(cuid())
+  pollId String
+  poll   MeetingPoll       @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  text   String            @db.VarChar(500)
+  order  Int
+  votes  MeetingPollVote[]
+
+  @@index([pollId])
+  @@map("meeting_poll_options")
+}
+
+// ─── Meeting Poll Vote ────────────────────────────────────────────────────────
+
+model MeetingPollVote {
+  id       String            @id @default(cuid())
+  pollId   String
+  poll     MeetingPoll       @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  optionId String
+  option   MeetingPollOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  userId   String
+  user     User              @relation("MeetPollVotes", fields: [userId], references: [id])
+  votedAt  DateTime          @default(now())
+
+  @@unique([pollId, optionId, userId])
+  @@index([pollId])
+  @@map("meeting_poll_votes")
+}
+
+// ─── Meeting Breakout Room ────────────────────────────────────────────────────
+
+model MeetingBreakoutRoom {
+  id        String         @id @default(cuid())
+  meetingId String
+  meeting   Meeting        @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  name      String         @db.VarChar(200)
+  capacity  Int?
+  status    BreakoutStatus @default(OPEN)
+  openedAt  DateTime       @default(now())
+  closedAt  DateTime?
+
+  participants MeetingBreakoutRoomParticipant[]
+
+  @@index([meetingId])
+  @@map("meeting_breakout_rooms")
+}
+
+// ─── Meeting Breakout Room Participant ────────────────────────────────────────
+
+model MeetingBreakoutRoomParticipant {
+  id       String              @id @default(cuid())
+  roomId   String
+  room     MeetingBreakoutRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  userId   String
+  user     User                @relation("BreakoutParticipant", fields: [userId], references: [id])
+  joinedAt DateTime            @default(now())
+  leftAt   DateTime?
+
+  @@unique([roomId, userId])
+  @@index([roomId])
+  @@map("meeting_breakout_room_participants")
+}
+
+// ─── Meeting Reaction ─────────────────────────────────────────────────────────
+
+model MeetingReaction {
+  id        String   @id @default(cuid())
+  meetingId String
+  meeting   Meeting  @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation("MeetReactions", fields: [userId], references: [id])
+  emoji     String   @db.VarChar(10)
+  createdAt DateTime @default(now())
+
+  @@index([meetingId])
+  @@index([userId])
+  @@map("meeting_reactions")
+}
+
+// ─── Meeting Invite ───────────────────────────────────────────────────────────
+
+model MeetingInvite {
+  id          String    @id @default(cuid())
+  meetingId   String
+  meeting     Meeting   @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  createdById String
+  createdBy   User      @relation("MeetInvites", fields: [createdById], references: [id])
+  token       String    @unique @default(cuid())
+  email       String?   @db.VarChar(500) // targeted invite (optional)
+  maxUses     Int?
+  uses        Int       @default(0)
+  expiresAt   DateTime?
+  revokedAt   DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@index([meetingId])
+  @@index([token])
+  @@map("meeting_invites")
 }
 
 // =============================================================================

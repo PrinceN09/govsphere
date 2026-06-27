@@ -131,6 +131,92 @@ export interface MeetingEndedPayload extends BaseEventPayload {
   durationSeconds: number;
 }
 
+// ─── Prinodia Meet (v1.5.0) ──────────────────────────────────────────────────
+
+export interface MeetSessionStartedPayload extends BaseEventPayload {
+  meetingId: string;
+  sessionId: string;
+  hostId: string;
+  joinToken: string;
+}
+
+export interface MeetSessionEndedPayload extends BaseEventPayload {
+  meetingId: string;
+  sessionId: string;
+  durationSeconds: number;
+  participantCount: number;
+}
+
+export interface MeetParticipantJoinedPayload extends BaseEventPayload {
+  meetingId: string;
+  userId: string;
+  displayName: string;
+  liveRole: string;
+  inWaitingRoom: boolean;
+}
+
+export interface MeetParticipantLeftPayload extends BaseEventPayload {
+  meetingId: string;
+  userId: string;
+}
+
+export interface MeetParticipantAdmittedPayload extends BaseEventPayload {
+  meetingId: string;
+  userId: string;
+  admittedById: string;
+}
+
+export interface MeetParticipantMutedPayload extends BaseEventPayload {
+  meetingId: string;
+  userId: string;
+  mutedById: string;
+}
+
+export interface MeetHandPayload extends BaseEventPayload {
+  meetingId: string;
+  userId: string;
+  displayName: string;
+}
+
+export interface MeetHostTransferredPayload extends BaseEventPayload {
+  meetingId: string;
+  previousHostId: string;
+  newHostId: string;
+}
+
+export interface MeetReactionPayload extends BaseEventPayload {
+  meetingId: string;
+  userId: string;
+  displayName: string;
+  emoji: string;
+  reactionId: string;
+}
+
+export interface MeetRecordingPayload extends BaseEventPayload {
+  meetingId: string;
+  recordingId: string;
+  startedById: string;
+}
+
+export interface MeetPollPayload extends BaseEventPayload {
+  meetingId: string;
+  pollId: string;
+  question: string;
+}
+
+export interface MeetPollVotedPayload extends BaseEventPayload {
+  meetingId: string;
+  pollId: string;
+  optionId: string;
+  userId: string;
+}
+
+export interface MeetBreakoutPayload extends BaseEventPayload {
+  meetingId: string;
+  roomId: string;
+  roomName: string;
+}
+
 // ─── Documents ────────────────────────────────────────────────────────────────
 
 export interface DocumentCreatedPayload extends BaseEventPayload {
@@ -202,6 +288,26 @@ export type EventPayloadMap = {
   "meeting.created": MeetingCreatedPayload;
   "meeting.started": MeetingStartedPayload;
   "meeting.ended": MeetingEndedPayload;
+  "meet.session.started": MeetSessionStartedPayload;
+  "meet.session.ended": MeetSessionEndedPayload;
+  "meet.participant.joined": MeetParticipantJoinedPayload;
+  "meet.participant.left": MeetParticipantLeftPayload;
+  "meet.participant.admitted": MeetParticipantAdmittedPayload;
+  "meet.participant.muted": MeetParticipantMutedPayload;
+  "meet.participant.muted_all": MeetParticipantMutedPayload;
+  "meet.hand.raised": MeetHandPayload;
+  "meet.hand.lowered": MeetHandPayload;
+  "meet.host.transferred": MeetHostTransferredPayload;
+  "meet.reaction": MeetReactionPayload;
+  "meet.locked": BaseEventPayload & { meetingId: string };
+  "meet.unlocked": BaseEventPayload & { meetingId: string };
+  "meet.recording.started": MeetRecordingPayload;
+  "meet.recording.stopped": MeetRecordingPayload;
+  "meet.poll.started": MeetPollPayload;
+  "meet.poll.closed": MeetPollPayload;
+  "meet.poll.voted": MeetPollVotedPayload;
+  "meet.breakout.created": MeetBreakoutPayload;
+  "meet.breakout.closed": MeetBreakoutPayload;
   "document.created": DocumentCreatedPayload;
   "document.updated": DocumentUpdatedPayload;
   "workflow.submitted": WorkflowSubmittedPayload;

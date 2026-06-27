@@ -64,7 +64,29 @@ export const EVENTS = {
   MEETING_PARTICIPANT_JOINED: "meeting.participant_joined",
   MEETING_PARTICIPANT_LEFT: "meeting.participant_left",
 
-  // Canvas (future v1.4.0)
+  // Prinodia Meet — Live Session (v1.5.0)
+  MEET_SESSION_STARTED: "meet.session.started",
+  MEET_SESSION_ENDED: "meet.session.ended",
+  MEET_PARTICIPANT_JOINED: "meet.participant.joined",
+  MEET_PARTICIPANT_LEFT: "meet.participant.left",
+  MEET_PARTICIPANT_ADMITTED: "meet.participant.admitted",
+  MEET_PARTICIPANT_MUTED: "meet.participant.muted",
+  MEET_PARTICIPANT_MUTED_ALL: "meet.participant.muted_all",
+  MEET_HAND_RAISED: "meet.hand.raised",
+  MEET_HAND_LOWERED: "meet.hand.lowered",
+  MEET_HOST_TRANSFERRED: "meet.host.transferred",
+  MEET_REACTION: "meet.reaction",
+  MEET_LOCKED: "meet.locked",
+  MEET_UNLOCKED: "meet.unlocked",
+  MEET_RECORDING_STARTED: "meet.recording.started",
+  MEET_RECORDING_STOPPED: "meet.recording.stopped",
+  MEET_POLL_STARTED: "meet.poll.started",
+  MEET_POLL_CLOSED: "meet.poll.closed",
+  MEET_POLL_VOTED: "meet.poll.voted",
+  MEET_BREAKOUT_CREATED: "meet.breakout.created",
+  MEET_BREAKOUT_CLOSED: "meet.breakout.closed",
+
+  // Canvas (future v1.6.0)
   CANVAS_OPENED: "canvas.opened",
   CANVAS_UPDATED: "canvas.updated",
   CANVAS_CLOSED: "canvas.closed",
