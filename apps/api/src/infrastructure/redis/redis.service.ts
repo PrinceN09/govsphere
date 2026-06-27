@@ -61,6 +61,28 @@ export class RedisService implements OnModuleDestroy {
     return this.client.mget(keys);
   }
 
+  // ── Hash operations (for connection tracking, v1.2.0) ───────────────────────
+
+  async hSet(key: string, field: string, value: string): Promise<void> {
+    await this.client.hset(key, field, value);
+  }
+
+  async hGet(key: string, field: string): Promise<string | null> {
+    return this.client.hget(key, field);
+  }
+
+  async hDel(key: string, field: string): Promise<void> {
+    await this.client.hdel(key, field);
+  }
+
+  async hGetAll(key: string): Promise<Record<string, string>> {
+    return this.client.hgetall(key);
+  }
+
+  async hLen(key: string): Promise<number> {
+    return this.client.hlen(key);
+  }
+
   // ── Permission cache ─────────────────────────────────────────────────────────
 
   private permKey(userId: string): string {

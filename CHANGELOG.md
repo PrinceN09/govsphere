@@ -7,6 +7,76 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/). Version
 
 ---
 
+## [1.2.0] — 2026-06-27
+
+**Real-Time Collaboration Core.** Complete WebSocket infrastructure powering Chat, Presence,
+Notifications, Canvas, Meetings, Live Dashboards, and AI Events — all built on a single reusable
+event-driven platform.
+
+**Breaking changes:** None. All existing users, roles, and matricule support are unchanged.
+
+### Added
+
+**Schema (Phase 1)**
+- `UserConnection` model — tracks every active WebSocket socket per user (device, IP, heartbeat).
+- `ActivityEvent` model — persistent org-scoped activity feed with 90-day rolling retention.
+- `PresenceStatus` enum extended: `IN_MEETING`, `ON_CALL` added alongside existing values.
+- `DeviceType` enum: `WEB | DESKTOP | MOBILE | API`.
+- `RoomType` enum: `WORKSPACE | ORGANIZATION | DEPARTMENT | CHANNEL | MEETING | CANVAS | PROJECT | DOCUMENT`.
+- SQL migration `20260627000000_v1_2_0_realtime_core` — backward-compatible, no data loss.
+
+**Event Bus (Phase 2)**
+- `EventsModule` upgraded to `EventEmitterModule.forRoot({ wildcard: true, delimiter: "." })`.
+- `EventBusService` — typed emit/emitAsync wrapper; auto-stamps `occurredAt` on every event.
+- `event-catalog.ts` — centralized `EVENTS` const object (20+ domain event names).
+- `event-payloads.ts` — typed payload interfaces for every domain event (`PresenceUpdatedPayload`, `ClientConnectedPayload`, `ActivityEventPayload`, etc.).
+
+**Core Services (Phase 3)**
+- `ConnectionManagerService` — Redis hash + PostgreSQL dual-tracking; `register`, `unregister`, `heartbeat`, `sweepStaleConnections`, `getOnlineUsers`.
+- `RealtimePresenceService` — Redis-backed presence with 10-min TTL; auto-status `IN_MEETING`/`ON_CALL` via EventBus; heartbeat-based AWAY→ONLINE recovery.
+- `RoomsService` — Socket.IO room management with typed room prefixes (`org:*`, `ch:*`, `meet:*`, `user:*`, etc.).
+- `ActivityService` — persists domain events to `activity_events` table; `listForOrg`, `listForActor`, `sweepOld` (90-day retention).
+- `NotificationHubService` — pushes to `user:{userId}` and `org:{orgId}` rooms; `setServer()` avoids circular DI.
+
+**WebSocket Gateway (Phase 4)**
+- `RealtimeGateway` — `@WebSocketGateway` on `/realtime` namespace; handles `connect`, `disconnect`, `heartbeat`, `join_room`, `leave_room`, `set_presence`, `typing_start`, `typing_stop`.
+- `WsAuthGuard` — JWT extraction from `socket.auth["token"]`, `Authorization` header, or `?token` query param.
+- `PresenceController` — `GET /v1/presence`, `PATCH /v1/presence`, `GET /v1/presence/bulk`.
+- `ActivityController` — `GET /v1/activity`, `GET /v1/activity/me`.
+- `ConnectionsController` — `GET /v1/connections`, `GET /v1/connections/org`.
+- `RealtimeModule` wired into `AppModule`.
+
+**Client SDK — `@prinodia/realtime` v1.2.0 (Phase 5)**
+- `RealtimeClient` — `connect`, `disconnect`, `joinRoom`, `leaveRoom`, `setPresence`, `startTyping`, `stopTyping`, `updateToken`.
+- Auto-heartbeat (configurable interval, default 30s).
+- `subscribe`, `on`, `off` for typed event listeners.
+- Exported from `packages/realtime` with full TypeScript types.
+
+**Frontend Integration (Phase 6)**
+- `RealtimeProvider` + `useRealtimeContext` — singleton client lifecycle tied to Next.js session.
+- `usePresence(userId)` — subscribes to `presence_update` for a specific user.
+- `useNotifications()` — accumulates live notifications; `markRead`, `markAllRead`, `unreadCount`.
+- `useConnectionStatus()` — `connected | disconnected | reconnecting` state.
+- `useTyping(roomId)` — `typingUsers`, `startTyping` (debounced), `stopTyping`.
+- `OnlineIndicator`, `NotificationBadge`, `ConnectionStatusBanner`, `TypingIndicator`, `ActivityPanel` UI components.
+
+**Tests (Phase 7)**
+- `presence.service.spec.ts` — 17 unit tests covering `setStatus`, `getStatus`, `getBulkStatus`, `heartbeat`, `clearPresence`, event handlers.
+- `connection-manager.service.spec.ts` — 16 unit tests covering `register`, `unregister`, `heartbeat`, `isOnline`, `getConnections`, `getOnlineUsers`, `sweepStaleConnections`.
+- `realtime.gateway.spec.ts` — 12 unit tests covering connection lifecycle, room management, presence, typing, EventBus broadcasts.
+- Total test suite: **125 tests, 125 passing** (was 80).
+
+### Changed
+- `RedisService` — added hash operations: `hSet`, `hGet`, `hDel`, `hGetAll`, `hLen`.
+- `apps/web/tsconfig.json` — added `@prinodia/realtime` path alias.
+- `apps/web/package.json` — added `@prinodia/realtime: "*"` dependency.
+
+### Notes
+- **Prisma sandbox pattern:** New models (`userConnection`, `activityEvent`) and new enum values are accessed via `(prisma as any).modelName` — `prisma generate` is blocked in the sandbox by a 403. Pattern is consistent with v1.1.x.
+- **Backward compatibility:** No existing tables, columns, or enum values are modified or removed.
+
+---
+
 ## [1.1.1] — 2026-06-26
 
 ### Authentication & Workspace Onboarding

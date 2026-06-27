@@ -32,6 +32,7 @@ import { RedisModule } from "./infrastructure/redis/redis.module";
 import { StorageModule } from "./infrastructure/storage/storage.module";
 import { OrganizationModule } from "./organizations/organization.module";
 import { PrismaModule } from "./prisma/prisma.module";
+import { RealtimeModule } from "./realtime/realtime.module";
 import { SearchModule } from "./search/search.module";
 import { WorkflowsModule } from "./workflows/workflows.module";
 
@@ -82,6 +83,7 @@ import { WorkflowsModule } from "./workflows/workflows.module";
     OrganizationModule, // Organizations — neutral parent model (v1.0.2)
     DemoModule, // Demo Environment Generator (v1.1.0)
     SearchModule, // Global Search — GET /v1/search?q= (v1.1.0)
+    RealtimeModule, // Real-Time Collaboration Core — WebSocket, Presence, Activity, Notifications (v1.2.0)
 
     // ── Health ───────────────────────────────────────────────────────────────
     HealthModule, // GET /health, /health/live, /health/ready, /health/db

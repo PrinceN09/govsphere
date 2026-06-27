@@ -12,6 +12,7 @@
     "clean": "rm -rf .next out dist"
   },
   "dependencies": {
+    "@prinodia/realtime": "*",
     "@prinodia/auth": "*",
     "@prinodia/config": "*",
     "@prinodia/i18n": "*",

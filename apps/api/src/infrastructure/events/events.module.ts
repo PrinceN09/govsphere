@@ -1,25 +1,33 @@
 /**
- * Prinodia Workspace — Events Module
+ * Prinodia Workspace — EventsModule v1.2.0
  *
- * Placeholder for internal domain event system.
- * Will be used for decoupled event handling across the platform:
+ * Registers @nestjs/event-emitter globally so every module can subscribe
+ * to domain events using @OnEvent() without importing EventEmitterModule.
  *
- *   - UserCreated     → send welcome email, create default channel membership
- *   - UserSuspended   → revoke all sessions, notify admins
- *   - MessageSent     → trigger push notification, update unread counts
- *   - FileUploaded    → trigger virus scan job, update storage quota
- *   - AuditLogWritten → stream to external SIEM (Phase 9)
+ * All domain events flow through EventBusService (apps/api/src/realtime).
+ * Publishers: any service via EventBusService.emit()
+ * Subscribers: @OnEvent(EVENTS.xxx) decorators in any service
  *
- * Architecture:
- *   - Internal events: NestJS EventEmitter2 (in-process, same instance)
- *   - Cross-service events (future): Redis pub/sub via ioredis
- *
- * TODO Sprint 2: Register EventEmitterModule and first domain event handlers.
+ * Future horizontal scaling: replace in-process emit with Redis pub/sub
+ * by swapping EventEmitter2.emit → ioredis.publish in EventBusService.
  *
  * @see https://docs.nestjs.com/techniques/events
  */
 
-import { Module } from "@nestjs/common";
+import { Global, Module } from "@nestjs/common";
+import { EventEmitterModule } from "@nestjs/event-emitter";
 
-@Module({})
+@Global()
+@Module({
+  imports: [
+    EventEmitterModule.forRoot({
+      wildcard: true, // allows "presence.*" pattern subscriptions
+      delimiter: ".", // "domain.entity.action" naming convention
+      maxListeners: 20, // warn on potential listener leaks
+      verboseMemoryLeak: true,
+      ignoreErrors: false,
+    }),
+  ],
+  exports: [EventEmitterModule],
+})
 export class EventsModule {}
