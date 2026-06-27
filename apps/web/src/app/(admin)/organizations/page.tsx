@@ -1,23 +1,29 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 
 import { AdminTopBar } from "@/components/layout/AdminTopBar";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import { TableEmpty } from "@/components/ui/Table";
 import { Pagination } from "@/components/ui/Pagination";
-import { useListQuery } from "@/lib/use-list-query";
+import { TableEmpty } from "@/components/ui/Table";
 import { apiPost } from "@/lib/api";
+import { useListQuery } from "@/lib/use-list-query";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type OrganizationType =
-  | "GOVERNMENT" | "ENTERPRISE" | "EDUCATION"
-  | "HEALTHCARE" | "NGO" | "CHURCH" | "NON_PROFIT" | "OTHER";
+  | "GOVERNMENT"
+  | "ENTERPRISE"
+  | "EDUCATION"
+  | "HEALTHCARE"
+  | "NGO"
+  | "CHURCH"
+  | "NON_PROFIT"
+  | "OTHER";
 
 type OrganizationStatus = "ACTIVE" | "INACTIVE" | "SUSPENDED" | "ARCHIVED";
 
@@ -56,7 +62,10 @@ const TYPE_LABELS: Record<OrganizationType, string> = {
   OTHER: "Autre",
 };
 
-const TYPE_BADGE: Record<OrganizationType, "blue" | "purple" | "gold" | "green" | "yellow" | "gray" | "red"> = {
+const TYPE_BADGE: Record<
+  OrganizationType,
+  "blue" | "purple" | "gold" | "green" | "yellow" | "gray" | "red"
+> = {
   GOVERNMENT: "blue",
   ENTERPRISE: "purple",
   EDUCATION: "gold",
@@ -92,7 +101,12 @@ export default function OrganizationsPage() {
 
   const [showCreate, setShowCreate] = useState(false);
   const [creating, setCreating] = useState(false);
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<CreateForm>();
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<CreateForm>();
 
   async function onCreate(data: CreateForm) {
     setCreating(true);
@@ -111,11 +125,7 @@ export default function OrganizationsPage() {
       <AdminTopBar
         title="Organisations"
         subtitle="Gérez les entités multitype : gouvernements, entreprises, établissements"
-        actions={
-          <Button onClick={() => setShowCreate(true)}>
-            + Nouvelle organisation
-          </Button>
-        }
+        actions={<Button onClick={() => setShowCreate(true)}>+ Nouvelle organisation</Button>}
       />
 
       <div className="p-6 space-y-4">
@@ -136,7 +146,7 @@ export default function OrganizationsPage() {
               <div className="border-b border-slate-200 px-6 py-4">
                 <h2 className="text-base font-semibold text-slate-900">Nouvelle organisation</h2>
               </div>
-              <form onSubmit={handleSubmit(onCreate)} className="px-6 py-4 space-y-4">
+              <form onSubmit={(e) => { void handleSubmit(onCreate)(e); }} className="px-6 py-4 space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-xs font-medium text-slate-700">Nom *</label>
@@ -165,7 +175,9 @@ export default function OrganizationsPage() {
                   >
                     <option value="">Sélectionner…</option>
                     {Object.entries(TYPE_LABELS).map(([k, v]) => (
-                      <option key={k} value={k}>{v}</option>
+                      <option key={k} value={k}>
+                        {v}
+                      </option>
                     ))}
                   </select>
                   {errors.type && <p className="text-xs text-red-500 mt-1">Requis</p>}
@@ -198,7 +210,14 @@ export default function OrganizationsPage() {
                   />
                 </div>
                 <div className="flex justify-end gap-3 pt-2">
-                  <Button variant="secondary" type="button" onClick={() => { setShowCreate(false); reset(); }}>
+                  <Button
+                    variant="secondary"
+                    type="button"
+                    onClick={() => {
+                      setShowCreate(false);
+                      reset();
+                    }}
+                  >
                     Annuler
                   </Button>
                   <Button type="submit" loading={creating}>
@@ -215,11 +234,21 @@ export default function OrganizationsPage() {
           <table className="min-w-full text-sm">
             <thead>
               <tr className="border-b border-slate-200 bg-slate-50">
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Organisation</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Type</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Statut</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Localisation</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Membres</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+                  Organisation
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+                  Type
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+                  Statut
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+                  Localisation
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+                  Membres
+                </th>
                 <th className="px-4 py-3" />
               </tr>
             </thead>
@@ -251,21 +280,15 @@ export default function OrganizationsPage() {
                       <p className="text-xs text-slate-500">{org.code}</p>
                     </td>
                     <td className="px-4 py-3">
-                      <Badge variant={TYPE_BADGE[org.type]}>
-                        {TYPE_LABELS[org.type]}
-                      </Badge>
+                      <Badge variant={TYPE_BADGE[org.type]}>{TYPE_LABELS[org.type]}</Badge>
                     </td>
                     <td className="px-4 py-3">
-                      <Badge variant={STATUS_BADGE[org.status]}>
-                        {STATUS_LABELS[org.status]}
-                      </Badge>
+                      <Badge variant={STATUS_BADGE[org.status]}>{STATUS_LABELS[org.status]}</Badge>
                     </td>
                     <td className="px-4 py-3 text-slate-600">
                       {[org.city, org.country].filter(Boolean).join(", ") || "—"}
                     </td>
-                    <td className="px-4 py-3 text-slate-600">
-                      {org._count?.users ?? 0} agents
-                    </td>
+                    <td className="px-4 py-3 text-slate-600">{org._count?.users ?? 0} agents</td>
                     <td className="px-4 py-3 text-right">
                       <Link
                         href={`/admin/organizations/${org.id}`}

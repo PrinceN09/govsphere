@@ -654,7 +654,9 @@ export function AdminSidebar({ mobileOpen = false, onMobileClose }: AdminSidebar
             <span className="text-sm font-black text-white leading-none">G</span>
           </div>
           <div className="min-w-0">
-            <p className="text-sm font-bold text-white tracking-tight leading-none">Prinodia Workspace</p>
+            <p className="text-sm font-bold text-white tracking-tight leading-none">
+              Prinodia Workspace
+            </p>
             <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-widest text-navy-400 leading-none">
               Administration
             </p>

@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState, useCallback } from "react";
 
-import { apiGet } from "@/lib/api";
 import { cn } from "@/components/ui/cn";
+import { apiGet } from "@/lib/api";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -42,12 +42,18 @@ interface SearchResponse {
 
 function getRoute(groupType: string, item: SearchResultItem): string {
   switch (groupType) {
-    case "users": return `/admin/employees/${item.id}`;
-    case "documents": return `/admin/documents/${item.id}`;
-    case "meetings": return `/admin/meetings/${item.id}`;
-    case "workflows": return `/admin/workflows/${item.id}`;
-    case "tasks": return `/admin/tasks/${item.id}`;
-    default: return "#";
+    case "users":
+      return `/admin/employees/${item.id}`;
+    case "documents":
+      return `/admin/documents/${item.id}`;
+    case "meetings":
+      return `/admin/meetings/${item.id}`;
+    case "workflows":
+      return `/admin/workflows/${item.id}`;
+    case "tasks":
+      return `/admin/tasks/${item.id}`;
+    default:
+      return "#";
   }
 }
 
@@ -57,12 +63,18 @@ function getLabel(item: SearchResultItem): string {
 
 function getSublabel(groupType: string, item: SearchResultItem): string {
   switch (groupType) {
-    case "users": return `${item.email ?? ""} · ${item.role ?? ""}`;
-    case "documents": return `${item.type ?? ""} · ${item.status ?? ""}`;
-    case "meetings": return item.startTime ? new Date(item.startTime).toLocaleDateString("fr-FR") : "";
-    case "workflows": return `${item.status ?? ""} · par ${item.initiator?.displayName ?? ""}`;
-    case "tasks": return `${item.status ?? ""} · ${item.assignee?.displayName ?? ""}`;
-    default: return "";
+    case "users":
+      return `${item.email ?? ""} · ${item.role ?? ""}`;
+    case "documents":
+      return `${item.type ?? ""} · ${item.status ?? ""}`;
+    case "meetings":
+      return item.startTime ? new Date(item.startTime).toLocaleDateString("fr-FR") : "";
+    case "workflows":
+      return `${item.status ?? ""} · par ${item.initiator?.displayName ?? ""}`;
+    case "tasks":
+      return `${item.status ?? ""} · ${item.assignee?.displayName ?? ""}`;
+    default:
+      return "";
   }
 }
 
@@ -79,7 +91,12 @@ function flattenResults(results: Record<string, SearchGroup>): FlatResult[] {
   const flat: FlatResult[] = [];
   for (const group of Object.values(results)) {
     for (const item of group.items) {
-      flat.push({ groupType: group.type, groupLabel: group.label, item, route: getRoute(group.type, item) });
+      flat.push({
+        groupType: group.type,
+        groupLabel: group.label,
+        item,
+        route: getRoute(group.type, item),
+      });
     }
   }
   return flat;
@@ -127,7 +144,10 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
   const handleKey = useCallback(
     (e: KeyboardEvent) => {
       if (!open) return;
-      if (e.key === "Escape") { onClose(); return; }
+      if (e.key === "Escape") {
+        onClose();
+        return;
+      }
       if (e.key === "ArrowDown") {
         e.preventDefault();
         setSelectedIndex((i) => Math.min(i + 1, flat.length - 1));
@@ -168,8 +188,16 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
       >
         {/* Search input */}
         <div className="flex items-center gap-3 border-b border-slate-200 px-4 py-3">
-          <svg className="h-4 w-4 flex-shrink-0 text-slate-400" viewBox="0 0 20 20" fill="currentColor">
-            <path fillRule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clipRule="evenodd" />
+          <svg
+            className="h-4 w-4 flex-shrink-0 text-slate-400"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fillRule="evenodd"
+              d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z"
+              clipRule="evenodd"
+            />
           </svg>
           <input
             ref={inputRef}
@@ -183,8 +211,19 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
           />
           {isFetching && (
             <svg className="h-4 w-4 animate-spin text-slate-400" viewBox="0 0 24 24" fill="none">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              />
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+              />
             </svg>
           )}
           <kbd className="hidden rounded border border-slate-200 bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium text-slate-500 sm:block">
@@ -219,12 +258,19 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
                         "flex w-full items-start gap-3 px-4 py-3 text-left transition-colors",
                         isSelected ? "bg-primary-50" : "hover:bg-slate-50",
                       )}
-                      onClick={() => { router.push(getRoute(group.type, item)); onClose(); }}
+                      onClick={() => {
+                        router.push(getRoute(group.type, item));
+                        onClose();
+                      }}
                       onMouseEnter={() => setSelectedIndex(idx)}
                     >
                       <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium text-slate-900 truncate">{getLabel(item)}</p>
-                        <p className="text-xs text-slate-500 truncate">{getSublabel(group.type, item)}</p>
+                        <p className="text-sm font-medium text-slate-900 truncate">
+                          {getLabel(item)}
+                        </p>
+                        <p className="text-xs text-slate-500 truncate">
+                          {getSublabel(group.type, item)}
+                        </p>
                       </div>
                       {isSelected && (
                         <kbd className="flex-shrink-0 rounded border border-slate-200 bg-white px-1.5 py-0.5 text-[10px] text-slate-400 mt-0.5">
@@ -241,9 +287,15 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
 
         {/* Footer hints */}
         <div className="flex items-center gap-4 border-t border-slate-200 px-4 py-2">
-          <span className="text-[10px] text-slate-400"><kbd className="font-medium">↑↓</kbd> naviguer</span>
-          <span className="text-[10px] text-slate-400"><kbd className="font-medium">↵</kbd> ouvrir</span>
-          <span className="text-[10px] text-slate-400"><kbd className="font-medium">ESC</kbd> fermer</span>
+          <span className="text-[10px] text-slate-400">
+            <kbd className="font-medium">↑↓</kbd> naviguer
+          </span>
+          <span className="text-[10px] text-slate-400">
+            <kbd className="font-medium">↵</kbd> ouvrir
+          </span>
+          <span className="text-[10px] text-slate-400">
+            <kbd className="font-medium">ESC</kbd> fermer
+          </span>
           {data && data.totalHits > 0 && (
             <span className="ml-auto text-[10px] text-slate-400">{data.totalHits} résultat(s)</span>
           )}

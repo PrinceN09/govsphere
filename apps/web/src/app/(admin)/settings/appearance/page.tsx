@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+
 import { AdminTopBar } from "@/components/layout/AdminTopBar";
 import { Button } from "@/components/ui/Button";
 
@@ -56,7 +57,10 @@ export default function AppearanceSettingsPage() {
           </div>
           <div className="px-5 py-5 space-y-2">
             {(["compact", "comfortable", "spacious"] as const).map((d) => (
-              <label key={d} className={`flex cursor-pointer items-center gap-3 rounded p-3 ${density === d ? "bg-primary-50 ring-1 ring-primary-300" : "hover:bg-slate-50"}`}>
+              <label
+                key={d}
+                className={`flex cursor-pointer items-center gap-3 rounded p-3 ${density === d ? "bg-primary-50 ring-1 ring-primary-300" : "hover:bg-slate-50"}`}
+              >
                 <input
                   type="radio"
                   name="density"
@@ -70,7 +74,11 @@ export default function AppearanceSettingsPage() {
                     {d === "compact" ? "Compact" : d === "comfortable" ? "Confortable" : "Spacieux"}
                   </p>
                   <p className="text-xs text-slate-500">
-                    {d === "compact" ? "Plus d'éléments visibles" : d === "comfortable" ? "Équilibre entre densité et lisibilité" : "Plus d'espace entre les éléments"}
+                    {d === "compact"
+                      ? "Plus d'éléments visibles"
+                      : d === "comfortable"
+                        ? "Équilibre entre densité et lisibilité"
+                        : "Plus d'espace entre les éléments"}
                   </p>
                 </div>
               </label>
@@ -81,7 +89,9 @@ export default function AppearanceSettingsPage() {
         {/* Language */}
         <div className="border border-slate-200 bg-white">
           <div className="border-b border-slate-100 px-5 py-3">
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Langue de l&apos;interface</p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+              Langue de l&apos;interface
+            </p>
           </div>
           <div className="px-5 py-5">
             <select

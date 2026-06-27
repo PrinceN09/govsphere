@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import Link from "next/link";
 import { useState } from "react";
 
 import { AdminTopBar } from "@/components/layout/AdminTopBar";
@@ -177,14 +177,22 @@ export default function NotificationsPage() {
             <div className="py-16 text-center">
               <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-slate-100">
                 <svg className="h-7 w-7 text-slate-400" viewBox="0 0 24 24" fill="currentColor">
-                  <path fillRule="evenodd" d="M5.25 9a6.75 6.75 0 0113.5 0v.75c0 2.123.8 4.057 2.118 5.52a.75.75 0 01-.297 1.206c-1.544.57-3.16.99-4.831 1.243a3.75 3.75 0 11-7.48 0 24.585 24.585 0 01-4.831-1.244.75.75 0 01-.298-1.205A8.217 8.217 0 005.25 9.75V9zm4.502 8.9a2.25 2.25 0 104.496 0 25.057 25.057 0 01-4.496 0z" clipRule="evenodd" />
+                  <path
+                    fillRule="evenodd"
+                    d="M5.25 9a6.75 6.75 0 0113.5 0v.75c0 2.123.8 4.057 2.118 5.52a.75.75 0 01-.297 1.206c-1.544.57-3.16.99-4.831 1.243a3.75 3.75 0 11-7.48 0 24.585 24.585 0 01-4.831-1.244.75.75 0 01-.298-1.205A8.217 8.217 0 005.25 9.75V9zm4.502 8.9a2.25 2.25 0 104.496 0 25.057 25.057 0 01-4.496 0z"
+                    clipRule="evenodd"
+                  />
                 </svg>
               </div>
               <p className="mt-4 text-sm font-medium text-slate-700">
-                {filter === "ALL" ? "Aucune notification pour l'instant" : `Aucune notification dans cette catégorie`}
+                {filter === "ALL"
+                  ? "Aucune notification pour l'instant"
+                  : `Aucune notification dans cette catégorie`}
               </p>
               <p className="mt-1 text-xs text-slate-400">
-                {filter === "UNREAD" ? "Vous avez lu toutes vos notifications." : "Les nouvelles notifications apparaîtront ici."}
+                {filter === "UNREAD"
+                  ? "Vous avez lu toutes vos notifications."
+                  : "Les nouvelles notifications apparaîtront ici."}
               </p>
             </div>
           ) : (

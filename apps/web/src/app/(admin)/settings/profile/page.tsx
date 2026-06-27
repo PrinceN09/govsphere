@@ -24,7 +24,9 @@ export default function ProfileSettingsPage() {
       <div className="p-6 max-w-2xl space-y-6">
         <div className="border border-slate-200 bg-white">
           <div className="border-b border-slate-100 px-5 py-3">
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Informations personnelles</p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+              Informations personnelles
+            </p>
           </div>
           <div className="px-5 py-5 space-y-4">
             <div className="grid grid-cols-2 gap-4">
@@ -53,7 +55,9 @@ export default function ProfileSettingsPage() {
                 className="mt-1 h-9 w-full border border-slate-300 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
                 readOnly
               />
-              <p className="mt-1 text-xs text-slate-400">Contactez l&apos;administrateur pour changer l&apos;email.</p>
+              <p className="mt-1 text-xs text-slate-400">
+                Contactez l&apos;administrateur pour changer l&apos;email.
+              </p>
             </div>
             <div>
               <label className="text-xs font-medium text-slate-700">Langue préférée</label>
@@ -71,7 +75,9 @@ export default function ProfileSettingsPage() {
         {/* Avatar */}
         <div className="border border-slate-200 bg-white">
           <div className="border-b border-slate-100 px-5 py-3">
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Photo de profil</p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+              Photo de profil
+            </p>
           </div>
           <div className="px-5 py-5">
             <div className="flex items-center gap-5">
@@ -79,7 +85,9 @@ export default function ProfileSettingsPage() {
                 {(user?.name ?? "?")[0]}
               </div>
               <div>
-                <Button variant="secondary" size="sm">Téléverser une photo</Button>
+                <Button variant="secondary" size="sm">
+                  Téléverser une photo
+                </Button>
                 <p className="mt-1.5 text-xs text-slate-400">JPG, PNG — max 5 Mo</p>
               </div>
             </div>

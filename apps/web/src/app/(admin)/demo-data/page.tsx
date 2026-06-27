@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 
 import { AdminTopBar } from "@/components/layout/AdminTopBar";
 import { Badge } from "@/components/ui/Badge";
@@ -41,7 +41,11 @@ const SEED_SIZES: Array<{ value: SeedSize; label: string; description: string }>
   { value: "SMALL", label: "Petit", description: "3 employés, 3 réunions, 4 documents par org" },
   { value: "MEDIUM", label: "Moyen", description: "5 employés, 8 réunions, 10 documents par org" },
   { value: "LARGE", label: "Grand", description: "10 employés, 15 réunions, 20 documents par org" },
-  { value: "GOVERNMENT_MINISTRY", label: "Ministère gouvernemental", description: "Structure complète pour 1 ministère gouvernemental" },
+  {
+    value: "GOVERNMENT_MINISTRY",
+    label: "Ministère gouvernemental",
+    description: "Structure complète pour 1 ministère gouvernemental",
+  },
 ];
 
 const ORG_TYPES: Array<{ value: OrgType; label: string }> = [
@@ -77,7 +81,11 @@ export default function DemoDataPage() {
   const [error, setError] = useState<string | null>(null);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
 
-  const { data: status, isLoading, refetch } = useQuery<DemoStatus>({
+  const {
+    data: status,
+    isLoading,
+    refetch,
+  } = useQuery<DemoStatus>({
     queryKey: ["demo-status"],
     queryFn: () => apiGet<DemoStatus>("/v1/demo/status"),
     staleTime: 30_000,
@@ -125,14 +133,24 @@ export default function DemoDataPage() {
       <div className="p-6 space-y-6">
         {/* Warning banner */}
         <div className="flex items-start gap-3 border border-amber-200 bg-amber-50 px-5 py-4">
-          <svg className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-600" viewBox="0 0 20 20" fill="currentColor">
-            <path fillRule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
+          <svg
+            className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-600"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fillRule="evenodd"
+              d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z"
+              clipRule="evenodd"
+            />
           </svg>
           <div>
-            <p className="text-sm font-semibold text-amber-800">Données de démonstration uniquement</p>
+            <p className="text-sm font-semibold text-amber-800">
+              Données de démonstration uniquement
+            </p>
             <p className="mt-0.5 text-sm text-amber-700">
-              Les données générées sont marquées comme démo et peuvent être supprimées en toute sécurité.
-              Elles n&apos;affectent jamais les données de production existantes.
+              Les données générées sont marquées comme démo et peuvent être supprimées en toute
+              sécurité. Elles n&apos;affectent jamais les données de production existantes.
             </p>
           </div>
         </div>
@@ -152,7 +170,9 @@ export default function DemoDataPage() {
                   <label
                     key={s.value}
                     className={`flex cursor-pointer items-start gap-3 rounded p-3 transition-colors ${
-                      seedSize === s.value ? "bg-primary-50 ring-1 ring-primary-300" : "hover:bg-slate-50"
+                      seedSize === s.value
+                        ? "bg-primary-50 ring-1 ring-primary-300"
+                        : "hover:bg-slate-50"
                     }`}
                   >
                     <input
@@ -198,7 +218,7 @@ export default function DemoDataPage() {
 
             {/* Actions */}
             <div className="flex items-center gap-3">
-              <Button onClick={handleGenerate} loading={generating} size="lg">
+              <Button onClick={() => { void handleGenerate(); }} loading={generating} size="lg">
                 ⚡ Générer les données démo
               </Button>
               {status?.hasDemoData && (
@@ -223,11 +243,15 @@ export default function DemoDataPage() {
             {/* Success result */}
             {result && (
               <div className="border border-green-200 bg-green-50 px-5 py-4">
-                <p className="text-sm font-semibold text-green-800">✓ Données générées avec succès</p>
+                <p className="text-sm font-semibold text-green-800">
+                  ✓ Données générées avec succès
+                </p>
                 <p className="mt-1 text-xs text-green-700">Session: {result.sessionId}</p>
                 <div className="mt-3 grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-green-700">
                   {Object.entries(result.counts).map(([k, v]) => (
-                    <span key={k}>{k}: <strong>{v}</strong></span>
+                    <span key={k}>
+                      {k}: <strong>{v}</strong>
+                    </span>
                   ))}
                 </div>
               </div>
@@ -242,7 +266,8 @@ export default function DemoDataPage() {
               </div>
               <div className="p-4">
                 <p className="text-xs text-slate-500 mb-3">
-                  Mot de passe pour tous les comptes démo: <code className="bg-slate-100 px-1.5 py-0.5 rounded font-mono">Demo@2025!</code>
+                  Mot de passe pour tous les comptes démo:{" "}
+                  <code className="bg-slate-100 px-1.5 py-0.5 rounded font-mono">Demo@2025!</code>
                 </p>
                 <div className="space-y-1.5 text-xs font-mono text-slate-700">
                   {[
@@ -275,14 +300,17 @@ export default function DemoDataPage() {
                 ) : (
                   <>
                     <div className="flex items-center gap-2 mb-4">
-                      <div className={`h-2.5 w-2.5 rounded-full ${status?.hasDemoData ? "bg-green-500" : "bg-slate-300"}`} />
+                      <div
+                        className={`h-2.5 w-2.5 rounded-full ${status?.hasDemoData ? "bg-green-500" : "bg-slate-300"}`}
+                      />
                       <span className="text-sm font-medium text-slate-700">
                         {status?.hasDemoData ? "Données démo actives" : "Aucune donnée démo"}
                       </span>
                     </div>
                     {status?.lastGenerated && (
                       <p className="text-xs text-slate-500 mb-4">
-                        Dernière génération: {new Date(status.lastGenerated).toLocaleString("fr-FR")}
+                        Dernière génération:{" "}
+                        {new Date(status.lastGenerated).toLocaleString("fr-FR")}
                       </p>
                     )}
                     <div className="divide-y divide-slate-100">
@@ -330,15 +358,18 @@ export default function DemoDataPage() {
       {showResetConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
           <div className="w-full max-w-sm bg-white p-6 shadow-xl">
-            <h3 className="text-base font-semibold text-slate-900">Confirmer la réinitialisation</h3>
+            <h3 className="text-base font-semibold text-slate-900">
+              Confirmer la réinitialisation
+            </h3>
             <p className="mt-2 text-sm text-slate-500">
-              Toutes les données démo seront supprimées définitivement. Cette action est irréversible.
+              Toutes les données démo seront supprimées définitivement. Cette action est
+              irréversible.
             </p>
             <div className="mt-5 flex gap-3 justify-end">
               <Button variant="secondary" onClick={() => setShowResetConfirm(false)}>
                 Annuler
               </Button>
-              <Button variant="danger" onClick={handleReset} loading={resetting}>
+              <Button variant="danger" onClick={() => { void handleReset(); }} loading={resetting}>
                 Réinitialiser
               </Button>
             </div>

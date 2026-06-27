@@ -246,6 +246,9 @@ enum AuditAction {
   CORRESPONDENCE_SENT
   EXECUTIVE_ANNOUNCEMENT_CREATED
   EXECUTIVE_ANNOUNCEMENT_PUBLISHED
+  // Workspace Onboarding (v1.1.1)
+  ORGANIZATION_SIGNUP         // New org self-registered
+  INVITATION_ACCEPTED         // Employee accepted invitation and set password
 }
 
 enum PresenceStatus {
@@ -522,7 +525,14 @@ model User {
   id                         String                    @id @default(cuid())
   // Matricule — government-issued ID (e.g. "1.641.558", "478.432", "424.55")
   // MUST be stored as string: dots, varying formats, leading zeros must be preserved
+  // Deprecated: use employeeNumber for new org types. Kept for backward compat.
   matriculeNumber            String?                   @unique @db.VarChar(50)
+  // Universal login identifier — auto-generated as firstName.lastName if not provided.
+  // Unique per platform (future: per-organization uniqueness via composite index).
+  username                   String?                   @unique @db.VarChar(100)
+  // Employee number — org-scoped identifier for non-government orgs (e.g. EMP-00125).
+  // Nullable and NOT globally unique: uniqueness is enforced per-org via @@index.
+  employeeNumber             String?                   @db.VarChar(100)
   email                      String                    @unique @db.VarChar(255)
   passwordHash               String                    @db.VarChar(255)
   firstName                  String                    @db.VarChar(100)
@@ -654,6 +664,8 @@ model User {
   @@index([managerId])
   @@index([role])
   @@index([status])
+  @@index([employeeNumber])
+  @@index([organizationId, employeeNumber])
   @@map("users")
 }
 
@@ -2653,25 +2665,29 @@ enum OrganizationStatus {
   INACTIVE
   SUSPENDED
   ARCHIVED
+  PENDING_VERIFICATION // Government/regulated orgs awaiting admin approval
 }
 
 model Organization {
-  id          String             @id @default(cuid())
-  name        String             @db.VarChar(255)
-  code        String             @unique @db.VarChar(50)
-  type        OrganizationType
-  status      OrganizationStatus @default(ACTIVE)
-  description String?            @db.Text
-  email       String?            @db.VarChar(255)
-  phone       String?            @db.VarChar(50)
-  website     String?            @db.VarChar(255)
-  address     String?            @db.VarChar(500)
-  city        String?            @db.VarChar(100)
-  country     String?            @db.VarChar(100)
-  logoUrl     String?            @db.VarChar(500)
-  isDemo      Boolean            @default(false)
-  createdAt   DateTime           @default(now())
-  updatedAt   DateTime           @updatedAt
+  id             String             @id @default(cuid())
+  name           String             @db.VarChar(255)
+  code           String             @unique @db.VarChar(50)
+  // URL-safe slug for workspace URLs — e.g. "prinodia-technologies", "ministry-of-finance"
+  // Unique across platform. Prepares for: app.prinodia.com/workspace/<slug>
+  workspaceSlug  String?            @unique @db.VarChar(120)
+  type           OrganizationType
+  status         OrganizationStatus @default(ACTIVE)
+  description    String?            @db.Text
+  email          String?            @db.VarChar(255)
+  phone          String?            @db.VarChar(50)
+  website        String?            @db.VarChar(255)
+  address        String?            @db.VarChar(500)
+  city           String?            @db.VarChar(100)
+  country        String?            @db.VarChar(100)
+  logoUrl        String?            @db.VarChar(500)
+  isDemo         Boolean            @default(false)
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
 
   // Reverse relations
   ministries  Ministry[]   @relation("OrganizationMinistries")

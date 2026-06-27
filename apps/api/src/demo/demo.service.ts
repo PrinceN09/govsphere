@@ -237,7 +237,7 @@ export class DemoService {
   /**
    * Generates demo data. Fully idempotent — safe to call multiple times.
    */
-  async generate(dto: GenerateDemoDto, generatedById?: string) {
+  async generate(dto: GenerateDemoDto, _generatedById?: string) {
     const sessionId = `demo-session-${Date.now()}`;
     const { seedSize = "MEDIUM", orgType = "ALL" } = dto;
 
@@ -335,17 +335,25 @@ export class DemoService {
       const empCount = seedSize === "SMALL" ? 3 : seedSize === "LARGE" ? 10 : 5;
       const templates = EMPLOYEE_TEMPLATES.slice(0, empCount);
 
-      for (const emp of templates) {
-        const email = `demo.${emp.suffix}.${org.code.toLowerCase().replace(/[^a-z0-9]/g, "")}@demo.prinodia`;
+      for (const [empIdx, emp] of templates.entries()) {
+        const orgSlug = org.code.toLowerCase().replace(/[^a-z0-9]/g, "");
+        const email = `demo.${emp.suffix}.${orgSlug}@demo.prinodia`;
+        // Username follows email prefix — stable, predictable for demo docs
+        const username = `demo.${emp.suffix}.${orgSlug}`;
+        // Employee number — org-scoped, zero-padded index (e.g. EMP-DEMO-001)
+        const employeeNumber = `EMP-DEMO-${String(empIdx + 1).padStart(3, "0")}`;
         const existing = await this.prisma.user.findUnique({ where: { email } });
 
         let userId: string;
         if (existing) {
           userId = existing.id;
         } else {
-          const created = await this.prisma.user.create({
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const created = await (this.prisma.user as any).create({
             data: {
               email,
+              username, // v1.1.1 — not in generated client yet
+              employeeNumber, // v1.1.1 — not in generated client yet
               passwordHash: DEMO_PASSWORD_HASH,
               firstName: emp.firstName,
               lastName: emp.lastName,

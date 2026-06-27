@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+
 import { AdminTopBar } from "@/components/layout/AdminTopBar";
 import { Button } from "@/components/ui/Button";
 
@@ -14,20 +15,62 @@ interface PrefRow {
 }
 
 const DEFAULT_PREFS: PrefRow[] = [
-  { key: "mentions", label: "Mentions", description: "Quand quelqu'un vous mentionne", inApp: true, email: false },
-  { key: "messages", label: "Messages directs", description: "Nouveaux messages dans vos conversations", inApp: true, email: false },
-  { key: "tasks", label: "Tâches assignées", description: "Quand une tâche vous est attribuée", inApp: true, email: true },
-  { key: "approvals", label: "Approbations requises", description: "Documents et workflows en attente de votre approbation", inApp: true, email: true },
-  { key: "meetings", label: "Réunions", description: "Invitations et rappels de réunions", inApp: true, email: true },
-  { key: "documents", label: "Partages de documents", description: "Quand un document est partagé avec vous", inApp: true, email: false },
-  { key: "security", label: "Alertes de sécurité", description: "Connexions suspectes, changement de mot de passe", inApp: true, email: true },
+  {
+    key: "mentions",
+    label: "Mentions",
+    description: "Quand quelqu'un vous mentionne",
+    inApp: true,
+    email: false,
+  },
+  {
+    key: "messages",
+    label: "Messages directs",
+    description: "Nouveaux messages dans vos conversations",
+    inApp: true,
+    email: false,
+  },
+  {
+    key: "tasks",
+    label: "Tâches assignées",
+    description: "Quand une tâche vous est attribuée",
+    inApp: true,
+    email: true,
+  },
+  {
+    key: "approvals",
+    label: "Approbations requises",
+    description: "Documents et workflows en attente de votre approbation",
+    inApp: true,
+    email: true,
+  },
+  {
+    key: "meetings",
+    label: "Réunions",
+    description: "Invitations et rappels de réunions",
+    inApp: true,
+    email: true,
+  },
+  {
+    key: "documents",
+    label: "Partages de documents",
+    description: "Quand un document est partagé avec vous",
+    inApp: true,
+    email: false,
+  },
+  {
+    key: "security",
+    label: "Alertes de sécurité",
+    description: "Connexions suspectes, changement de mot de passe",
+    inApp: true,
+    email: true,
+  },
 ];
 
 export default function NotificationSettingsPage() {
   const [prefs, setPrefs] = useState(DEFAULT_PREFS);
 
   function toggle(key: string, channel: "inApp" | "email") {
-    setPrefs((prev) => prev.map((p) => p.key === key ? { ...p, [channel]: !p[channel] } : p));
+    setPrefs((prev) => prev.map((p) => (p.key === key ? { ...p, [channel]: !p[channel] } : p)));
   }
 
   return (
@@ -64,7 +107,9 @@ export default function NotificationSettingsPage() {
                   onClick={() => toggle(pref.key, "inApp")}
                   className={`relative inline-flex h-5 w-9 rounded-full transition-colors ${pref.inApp ? "bg-primary-600" : "bg-slate-200"}`}
                 >
-                  <span className={`inline-block h-4 w-4 translate-y-0.5 rounded-full bg-white shadow transition-transform ${pref.inApp ? "translate-x-4" : "translate-x-0.5"}`} />
+                  <span
+                    className={`inline-block h-4 w-4 translate-y-0.5 rounded-full bg-white shadow transition-transform ${pref.inApp ? "translate-x-4" : "translate-x-0.5"}`}
+                  />
                 </button>
               </div>
               <div className="flex justify-center">
@@ -72,7 +117,9 @@ export default function NotificationSettingsPage() {
                   onClick={() => toggle(pref.key, "email")}
                   className={`relative inline-flex h-5 w-9 rounded-full transition-colors ${pref.email ? "bg-primary-600" : "bg-slate-200"}`}
                 >
-                  <span className={`inline-block h-4 w-4 translate-y-0.5 rounded-full bg-white shadow transition-transform ${pref.email ? "translate-x-4" : "translate-x-0.5"}`} />
+                  <span
+                    className={`inline-block h-4 w-4 translate-y-0.5 rounded-full bg-white shadow transition-transform ${pref.email ? "translate-x-4" : "translate-x-0.5"}`}
+                  />
                 </button>
               </div>
             </div>

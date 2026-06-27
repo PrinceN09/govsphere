@@ -26,7 +26,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
 
       {/* Footer */}
       <p className="mt-6 text-center text-xs text-navy-500">
-        République Démocratique du Congo · Usage gouvernemental exclusif
+        Prinodia Workspace · Gouvernements, Entreprises &amp; Organisations
       </p>
     </div>
   );

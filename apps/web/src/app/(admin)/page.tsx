@@ -1,12 +1,12 @@
 "use client";
 
-import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
+import Link from "next/link";
 import { useSession } from "next-auth/react";
 
 import { AdminTopBar } from "@/components/layout/AdminTopBar";
-import { StatCard } from "@/components/ui/StatCard";
 import { Button } from "@/components/ui/Button";
+import { StatCard } from "@/components/ui/StatCard";
 import { apiGet } from "@/lib/api";
 
 import type { PaginatedResponse } from "@/lib/api";
@@ -219,7 +219,9 @@ export default function DashboardPage() {
                 className="flex flex-col items-center gap-2 bg-white px-4 py-5 text-center hover:bg-slate-50 transition-colors"
               >
                 <span className="text-2xl">{action.icon}</span>
-                <span className="text-xs font-medium text-slate-600 leading-tight">{action.label}</span>
+                <span className="text-xs font-medium text-slate-600 leading-tight">
+                  {action.label}
+                </span>
               </Link>
             ))}
           </div>
@@ -229,10 +231,12 @@ export default function DashboardPage() {
         {stats?.ministries === 0 && (
           <div className="border-2 border-dashed border-slate-300 bg-white px-6 py-10 text-center">
             <p className="text-3xl mb-3">🏢</p>
-            <p className="text-base font-semibold text-slate-800">Démarrez avec Prinodia Workspace</p>
+            <p className="text-base font-semibold text-slate-800">
+              Démarrez avec Prinodia Workspace
+            </p>
             <p className="mt-1 text-sm text-slate-500 max-w-md mx-auto">
-              Aucune structure organisationnelle n&apos;est encore configurée. Créez votre première organisation
-              ou générez des données de démonstration pour explorer la plateforme.
+              Aucune structure organisationnelle n&apos;est encore configurée. Créez votre première
+              organisation ou générez des données de démonstration pour explorer la plateforme.
             </p>
             <div className="mt-5 flex justify-center gap-3">
               <Link href="/admin/organizations">
@@ -254,9 +258,10 @@ export default function DashboardPage() {
           </div>
           <div className="px-5 py-4">
             <p className="text-sm text-slate-600 leading-relaxed">
-              Prinodia Workspace est une plateforme multi-organisations pour gouvernements, entreprises,
-              universités, hôpitaux, ONG et églises. Gérez votre structure, votre personnel,
-              vos documents, workflows, réunions et communications depuis un espace de travail sécurisé.
+              Prinodia Workspace est une plateforme multi-organisations pour gouvernements,
+              entreprises, universités, hôpitaux, ONG et églises. Gérez votre structure, votre
+              personnel, vos documents, workflows, réunions et communications depuis un espace de
+              travail sécurisé.
             </p>
           </div>
         </div>

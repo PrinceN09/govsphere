@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
+
 import { AdminTopBar } from "@/components/layout/AdminTopBar";
-import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
 
 export default function SecuritySettingsPage() {
   return (
@@ -21,20 +22,33 @@ export default function SecuritySettingsPage() {
         {/* Password */}
         <div className="border border-slate-200 bg-white">
           <div className="border-b border-slate-100 px-5 py-3">
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Mot de passe</p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+              Mot de passe
+            </p>
           </div>
           <div className="px-5 py-5 space-y-4">
             <div>
               <label className="text-xs font-medium text-slate-700">Mot de passe actuel</label>
-              <input type="password" className="mt-1 h-9 w-full border border-slate-300 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500" />
+              <input
+                type="password"
+                className="mt-1 h-9 w-full border border-slate-300 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+              />
             </div>
             <div>
               <label className="text-xs font-medium text-slate-700">Nouveau mot de passe</label>
-              <input type="password" className="mt-1 h-9 w-full border border-slate-300 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500" />
+              <input
+                type="password"
+                className="mt-1 h-9 w-full border border-slate-300 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+              />
             </div>
             <div>
-              <label className="text-xs font-medium text-slate-700">Confirmer le nouveau mot de passe</label>
-              <input type="password" className="mt-1 h-9 w-full border border-slate-300 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500" />
+              <label className="text-xs font-medium text-slate-700">
+                Confirmer le nouveau mot de passe
+              </label>
+              <input
+                type="password"
+                className="mt-1 h-9 w-full border border-slate-300 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+              />
             </div>
           </div>
           <div className="border-t border-slate-100 px-5 py-3 flex justify-end">
@@ -64,7 +78,9 @@ export default function SecuritySettingsPage() {
         {/* Sessions */}
         <div className="border border-slate-200 bg-white">
           <div className="border-b border-slate-100 px-5 py-3">
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Sessions actives</p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+              Sessions actives
+            </p>
           </div>
           <div className="px-5 py-5">
             <p className="text-sm text-slate-600 mb-4">
@@ -72,9 +88,13 @@ export default function SecuritySettingsPage() {
             </p>
             <div className="flex gap-3">
               <Link href="/admin/security/sessions">
-                <Button variant="secondary" size="sm">Voir mes sessions</Button>
+                <Button variant="secondary" size="sm">
+                  Voir mes sessions
+                </Button>
               </Link>
-              <Button variant="danger" size="sm">Déconnecter toutes les sessions</Button>
+              <Button variant="danger" size="sm">
+                Déconnecter toutes les sessions
+              </Button>
             </div>
           </div>
         </div>

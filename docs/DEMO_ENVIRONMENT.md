@@ -56,13 +56,28 @@ curl -X POST http://localhost:3001/v1/demo/generate \
 
 **Password for all demo accounts:** `Demo@2025!`
 
-Demo emails follow the pattern: `demo.<role>.<orgcode>@demo.prinodia`
+As of v1.1.1, demo users can log in with **any** of three identifiers:
 
-Example accounts (after generating with orgType=ALL):
-- `demo.exec.demogov-fin@demo.prinodia` — Executive / Super Admin
-- `demo.mgr1.demogov-fin@demo.prinodia` — Manager
-- `demo.hr.demogov-fin@demo.prinodia` — HR Manager
-- `demo.emp1.demogov-fin@demo.prinodia` — Employee
+| Identifier type | Example |
+|-----------------|---------|
+| Email | `demo.exec.demogov-fin@demo.prinodia` |
+| Username | `demo.exec.demogov-fin` |
+| Employee ID | `EMP-DEMO-001` |
+
+Demo emails, usernames, and employee numbers follow stable patterns:
+- Email: `demo.<role>.<orgcode>@demo.prinodia`
+- Username: `demo.<role>.<orgcode>`
+- Employee number: `EMP-DEMO-<padded-index>` (001, 002, …)
+
+Example accounts (after generating with orgType=ALL, seedSize=MEDIUM):
+
+| Email | Username | Employee # | Role |
+|-------|----------|------------|------|
+| `demo.exec.demogov-fin@demo.prinodia` | `demo.exec.demogov-fin` | `EMP-DEMO-001` | Executive / Super Admin |
+| `demo.mgr1.demogov-fin@demo.prinodia` | `demo.mgr1.demogov-fin` | `EMP-DEMO-002` | Manager |
+| `demo.mgr2.demogov-fin@demo.prinodia` | `demo.mgr2.demogov-fin` | `EMP-DEMO-003` | Manager |
+| `demo.emp1.demogov-fin@demo.prinodia` | `demo.emp1.demogov-fin` | `EMP-DEMO-004` | Employee |
+| `demo.hr.demogov-fin@demo.prinodia` | `demo.hr.demogov-fin` | `EMP-DEMO-005` | HR Manager |
 
 ---
 

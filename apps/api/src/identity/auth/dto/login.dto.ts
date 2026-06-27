@@ -1,13 +1,37 @@
-import { IsNotEmpty, IsString, MaxLength, MinLength } from "class-validator";
+import { IsNotEmpty, IsOptional, IsString, MaxLength, MinLength } from "class-validator";
 
 export class LoginDto {
   /**
-   * Government credential: matricule number (e.g. "1.641.558") or government email.
+   * Universal login identifier: email, username, employee ID, or matricule number.
+   * Primary field for v1.1.1+.
+   *
+   * Backward-compat aliases (resolved in auth service if this is absent):
+   *   - `credential` — legacy field (existing clients / NextAuth)
+   *   - `matricule`  — legacy field (old government clients)
    */
+  @IsOptional()
   @IsString()
   @IsNotEmpty()
   @MaxLength(255)
-  credential!: string;
+  identifier?: string;
+
+  /**
+   * @deprecated Use `identifier`.
+   * Accepted for backward compatibility with existing NextAuth and mobile clients.
+   */
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  credential?: string;
+
+  /**
+   * @deprecated Use `identifier`.
+   * Accepted for backward compatibility with old government-only clients.
+   */
+  @IsOptional()
+  @IsString()
+  @MaxLength(50)
+  matricule?: string;
 
   @IsString()
   @IsNotEmpty()
@@ -16,8 +40,8 @@ export class LoginDto {
   password!: string;
 
   /** Optional: browser/device fingerprint for device tracking. */
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
   @MaxLength(255)
   deviceFingerprint?: string;
 }

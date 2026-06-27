@@ -1,9 +1,9 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 
 import { AdminTopBar } from "@/components/layout/AdminTopBar";
 import { Badge } from "@/components/ui/Badge";
@@ -13,7 +13,15 @@ import { apiGet } from "@/lib/api";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type OrganizationType = "GOVERNMENT" | "ENTERPRISE" | "EDUCATION" | "HEALTHCARE" | "NGO" | "CHURCH" | "NON_PROFIT" | "OTHER";
+type OrganizationType =
+  | "GOVERNMENT"
+  | "ENTERPRISE"
+  | "EDUCATION"
+  | "HEALTHCARE"
+  | "NGO"
+  | "CHURCH"
+  | "NON_PROFIT"
+  | "OTHER";
 type OrganizationStatus = "ACTIVE" | "INACTIVE" | "SUSPENDED" | "ARCHIVED";
 
 interface OrgDetail {
@@ -45,12 +53,21 @@ interface DashboardData {
 }
 
 const TYPE_LABELS: Record<OrganizationType, string> = {
-  GOVERNMENT: "Gouvernement", ENTERPRISE: "Entreprise", EDUCATION: "Éducation",
-  HEALTHCARE: "Santé", NGO: "ONG", CHURCH: "Église", NON_PROFIT: "Non-profit", OTHER: "Autre",
+  GOVERNMENT: "Gouvernement",
+  ENTERPRISE: "Entreprise",
+  EDUCATION: "Éducation",
+  HEALTHCARE: "Santé",
+  NGO: "ONG",
+  CHURCH: "Église",
+  NON_PROFIT: "Non-profit",
+  OTHER: "Autre",
 };
 
 const STATUS_BADGE: Record<OrganizationStatus, "green" | "gray" | "yellow" | "red"> = {
-  ACTIVE: "green", INACTIVE: "gray", SUSPENDED: "yellow", ARCHIVED: "red",
+  ACTIVE: "green",
+  INACTIVE: "gray",
+  SUSPENDED: "yellow",
+  ARCHIVED: "red",
 };
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
@@ -88,7 +105,10 @@ export default function OrganizationDetailPage() {
         <AdminTopBar title="Organisation introuvable" />
         <div className="p-6">
           <p className="text-slate-500">Cette organisation n&apos;existe pas ou a été supprimée.</p>
-          <Link href="/admin/organizations" className="mt-4 inline-block text-sm text-primary-600 hover:underline">
+          <Link
+            href="/admin/organizations"
+            className="mt-4 inline-block text-sm text-primary-600 hover:underline"
+          >
             ← Retour aux organisations
           </Link>
         </div>
@@ -103,12 +123,13 @@ export default function OrganizationDetailPage() {
         subtitle={`${TYPE_LABELS[org.type]} · ${org.city ?? ""}${org.country ? `, ${org.country}` : ""}`}
         actions={
           <div className="flex items-center gap-3">
-            <Link href="/admin/organizations" className="text-sm text-slate-500 hover:text-slate-700">
+            <Link
+              href="/admin/organizations"
+              className="text-sm text-slate-500 hover:text-slate-700"
+            >
               ← Organisations
             </Link>
-            <Badge variant={STATUS_BADGE[org.status]}>
-              {org.status}
-            </Badge>
+            <Badge variant={STATUS_BADGE[org.status]}>{org.status}</Badge>
             {org.isDemo && (
               <span className="rounded bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700">
                 DÉMO
@@ -130,7 +151,9 @@ export default function OrganizationDetailPage() {
             { label: "Workflows", value: dashboard?.workflowCount ?? 0 },
           ].map((s) => (
             <div key={s.label} className="bg-white px-4 py-3">
-              <p className="text-xs font-medium uppercase tracking-wider text-slate-500">{s.label}</p>
+              <p className="text-xs font-medium uppercase tracking-wider text-slate-500">
+                {s.label}
+              </p>
               <p className="mt-1 text-2xl font-bold text-slate-900">{s.value}</p>
             </div>
           ))}
@@ -149,7 +172,11 @@ export default function OrganizationDetailPage() {
                     : "text-slate-500 hover:text-slate-700"
                 }`}
               >
-                {t === "overview" ? "Vue d'ensemble" : t === "departments" ? "Départements" : "Agents"}
+                {t === "overview"
+                  ? "Vue d'ensemble"
+                  : t === "departments"
+                    ? "Départements"
+                    : "Agents"}
               </button>
             ))}
           </nav>
@@ -161,7 +188,9 @@ export default function OrganizationDetailPage() {
             {/* Info card */}
             <div className="border border-slate-200 bg-white">
               <div className="border-b border-slate-100 px-5 py-3">
-                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Informations</p>
+                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                  Informations
+                </p>
               </div>
               <dl className="divide-y divide-slate-100">
                 {[
@@ -170,7 +199,10 @@ export default function OrganizationDetailPage() {
                   { label: "Email", value: org.email ?? "—" },
                   { label: "Téléphone", value: org.phone ?? "—" },
                   { label: "Site web", value: org.website ?? "—" },
-                  { label: "Adresse", value: [org.address, org.city, org.country].filter(Boolean).join(", ") || "—" },
+                  {
+                    label: "Adresse",
+                    value: [org.address, org.city, org.country].filter(Boolean).join(", ") || "—",
+                  },
                   { label: "Créé le", value: new Date(org.createdAt).toLocaleDateString("fr-FR") },
                 ].map((row) => (
                   <div key={row.label} className="flex px-5 py-2.5 text-sm">
@@ -184,7 +216,9 @@ export default function OrganizationDetailPage() {
             {/* Description */}
             <div className="border border-slate-200 bg-white">
               <div className="border-b border-slate-100 px-5 py-3">
-                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Description</p>
+                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                  Description
+                </p>
               </div>
               <div className="px-5 py-4 text-sm text-slate-600 leading-relaxed">
                 {org.description ?? "Aucune description renseignée."}
@@ -198,9 +232,15 @@ export default function OrganizationDetailPage() {
             <table className="min-w-full text-sm">
               <thead>
                 <tr className="border-b border-slate-200 bg-slate-50">
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Département</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Code</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Ministère</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+                    Département
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+                    Code
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+                    Ministère
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -242,7 +282,7 @@ export default function OrganizationDetailPage() {
                 variant="secondary"
                 size="sm"
                 className="mt-3"
-                onClick={() => window.location.href = `/admin/employees?organizationId=${id}`}
+                onClick={() => (window.location.href = `/admin/employees?organizationId=${id}`)}
               >
                 Voir les agents →
               </Button>

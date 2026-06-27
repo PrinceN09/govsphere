@@ -29,7 +29,8 @@ interface ApiUserProfile {
   id: string;
   displayName: string;
   email: string;
-  matriculeNumber: string | null;
+  username: string | null;
+  matriculeNumber: string | null; // backward compat
   role: UserRole;
   ministryId: string | null;
   sessionId: string;
@@ -138,7 +139,7 @@ export const authOptions: AuthOptions = {
       id: "credentials",
       name: "Prinodia Workspace",
       credentials: {
-        credential: { label: "Matricule or Email", type: "text" },
+        credential: { label: "Email, username or employee ID", type: "text" },
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials): Promise<User | null> {
@@ -160,6 +161,7 @@ export const authOptions: AuthOptions = {
             id: "mfa-pending",
             displayName: "",
             email: credentials.credential,
+            username: null,
             matriculeNumber: null,
             role: "GUEST" as UserRole,
             ministryId: null,
@@ -184,6 +186,7 @@ export const authOptions: AuthOptions = {
           id: body.user.id,
           displayName: body.user.displayName,
           email: body.user.email,
+          username: body.user.username ?? null,
           matriculeNumber: body.user.matriculeNumber,
           role: body.user.role,
           ministryId: body.user.ministryId,
@@ -230,6 +233,7 @@ export const authOptions: AuthOptions = {
           id: body.user.id,
           displayName: body.user.displayName,
           email: body.user.email,
+          username: body.user.username ?? null,
           matriculeNumber: body.user.matriculeNumber,
           role: body.user.role,
           ministryId: body.user.ministryId,
@@ -260,6 +264,7 @@ export const authOptions: AuthOptions = {
           id: user.id,
           displayName: user.displayName,
           email: user.email,
+          username: user.username ?? null,
           matriculeNumber: user.matriculeNumber,
           role: user.role,
           ministryId: user.ministryId,
@@ -295,6 +300,7 @@ export const authOptions: AuthOptions = {
         id: token.id,
         displayName: token.displayName,
         email: token.email,
+        username: token.username ?? null,
         matriculeNumber: token.matriculeNumber,
         role: token.role,
         ministryId: token.ministryId,

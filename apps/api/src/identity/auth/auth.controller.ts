@@ -11,9 +11,11 @@ import {
 } from "@nestjs/common";
 
 import { AuthService } from "./auth.service";
+import { AcceptInvitationDto } from "./dto/accept-invitation.dto";
 import { ForgotPasswordDto } from "./dto/forgot-password.dto";
 import { LoginDto } from "./dto/login.dto";
 import { ResetPasswordDto } from "./dto/reset-password.dto";
+import { SignupDto } from "./dto/signup.dto";
 import { CurrentUser } from "../../common/decorators/current-user.decorator";
 import { Public } from "../../common/decorators/public.decorator";
 import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard";
@@ -192,6 +194,33 @@ export class AuthController {
   @Get("me")
   async getMe(@CurrentUser() user: AuthenticatedUser): Promise<unknown> {
     return this.usersService.getProfile(user.id);
+  }
+
+  // ---------------------------------------------------------------------------
+  // POST /v1/auth/signup  (public — creates org + admin user)
+  // ---------------------------------------------------------------------------
+
+  @Public()
+  @Post("signup")
+  @HttpCode(HttpStatus.CREATED)
+  async signup(
+    @Body() dto: SignupDto,
+  ): Promise<{ organizationId: string; userId: string; workspaceSlug: string }> {
+    return this.authService.signup(dto);
+  }
+
+  // ---------------------------------------------------------------------------
+  // POST /v1/auth/accept-invitation  (public — set password + activate)
+  // ---------------------------------------------------------------------------
+
+  @Public()
+  @Post("accept-invitation")
+  @HttpCode(HttpStatus.OK)
+  async acceptInvitation(
+    @Body() dto: AcceptInvitationDto,
+  ): Promise<{ message: string; userId: string; email: string }> {
+    const result = await this.authService.acceptInvitation(dto);
+    return { message: "Account activated. You can now log in.", ...result };
   }
 
   // ---------------------------------------------------------------------------

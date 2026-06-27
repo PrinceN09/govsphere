@@ -7,6 +7,46 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/). Version
 
 ---
 
+## [1.1.1] — 2026-06-26
+
+### Authentication & Workspace Onboarding
+
+**Breaking changes:** None. All existing login flows are preserved. Matricule support unchanged.
+
+#### Added (workspace onboarding)
+- `workspaceSlug String? @unique` on `Organization` — URL-safe slug auto-generated from org name at signup.
+- `employeeNumber String?` on `User` with `@@index([organizationId, employeeNumber])` — org-scoped employee number, not globally unique.
+- `OrganizationStatus.PENDING_VERIFICATION` — government orgs created via self-service signup are held in this state pending manual review.
+- `AuditAction.ORGANIZATION_SIGNUP` and `AuditAction.INVITATION_ACCEPTED` — new audit events.
+- `POST /v1/auth/signup` (public) — creates Organization + admin User + default SUPER_ADMIN role in one atomic transaction. Government orgs auto-assigned `PENDING_VERIFICATION` status.
+- `POST /v1/auth/accept-invitation` (public) — validates SHA-256 hashed invitation token, sets user password, activates account, marks invitation used.
+- Web signup flow: `/signup` (landing), `/signup/organization` (full org + admin form), `/signup/join` (accept invite token + set password), `/signup/success` (confirmation with gov-aware messaging).
+- Login page: **"Pas encore de compte ? Créer un espace de travail"** link.
+
+#### Added (login identifier modernization, continued)
+- `username String? @unique` field on the `User` model — auto-generated as `firstName.lastName` on user creation.
+- Universal login identifier: users can now authenticate with **email**, **username**, **employee number** (`EMP-001`), or **matricule** in a single `identifier` field.
+- Search order in auth service: email → username → employeeNumber → matriculeNumber.
+- Backward-compat aliases: `credential` and `matricule` fields still accepted in `POST /v1/auth/login` and `POST /v1/auth/forgot-password`.
+- `username` auto-generation in `UsersService.create()` and `UsersService.invite()` with `firstName.lastName` pattern and automatic numeric suffix on collision.
+- `employeeNumber` field added to `CreateUserDto` and passed through `UsersService.create()`.
+- Demo users now receive a stable username (`demo.<role>.<orgcode>`) and employee number (`EMP-DEMO-001`).
+- `username` propagated through NextAuth JWT → session → `session.user`.
+
+#### Changed
+- Login page label: **"Matricule ou adresse e-mail"** → **"E-mail, nom d'utilisateur ou identifiant employé"**
+- Login page placeholder updated to show multi-type examples.
+- Forgot-password page updated with same universal label.
+- Auth layout footer: "République Démocratique du Congo · Usage gouvernemental exclusif" → "Prinodia Workspace · Gouvernements, Entreprises & Organisations".
+- `PublicUserProfile` (auth service return type) now includes `username`.
+- `ApiUserProfile` (NextAuth) now includes `username`.
+
+#### Notes
+- **Matricule remains fully supported** as an employee ID for government deployments. No existing data is touched.
+- `username` uniqueness is currently platform-wide. Per-organization composite uniqueness is planned for a future release.
+
+---
+
 ## [1.1.0] — 2026-06-25
 
 **Product Readiness & Demo Environment.** Multi-org demo data generator, global Cmd+K search

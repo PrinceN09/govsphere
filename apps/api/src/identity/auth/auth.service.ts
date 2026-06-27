@@ -14,9 +14,11 @@ import { PermissionsService } from "../permissions/permissions.service";
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
 import { SessionsService } from "../sessions/sessions.service";
 
+import type { AcceptInvitationDto } from "./dto/accept-invitation.dto";
 import type { ForgotPasswordDto } from "./dto/forgot-password.dto";
 import type { LoginDto } from "./dto/login.dto";
 import type { ResetPasswordDto } from "./dto/reset-password.dto";
+import type { SignupDto } from "./dto/signup.dto";
 import type {
   AccessTokenPayload,
   MfaChallengePayload,
@@ -24,8 +26,11 @@ import type {
 } from "../../common/types/auth.types";
 import type { UserRole, UserStatus } from "@prisma/client";
 
-/** Matricule regex: 1–4 digits, 1 or 2 dot-separated groups. */
+/** Matricule regex: 1–4 digits, 1 or 2 dot-separated groups (kept for search fallback). */
 const MATRICULE_REGEX = /^\d{1,4}(\.\d{1,4}){1,2}$/;
+
+/** Email heuristic — used to short-circuit the lookup to email-only search. */
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /** bcrypt cost factor. */
 const BCRYPT_ROUNDS = 12;
@@ -69,7 +74,8 @@ export interface PublicUserProfile {
   id: string;
   displayName: string;
   email: string;
-  matriculeNumber: string | null;
+  username: string | null;
+  matriculeNumber: string | null; // kept for backward compat
   role: UserRole;
   ministryId: string | null;
 }
@@ -97,35 +103,15 @@ export class AuthService {
     ipAddress: string,
     userAgent: string,
   ): Promise<LoginResult | MfaRequiredResult> {
-    const { credential, password, deviceFingerprint } = dto;
+    // Resolve the effective identifier — support identifier (v1.1.1+), credential (legacy), matricule (gov legacy)
+    const raw = (dto.identifier ?? dto.credential ?? dto.matricule ?? "").trim();
+    const { password, deviceFingerprint } = dto;
 
-    const isMatricule = MATRICULE_REGEX.test(credential.trim());
-    const where = isMatricule
-      ? { matriculeNumber: credential.trim() }
-      : { email: credential.trim().toLowerCase() };
-
-    // 1. Look up the user
-    const user = await this.prisma.user.findFirst({
-      where,
-      select: {
-        id: true,
-        email: true,
-        matriculeNumber: true,
-        displayName: true,
-        passwordHash: true,
-        role: true,
-        status: true,
-        mfaEnabled: true,
-        failedLoginCount: true,
-        lockedUntil: true,
-        ministryId: true,
-        departmentId: true,
-        divisionId: true,
-      },
-    });
+    // 1. Look up the user — search order: email → username → matriculeNumber
+    const user = await this.findUserForLogin(raw);
 
     // 2. Record login history regardless of outcome
-    const credentialLabel = isMatricule ? credential.trim() : credential.trim().toLowerCase();
+    const credentialLabel = EMAIL_REGEX.test(raw) ? raw.toLowerCase() : raw;
 
     // 3. User not found — return same error as wrong password (prevent enumeration)
     if (!user) {
@@ -191,11 +177,13 @@ export class AuthService {
     userAgent: string,
     deviceFingerprint?: string,
   ): Promise<LoginResult> {
-    const user = await this.prisma.user.findUniqueOrThrow({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const user = (await (this.prisma.user as any).findUniqueOrThrow({
       where: { id: userId },
       select: {
         id: true,
         email: true,
+        username: true, // v1.1.1 — not in generated client yet
         matriculeNumber: true,
         displayName: true,
         role: true,
@@ -205,7 +193,19 @@ export class AuthService {
         departmentId: true,
         divisionId: true,
       },
-    });
+    })) as {
+      id: string;
+      email: string;
+      username: string | null;
+      matriculeNumber: string | null;
+      displayName: string;
+      role: UserRole;
+      status: UserStatus;
+      mfaEnabled: boolean;
+      ministryId: string | null;
+      departmentId: string | null;
+      divisionId: string | null;
+    };
 
     return this.createAuthenticatedSession(user, ipAddress, userAgent, deviceFingerprint);
   }
@@ -357,16 +357,9 @@ export class AuthService {
   // ---------------------------------------------------------------------------
 
   async forgotPassword(dto: ForgotPasswordDto): Promise<void> {
-    const { credential } = dto;
-    const isMatricule = MATRICULE_REGEX.test(credential.trim());
-    const where = isMatricule
-      ? { matriculeNumber: credential.trim() }
-      : { email: credential.trim().toLowerCase() };
+    const raw = (dto.identifier ?? dto.credential ?? dto.matricule ?? "").trim();
 
-    const user = await this.prisma.user.findFirst({
-      where,
-      select: { id: true, email: true, status: true },
-    });
+    const user = await this.findUserForReset(raw);
 
     // Always return success — prevent user enumeration
     if (!user || user.status === "DEACTIVATED" || user.status === "ARCHIVED") {
@@ -396,7 +389,7 @@ export class AuthService {
       action: "PASSWORD_RESET_REQUESTED",
       entityType: "USER",
       entityId: user.id,
-      metadata: { credential: isMatricule ? "matricule" : "email" },
+      metadata: { identifierType: MATRICULE_REGEX.test(raw) ? "matricule" : EMAIL_REGEX.test(raw) ? "email" : "username" },
     });
 
     // TODO: Send email with reset link containing rawToken
@@ -478,6 +471,139 @@ export class AuthService {
   // ---------------------------------------------------------------------------
   // PRIVATE HELPERS
   // ---------------------------------------------------------------------------
+
+  /**
+   * Find a user for login by identifier (v1.1.1 search order):
+   *   1. email (normalized lowercase)
+   *   2. username (case-insensitive)
+   *   3. employeeNumber (exact — org-scoped, e.g. EMP-00125)
+   *   4. matriculeNumber (exact — government backward compat)
+   *
+   * Returns null if not found. Never throws.
+   */
+  private async findUserForLogin(raw: string): Promise<{
+    id: string;
+    email: string;
+    matriculeNumber: string | null;
+    username: string | null;
+    employeeNumber: string | null;
+    displayName: string;
+    passwordHash: string;
+    role: UserRole;
+    status: UserStatus;
+    mfaEnabled: boolean;
+    failedLoginCount: number;
+    lockedUntil: Date | null;
+    ministryId: string | null;
+    departmentId: string | null;
+    divisionId: string | null;
+  } | null> {
+    const loginSelect = {
+      id: true,
+      email: true,
+      matriculeNumber: true,
+      username: true,
+      employeeNumber: true, // v1.1.1 — not in generated client yet
+      displayName: true,
+      passwordHash: true,
+      role: true,
+      status: true,
+      mfaEnabled: true,
+      failedLoginCount: true,
+      lockedUntil: true,
+      ministryId: true,
+      departmentId: true,
+      divisionId: true,
+    };
+
+    type LoginUser = {
+      id: string; email: string; matriculeNumber: string | null;
+      username: string | null; employeeNumber: string | null;
+      displayName: string; passwordHash: string; role: UserRole; status: UserStatus;
+      mfaEnabled: boolean; failedLoginCount: number; lockedUntil: Date | null;
+      ministryId: string | null; departmentId: string | null; divisionId: string | null;
+    };
+
+    // 1. email — only when identifier is a valid email address (contains @)
+    if (EMAIL_REGEX.test(raw)) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const byEmail = await (this.prisma.user as any).findFirst({
+        where: { email: raw.toLowerCase() }, select: loginSelect,
+      }) as LoginUser | null;
+      if (byEmail) return byEmail;
+    }
+
+    // 2. matriculeNumber (government format: "1.641.558", "478.432") — before generic lookups
+    if (MATRICULE_REGEX.test(raw)) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const byMatricule = await (this.prisma.user as any).findFirst({
+        where: { matriculeNumber: raw }, select: loginSelect,
+      }) as LoginUser | null;
+      if (byMatricule) return byMatricule;
+    }
+
+    // 3. employeeNumber (exact — org-scoped, e.g. EMP-00125)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const byEmployeeNumber = await (this.prisma.user as any).findFirst({
+      where: { employeeNumber: raw }, select: loginSelect,
+    }) as LoginUser | null;
+    if (byEmployeeNumber) return byEmployeeNumber;
+
+    // 4. username (case-insensitive)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const byUsername = await (this.prisma.user as any).findFirst({
+      where: { username: { equals: raw, mode: "insensitive" } }, select: loginSelect,
+    }) as LoginUser | null;
+    if (byUsername) return byUsername;
+
+    return null;
+  }
+
+  /**
+   * Find a user for password-reset by identifier.
+   * Same search order as findUserForLogin but returns only id/email/status.
+   */
+  private async findUserForReset(raw: string): Promise<{
+    id: string; email: string; status: string;
+  } | null> {
+    const resetSelect = { id: true, email: true, status: true };
+
+    type ResetUser = { id: string; email: string; status: string };
+
+    // 1. email — only when identifier is a valid email address (contains @)
+    if (EMAIL_REGEX.test(raw)) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const byEmail = await (this.prisma.user as any).findFirst({
+        where: { email: raw.toLowerCase() }, select: resetSelect,
+      }) as ResetUser | null;
+      if (byEmail) return byEmail;
+    }
+
+    // 2. matriculeNumber (government format: "1.641.558", "478.432") — before generic lookups
+    if (MATRICULE_REGEX.test(raw)) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const byMatricule = await (this.prisma.user as any).findFirst({
+        where: { matriculeNumber: raw }, select: resetSelect,
+      }) as ResetUser | null;
+      if (byMatricule) return byMatricule;
+    }
+
+    // 3. employeeNumber
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const byEmployeeNumber = await (this.prisma.user as any).findFirst({
+      where: { employeeNumber: raw }, select: resetSelect,
+    }) as ResetUser | null;
+    if (byEmployeeNumber) return byEmployeeNumber;
+
+    // 4. username (case-insensitive)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const byUsername = await (this.prisma.user as any).findFirst({
+      where: { username: { equals: raw, mode: "insensitive" } }, select: resetSelect,
+    }) as ResetUser | null;
+    if (byUsername) return byUsername;
+
+    return null;
+  }
 
   private assertAccountUsable(status: UserStatus, lockedUntil: Date | null): void {
     if (status === "SUSPENDED") {
@@ -570,7 +696,8 @@ export class AuthService {
     user: {
       id: string;
       email: string;
-      matriculeNumber: string | null;
+      username?: string | null;
+      matriculeNumber?: string | null;
       displayName: string;
       role: UserRole;
       ministryId: string | null;
@@ -648,7 +775,8 @@ export class AuthService {
         id: user.id,
         displayName: user.displayName,
         email: user.email,
-        matriculeNumber: user.matriculeNumber,
+        username: user.username ?? null,
+        matriculeNumber: user.matriculeNumber ?? null,
         role: user.role,
         ministryId: user.ministryId,
       },
@@ -795,5 +923,258 @@ export class AuthService {
     if (userAgent.toLowerCase().includes("firefox")) return "Firefox";
     if (userAgent.toLowerCase().includes("safari")) return "Safari";
     return "Browser";
+  }
+
+  // ---------------------------------------------------------------------------
+  // ORGANIZATION SIGNUP (Phase 5+6 — v1.1.1)
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Public workspace signup: creates an Organization + admin User in one atomic
+   * transaction.  GOVERNMENT orgs are created with status PENDING_VERIFICATION
+   * so an administrator can review them before granting access.
+   */
+  async signup(dto: SignupDto): Promise<{ organizationId: string; userId: string; workspaceSlug: string }> {
+    if (dto.password !== dto.confirmPassword) {
+      throw new BadRequestException("Passwords do not match");
+    }
+    if (!dto.acceptTerms) {
+      throw new BadRequestException("You must accept the terms of service");
+    }
+
+    const normalizedEmail = dto.workEmail.toLowerCase().trim();
+
+    // Check email is not already registered
+    const existingUser = await this.prisma.user.findUnique({ where: { email: normalizedEmail } });
+    if (existingUser) {
+      throw new BadRequestException("An account with this email address already exists");
+    }
+
+    const passwordHash = await bcrypt.hash(dto.password, BCRYPT_ROUNDS);
+    const displayName = `${dto.firstName} ${dto.lastName}`;
+
+    // Government orgs await manual verification; others are immediately active
+    const orgStatus = dto.orgType === "GOVERNMENT" ? "PENDING_VERIFICATION" : "ACTIVE";
+
+    const slug = await this.generateWorkspaceSlug(dto.orgName);
+    const orgCode = slug.toUpperCase().replace(/-/g, "_").slice(0, 50);
+
+    // Resolve username: firstName.lastName pattern
+    const username = await this.resolveSignupUsername(dto.firstName, dto.lastName, normalizedEmail);
+
+    // Atomic: create org + user + role assignment
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const db = this.prisma as any;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const result = await this.prisma.$transaction(async (tx) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const txAny = tx as any;
+
+      // 1. Create organization
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      const org = await txAny.organization.create({
+        data: {
+          name: dto.orgName,
+          code: orgCode,
+          workspaceSlug: slug,
+          type: dto.orgType,
+          status: orgStatus,
+          email: normalizedEmail,
+          city: dto.city,
+          country: dto.country,
+        },
+      });
+
+      // 2. Create admin user
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      const user = await txAny.user.create({
+        data: {
+          email: normalizedEmail,
+          username,
+          passwordHash,
+          firstName: dto.firstName,
+          lastName: dto.lastName,
+          displayName,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          organizationId: org.id,
+          role: "SUPER_ADMIN",
+          status: "ACTIVE",
+        },
+      });
+
+      // 3. Default role assignment row (SUPER_ADMIN)
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      await txAny.userRoleAssignment.create({
+        data: {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          userId: user.id,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          organizationId: org.id,
+          role: "SUPER_ADMIN",
+          assignedById: user.id, // self-assigned for signup
+        },
+      });
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+      return { org, user };
+    });
+
+    // Audit log (fire-and-forget)
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    const userId = String((result as { org: unknown; user: { id: unknown } }).user.id);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    const orgId = String((result as { org: { id: unknown }; user: unknown }).org.id);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    this.auditService.log({
+      userId,
+      action: "ORGANIZATION_SIGNUP" as any, // not in generated client yet (v1.1.1)
+      entityType: "organization",
+      entityId: orgId,
+      metadata: { orgName: dto.orgName, orgType: dto.orgType, orgStatus },
+      ipAddress: "signup",
+      userAgent: "signup",
+    });
+
+    void db; // satisfy no-unused-vars — db is typed for reference only
+
+    return { organizationId: orgId, userId, workspaceSlug: slug };
+  }
+
+  // ---------------------------------------------------------------------------
+  // ACCEPT INVITATION (Phase 7 — v1.1.1)
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Accept an employee invitation:
+   * 1. Validate raw token (SHA-256 → tokenHash lookup)
+   * 2. Check not expired / not already used
+   * 3. Set password, mark user ACTIVE
+   * 4. Mark invitation used
+   */
+  async acceptInvitation(dto: AcceptInvitationDto): Promise<{ userId: string; email: string }> {
+    if (dto.password !== dto.confirmPassword) {
+      throw new BadRequestException("Passwords do not match");
+    }
+
+    const tokenHash = crypto.createHash("sha256").update(dto.token).digest("hex");
+
+    const invitation = await this.prisma.employeeInvitation.findUnique({
+      where: { tokenHash },
+      include: { user: { select: { id: true, email: true, status: true } } },
+    });
+
+    if (!invitation) {
+      throw new BadRequestException("Invalid or expired invitation link");
+    }
+    if (invitation.used) {
+      throw new BadRequestException("This invitation has already been used");
+    }
+    if (invitation.expiresAt < new Date()) {
+      throw new BadRequestException("This invitation link has expired. Please request a new one.");
+    }
+
+    const passwordHash = await bcrypt.hash(dto.password, BCRYPT_ROUNDS);
+
+    await this.prisma.$transaction([
+      // Activate the user and set their password
+      this.prisma.user.update({
+        where: { id: invitation.userId },
+        data: { passwordHash, status: "ACTIVE", passwordChangedAt: new Date() },
+      }),
+      // Mark invitation consumed
+      this.prisma.employeeInvitation.update({
+        where: { id: invitation.id },
+        data: { used: true, usedAt: new Date() },
+      }),
+    ]);
+
+    // Audit log
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    this.auditService.log({
+      userId: invitation.userId,
+      action: "INVITATION_ACCEPTED" as any, // not in generated client yet (v1.1.1)
+      entityType: "user",
+      entityId: invitation.userId,
+      ipAddress: "accept-invitation",
+      userAgent: "accept-invitation",
+    });
+
+    return { userId: invitation.userId, email: invitation.user.email };
+  }
+
+  // ---------------------------------------------------------------------------
+  // PRIVATE HELPERS — Signup
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Generates a unique URL-safe workspace slug from an org name.
+   * Appends a numeric suffix on collision (up to 20 attempts).
+   */
+  private async generateWorkspaceSlug(orgName: string): Promise<string> {
+    const base = orgName
+      .normalize("NFD")
+      .replace(/[̀-ͯ]/g, "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 80);
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const db = this.prisma as any;
+
+    for (let i = 0; i <= 20; i++) {
+      const candidate = i === 0 ? base : `${base}-${i.toString()}`;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      const existing = await db.organization.findUnique({ where: { workspaceSlug: candidate } });
+      if (!existing) return candidate;
+    }
+    // Fallback: base + random hex
+    return `${base}-${crypto.randomBytes(4).toString("hex")}`;
+  }
+
+  /**
+   * Resolves a username during signup using the same firstName.lastName pattern
+   * as employee creation, but without injecting UsersService (avoids circular dep).
+   */
+  private async resolveSignupUsername(
+    firstName: string,
+    lastName: string,
+    email: string,
+  ): Promise<string | null> {
+    const normalize = (s: string) =>
+      s
+        .normalize("NFD")
+        .replace(/[̀-ͯ]/g, "")
+        .toLowerCase()
+        .replace(/[^a-z0-9._-]/g, ".");
+
+    const fnNorm = normalize(firstName);
+    const lnNorm = normalize(lastName);
+    const base = `${fnNorm}.${lnNorm}`;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const db = this.prisma as any;
+
+    const tryUsername = async (candidate: string): Promise<string | null> => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      const existing = await db.user.findUnique({ where: { username: candidate } });
+      return existing ? null : candidate;
+    };
+
+    const found = await tryUsername(base);
+    if (found) return found;
+
+    for (let i = 2; i <= 10; i++) {
+      const candidate = `${base}${i.toString()}`;
+      const ok = await tryUsername(candidate);
+      if (ok) return ok;
+    }
+
+    // Fallback: email prefix
+    const emailPrefix = normalize(email.split("@")[0] ?? email);
+    const fromEmail = await tryUsername(emailPrefix);
+    if (fromEmail) return fromEmail;
+
+    return null;
   }
 }

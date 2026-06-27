@@ -82,7 +82,7 @@ export default function LoginPage() {
       {/* Heading */}
       <div className="mb-6">
         <h1 className="text-xl font-bold tracking-tight text-slate-900">Connexion</h1>
-        <p className="mt-1 text-sm text-slate-500">Plateforme de Collaboration Gouvernementale</p>
+        <p className="mt-1 text-sm text-slate-500">Prinodia Workspace</p>
       </div>
 
       {serverError && (
@@ -99,8 +99,8 @@ export default function LoginPage() {
         className="space-y-4"
       >
         <Input
-          label="Matricule ou adresse e-mail"
-          placeholder="1.641.558 ou nom@gouv.cd"
+          label="E-mail, nom d'utilisateur ou identifiant employé"
+          placeholder="john@organisation.com, jean.dupont ou EMP-001"
           autoComplete="username"
           autoFocus
           error={errors.credential?.message}
@@ -131,6 +131,13 @@ export default function LoginPage() {
           Se connecter
         </Button>
       </form>
+
+      <p className="mt-5 text-center text-xs text-slate-500">
+        Pas encore de compte ?{" "}
+        <Link href="/signup" className="text-primary-600 hover:underline font-medium">
+          Créer un espace de travail
+        </Link>
+      </p>
     </div>
   );
 }

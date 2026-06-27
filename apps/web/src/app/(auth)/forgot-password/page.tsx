@@ -80,7 +80,8 @@ export default function ForgotPasswordPage() {
           Réinitialiser le mot de passe
         </h1>
         <p className="mt-1 text-sm text-slate-500">
-          Entrez votre matricule ou adresse e-mail pour recevoir un lien de réinitialisation
+          Entrez votre e-mail, nom d&apos;utilisateur ou identifiant employé pour recevoir un lien
+          de réinitialisation
         </p>
       </div>
 
@@ -98,8 +99,8 @@ export default function ForgotPasswordPage() {
         className="space-y-4"
       >
         <Input
-          label="Matricule ou adresse e-mail"
-          placeholder="1.641.558 ou nom@gouv.cd"
+          label="E-mail, nom d'utilisateur ou identifiant employé"
+          placeholder="john@organisation.com, jean.dupont ou EMP-001"
           autoComplete="username"
           autoFocus
           error={errors.credential?.message}

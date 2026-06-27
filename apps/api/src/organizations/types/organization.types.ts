@@ -1,46 +1,36 @@
-/**
- * Local Organization type definitions — mirrors the Prisma schema until
- * `prisma generate` is re-run after v1.0.2 migration in the real environment.
- */
+import type { Prisma } from "@prisma/client";
+import type { OrganizationStatus, OrganizationType } from "@prisma/client";
 
-export type OrganizationType =
-  | "GOVERNMENT"
-  | "ENTERPRISE"
-  | "EDUCATION"
-  | "HEALTHCARE"
-  | "NGO"
-  | "CHURCH"
-  | "NON_PROFIT"
-  | "OTHER";
+export type { OrganizationStatus, OrganizationType };
 
-export type OrganizationStatus = "ACTIVE" | "INACTIVE" | "SUSPENDED" | "ARCHIVED";
-
-export interface Organization {
-  id: string;
-  name: string;
-  code: string;
-  type: OrganizationType;
-  status: OrganizationStatus;
-  description: string | null;
-  email: string | null;
-  phone: string | null;
-  website: string | null;
-  address: string | null;
-  city: string | null;
-  country: string | null;
-  logoUrl: string | null;
-  isDemo?: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface OrganizationWithCounts extends Organization {
-  _count?: {
-    ministries: number;
-    departments: number;
-    users: number;
+export type OrganizationWithCounts = Prisma.OrganizationGetPayload<{
+  include: {
+    _count: {
+      select: {
+        ministries: true;
+        departments: true;
+        users: true;
+      };
+    };
+    ministries: {
+      select: {
+        id: true;
+        name: true;
+        code: true;
+        isActive: true;
+      };
+    };
   };
-}
+}>;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type OrganizationDelegate = Record<string, any>;
+export type OrganizationDelegate = PrismaClientLike["organization"];
+
+type PrismaClientLike = {
+  organization: {
+    findMany: (args?: unknown) => Promise<unknown[]>;
+    findUnique: (args?: unknown) => Promise<OrganizationWithCounts | null>;
+    create: (args?: unknown) => Promise<unknown>;
+    update: (args?: unknown) => Promise<unknown>;
+    count: (args?: unknown) => Promise<number>;
+  };
+};

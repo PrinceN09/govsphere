@@ -12,7 +12,8 @@ declare module "next-auth" {
       id: string;
       displayName: string;
       email: string;
-      matriculeNumber: string | null;
+      username: string | null;
+      matriculeNumber: string | null; // backward compat
       role: UserRole;
       ministryId: string | null;
       sessionId: string;
@@ -26,7 +27,8 @@ declare module "next-auth" {
     id: string;
     displayName: string;
     email: string;
-    matriculeNumber: string | null;
+    username?: string | null;
+    matriculeNumber: string | null; // backward compat
     role: UserRole;
     ministryId: string | null;
     sessionId: string;
@@ -45,7 +47,8 @@ declare module "next-auth/jwt" {
     id: string;
     displayName: string;
     email: string;
-    matriculeNumber: string | null;
+    username?: string | null;
+    matriculeNumber: string | null; // backward compat
     role: UserRole;
     ministryId: string | null;
     sessionId: string;

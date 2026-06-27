@@ -28,6 +28,27 @@ export class CreateUserDto {
   @MaxLength(255)
   email!: string;
 
+  /**
+   * Optional login username. Auto-generated as firstName.lastName if omitted.
+   * Allowed characters: letters, digits, dots, hyphens, underscores.
+   */
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  @Matches(/^[a-zA-Z0-9._-]+$/, {
+    message: "Username may only contain letters, digits, dots, hyphens and underscores",
+  })
+  username?: string;
+
+  /**
+   * Optional employee number for org-scoped identification (e.g. EMP-00125).
+   * Not globally unique — uniqueness is enforced per-organization in the application layer.
+   */
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  employeeNumber?: string;
+
   @IsOptional()
   @IsString()
   @Matches(MATRICULE_REGEX, {

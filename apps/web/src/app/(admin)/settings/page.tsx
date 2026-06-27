@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+
 import { AdminTopBar } from "@/components/layout/AdminTopBar";
 
 const SETTINGS_SECTIONS = [
@@ -65,7 +66,9 @@ export default function SettingsPage() {
             <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Version</p>
           </div>
           <div className="px-5 py-4 space-y-1 text-sm text-slate-600">
-            <p>Prinodia Workspace <span className="font-semibold">v1.1.0</span></p>
+            <p>
+              Prinodia Workspace <span className="font-semibold">v1.1.0</span>
+            </p>
             <p className="text-xs text-slate-400">Product Readiness &amp; Demo Environment</p>
           </div>
         </div>
