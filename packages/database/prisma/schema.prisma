@@ -2787,3 +2787,164 @@ model DemoRegistry {
   @@index([entityType])
   @@map("demo_registry")
 }
+
+// =============================================================================
+// PRINODIA PEOPLE — v1.3.0
+// Additive models. No existing models are modified.
+// =============================================================================
+
+// ─── Enums ───────────────────────────────────────────────────────────────────
+
+enum OrgNodeType {
+  ORGANIZATION
+  DIVISION
+  DEPARTMENT
+  TEAM
+  CUSTOM
+}
+
+enum WorkloadStatus {
+  NOT_ASSIGNED
+  AVAILABLE
+  NORMAL
+  BUSY
+  OVERLOADED
+}
+
+enum VacationStatus {
+  VACATION
+  SICK_LEAVE
+  REMOTE
+  OFFICE
+  TRAVEL
+  TRAINING
+}
+
+enum SkillLevel {
+  BEGINNER
+  INTERMEDIATE
+  EXPERT
+}
+
+enum SkillCategory {
+  TECHNICAL
+  DOMAIN
+  SOFT
+  LANGUAGE
+  CERTIFICATION
+}
+
+// ─── OrgNode — Generic, recursive organizational hierarchy ───────────────────
+// Additive: complements existing Ministry/Department/Division (government).
+// Use for non-government orgs or cross-cutting teams.
+// Uses adjacency list + materializedPath for efficient subtree queries.
+
+model OrgNode {
+  id               String      @id @default(cuid())
+  organizationId   String
+  name             String      @db.VarChar(200)
+  type             OrgNodeType @default(DEPARTMENT)
+  parentId         String?
+  // e.g. "/org-abc/div-xyz/dept-123/" — enables fast subtree: LIKE '/prefix/%'
+  materializedPath String      @db.VarChar(1000)
+  description      String?     @db.Text
+  code             String?     @db.VarChar(50)
+  color            String?     @db.VarChar(7)
+  icon             String?     @db.VarChar(50)
+  sortOrder        Int         @default(0)
+  isActive         Boolean     @default(true)
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  parent           OrgNode?         @relation("OrgNodeTree", fields: [parentId], references: [id])
+  children         OrgNode[]        @relation("OrgNodeTree")
+  employees        EmployeeProfile[] @relation("EmployeePrimaryNode")
+
+  @@index([organizationId])
+  @@index([parentId])
+  @@index([organizationId, materializedPath])
+  @@index([isActive])
+  @@map("org_nodes")
+}
+
+// ─── EmployeeProfile — Extended profile layered on top of User ────────────────
+// 1-to-1 with User. Opt-in: not every User has a profile.
+// Stores: bio, workload, availability, skills summary, org-node placement.
+
+model EmployeeProfile {
+  id             String         @id @default(cuid())
+  userId         String         @unique
+  organizationId String
+
+  // Extended identity
+  bio            String?        @db.Text
+  phone          String?        @db.VarChar(50)
+  mobile         String?        @db.VarChar(50)
+  officeLocation String?        @db.VarChar(200)
+  timeZone       String         @default("UTC") @db.VarChar(60)
+  workingHours   Json?          // { mon:["08:00","17:00"], tue:["08:00","17:00"], ... }
+
+  // Org placement (generic hierarchy)
+  orgNodeId      String?
+  // Secondary memberships stored as simple array of orgNode IDs
+  secondaryOrgNodeIds String[]  @default([])
+
+  // Workload & availability
+  workloadStatus WorkloadStatus @default(AVAILABLE)
+  vacationStatus VacationStatus?
+  vacationFrom   DateTime?
+  vacationUntil  DateTime?
+  availabilityNote String?      @db.VarChar(200)
+
+  // Languages: [{ code:"fr", level:"NATIVE" }, { code:"en", level:"PROFESSIONAL" }]
+  languages      Json[]         @default([])
+
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  orgNode        OrgNode?       @relation("EmployeePrimaryNode", fields: [orgNodeId], references: [id])
+  skills         EmployeeSkill[]
+
+  @@index([organizationId])
+  @@index([orgNodeId])
+  @@index([workloadStatus])
+  @@map("employee_profiles")
+}
+
+// ─── Skill catalog ────────────────────────────────────────────────────────────
+
+model Skill {
+  id          String        @id @default(cuid())
+  name        String        @db.VarChar(100)
+  slug        String        @unique @db.VarChar(100)
+  category    SkillCategory @default(TECHNICAL)
+  description String?       @db.Text
+  icon        String?       @db.VarChar(50)
+  isActive    Boolean       @default(true)
+  createdAt   DateTime      @default(now())
+
+  employees   EmployeeSkill[]
+
+  @@index([category])
+  @@index([isActive])
+  @@map("skills")
+}
+
+// ─── Employee ↔ Skill junction ────────────────────────────────────────────────
+
+model EmployeeSkill {
+  id          String          @id @default(cuid())
+  profileId   String
+  skillId     String
+  level       SkillLevel      @default(INTERMEDIATE)
+  verified    Boolean         @default(false)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  profile     EmployeeProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  skill       Skill           @relation(fields: [skillId], references: [id])
+
+  @@unique([profileId, skillId])
+  @@index([skillId, level])
+  @@map("employee_skills")
+}

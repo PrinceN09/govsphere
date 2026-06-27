@@ -247,10 +247,15 @@ export class UsersService {
     const temporaryPassword = dto.initialPassword ?? this.generateTemporaryPassword();
     const passwordHash = await bcrypt.hash(temporaryPassword, BCRYPT_ROUNDS);
     const displayName = `${dto.firstName} ${dto.lastName}`;
-    const username = await this.resolveUsername(dto.username, dto.firstName, dto.lastName, dto.email);
+    const username = await this.resolveUsername(
+      dto.username,
+      dto.firstName,
+      dto.lastName,
+      dto.email,
+    );
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const user = await (this.prisma.user as any).create({
+    const user = (await (this.prisma.user as any).create({
       data: {
         firstName: dto.firstName,
         lastName: dto.lastName,
@@ -272,7 +277,7 @@ export class UsersService {
         managerId: dto.managerId ?? null,
       },
       select: { id: true, status: true },
-    }) as { id: string; status: string };
+    })) as { id: string; status: string };
 
     // If a position was specified, create an assignment
     if (dto.positionId) {
@@ -324,7 +329,7 @@ export class UsersService {
     const username = await this.resolveUsername(undefined, dto.firstName, dto.lastName, dto.email);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const user = await (this.prisma.user as any).create({
+    const user = (await (this.prisma.user as any).create({
       data: {
         firstName: dto.firstName,
         lastName: dto.lastName,
@@ -343,7 +348,7 @@ export class UsersService {
         managerId: dto.managerId ?? null,
       },
       select: { id: true },
-    }) as { id: string };
+    })) as { id: string };
 
     const invitationToken = await this.createInvitationToken(user.id, invitedBy.id);
 
@@ -667,20 +672,20 @@ export class UsersService {
     for (const candidate of candidates) {
       if (!candidate || candidate.length < 2) continue;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const taken = await (this.prisma.user as any).findUnique({
+      const taken = (await (this.prisma.user as any).findUnique({
         where: { username: candidate },
         select: { id: true },
-      }) as { id: string } | null;
+      })) as { id: string } | null;
       if (!taken) return candidate;
 
       // Try suffixes 2..10
       for (let i = 2; i <= 10; i++) {
         const withSuffix = `${candidate}${i.toString()}`;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const takenSuffix = await (this.prisma.user as any).findUnique({
+        const takenSuffix = (await (this.prisma.user as any).findUnique({
           where: { username: withSuffix },
           select: { id: true },
-        }) as { id: string } | null;
+        })) as { id: string } | null;
         if (!takenSuffix) return withSuffix;
       }
     }

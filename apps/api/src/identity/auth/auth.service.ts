@@ -389,7 +389,13 @@ export class AuthService {
       action: "PASSWORD_RESET_REQUESTED",
       entityType: "USER",
       entityId: user.id,
-      metadata: { identifierType: MATRICULE_REGEX.test(raw) ? "matricule" : EMAIL_REGEX.test(raw) ? "email" : "username" },
+      metadata: {
+        identifierType: MATRICULE_REGEX.test(raw)
+          ? "matricule"
+          : EMAIL_REGEX.test(raw)
+            ? "email"
+            : "username",
+      },
     });
 
     // TODO: Send email with reset link containing rawToken
@@ -517,43 +523,57 @@ export class AuthService {
     };
 
     type LoginUser = {
-      id: string; email: string; matriculeNumber: string | null;
-      username: string | null; employeeNumber: string | null;
-      displayName: string; passwordHash: string; role: UserRole; status: UserStatus;
-      mfaEnabled: boolean; failedLoginCount: number; lockedUntil: Date | null;
-      ministryId: string | null; departmentId: string | null; divisionId: string | null;
+      id: string;
+      email: string;
+      matriculeNumber: string | null;
+      username: string | null;
+      employeeNumber: string | null;
+      displayName: string;
+      passwordHash: string;
+      role: UserRole;
+      status: UserStatus;
+      mfaEnabled: boolean;
+      failedLoginCount: number;
+      lockedUntil: Date | null;
+      ministryId: string | null;
+      departmentId: string | null;
+      divisionId: string | null;
     };
 
     // 1. email — only when identifier is a valid email address (contains @)
     if (EMAIL_REGEX.test(raw)) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const byEmail = await (this.prisma.user as any).findFirst({
-        where: { email: raw.toLowerCase() }, select: loginSelect,
-      }) as LoginUser | null;
+      const byEmail = (await (this.prisma.user as any).findFirst({
+        where: { email: raw.toLowerCase() },
+        select: loginSelect,
+      })) as LoginUser | null;
       if (byEmail) return byEmail;
     }
 
     // 2. matriculeNumber (government format: "1.641.558", "478.432") — before generic lookups
     if (MATRICULE_REGEX.test(raw)) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const byMatricule = await (this.prisma.user as any).findFirst({
-        where: { matriculeNumber: raw }, select: loginSelect,
-      }) as LoginUser | null;
+      const byMatricule = (await (this.prisma.user as any).findFirst({
+        where: { matriculeNumber: raw },
+        select: loginSelect,
+      })) as LoginUser | null;
       if (byMatricule) return byMatricule;
     }
 
     // 3. employeeNumber (exact — org-scoped, e.g. EMP-00125)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const byEmployeeNumber = await (this.prisma.user as any).findFirst({
-      where: { employeeNumber: raw }, select: loginSelect,
-    }) as LoginUser | null;
+    const byEmployeeNumber = (await (this.prisma.user as any).findFirst({
+      where: { employeeNumber: raw },
+      select: loginSelect,
+    })) as LoginUser | null;
     if (byEmployeeNumber) return byEmployeeNumber;
 
     // 4. username (case-insensitive)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const byUsername = await (this.prisma.user as any).findFirst({
-      where: { username: { equals: raw, mode: "insensitive" } }, select: loginSelect,
-    }) as LoginUser | null;
+    const byUsername = (await (this.prisma.user as any).findFirst({
+      where: { username: { equals: raw, mode: "insensitive" } },
+      select: loginSelect,
+    })) as LoginUser | null;
     if (byUsername) return byUsername;
 
     return null;
@@ -564,7 +584,9 @@ export class AuthService {
    * Same search order as findUserForLogin but returns only id/email/status.
    */
   private async findUserForReset(raw: string): Promise<{
-    id: string; email: string; status: string;
+    id: string;
+    email: string;
+    status: string;
   } | null> {
     const resetSelect = { id: true, email: true, status: true };
 
@@ -573,33 +595,37 @@ export class AuthService {
     // 1. email — only when identifier is a valid email address (contains @)
     if (EMAIL_REGEX.test(raw)) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const byEmail = await (this.prisma.user as any).findFirst({
-        where: { email: raw.toLowerCase() }, select: resetSelect,
-      }) as ResetUser | null;
+      const byEmail = (await (this.prisma.user as any).findFirst({
+        where: { email: raw.toLowerCase() },
+        select: resetSelect,
+      })) as ResetUser | null;
       if (byEmail) return byEmail;
     }
 
     // 2. matriculeNumber (government format: "1.641.558", "478.432") — before generic lookups
     if (MATRICULE_REGEX.test(raw)) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const byMatricule = await (this.prisma.user as any).findFirst({
-        where: { matriculeNumber: raw }, select: resetSelect,
-      }) as ResetUser | null;
+      const byMatricule = (await (this.prisma.user as any).findFirst({
+        where: { matriculeNumber: raw },
+        select: resetSelect,
+      })) as ResetUser | null;
       if (byMatricule) return byMatricule;
     }
 
     // 3. employeeNumber
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const byEmployeeNumber = await (this.prisma.user as any).findFirst({
-      where: { employeeNumber: raw }, select: resetSelect,
-    }) as ResetUser | null;
+    const byEmployeeNumber = (await (this.prisma.user as any).findFirst({
+      where: { employeeNumber: raw },
+      select: resetSelect,
+    })) as ResetUser | null;
     if (byEmployeeNumber) return byEmployeeNumber;
 
     // 4. username (case-insensitive)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const byUsername = await (this.prisma.user as any).findFirst({
-      where: { username: { equals: raw, mode: "insensitive" } }, select: resetSelect,
-    }) as ResetUser | null;
+    const byUsername = (await (this.prisma.user as any).findFirst({
+      where: { username: { equals: raw, mode: "insensitive" } },
+      select: resetSelect,
+    })) as ResetUser | null;
     if (byUsername) return byUsername;
 
     return null;
@@ -934,7 +960,9 @@ export class AuthService {
    * transaction.  GOVERNMENT orgs are created with status PENDING_VERIFICATION
    * so an administrator can review them before granting access.
    */
-  async signup(dto: SignupDto): Promise<{ organizationId: string; userId: string; workspaceSlug: string }> {
+  async signup(
+    dto: SignupDto,
+  ): Promise<{ organizationId: string; userId: string; workspaceSlug: string }> {
     if (dto.password !== dto.confirmPassword) {
       throw new BadRequestException("Passwords do not match");
     }

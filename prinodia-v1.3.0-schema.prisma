@@ -1,0 +1,869 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// Prinodia Workspace — v1.3.0 Architecture Blueprint
+// New Prisma Models (ADDITIVE ONLY — do not modify existing models)
+// All models below are NEW. Existing v1.2.0 models are preserved as-is.
+// ─────────────────────────────────────────────────────────────────────────────
+//
+// SAFETY CONSTRAINTS:
+//   - Do NOT remove matricule support
+//   - Do NOT break existing users
+//   - Do NOT rewrite Git history
+//   - Do NOT delete old migrations
+//   - Do NOT modify existing models unless adding an optional relation field
+//
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PHASE A — PRINODIA PEOPLE
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Recursive organizational hierarchy
+// Uses adjacency list + materializedPath for efficient subtree queries
+model OrgNode {
+  id               String       @id @default(uuid())
+  organizationId   String
+  name             String
+  type             OrgNodeType
+  parentId         String?
+  materializedPath String       // e.g., "/org-1/div-3/dept-7/"
+  description      String?
+  icon             String?
+  color            String?
+  sortOrder        Int          @default(0)
+  isActive         Boolean      @default(true)
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  parent           OrgNode?     @relation("OrgNodeTree", fields: [parentId], references: [id])
+  children         OrgNode[]    @relation("OrgNodeTree")
+  employees        EmployeeProfile[] @relation("PrimaryOrgNode")
+
+  @@index([organizationId])
+  @@index([parentId])
+  @@index([materializedPath])
+}
+
+enum OrgNodeType {
+  ORGANIZATION
+  DIVISION
+  DEPARTMENT
+  TEAM
+  CUSTOM
+}
+
+// Full employee profile — extends the base User
+model EmployeeProfile {
+  id                   String             @id @default(uuid())
+  userId               String             @unique
+  organizationId       String
+
+  // Identity
+  firstName            String
+  lastName             String
+  displayName          String
+  pronouns             String?
+  avatarUrl            String?
+  bio                  String?
+
+  // Contact
+  email                String
+  phone                String?
+  mobile               String?
+
+  // HR identifiers (CRITICAL: matricule support preserved)
+  matricule            String?
+  employeeNumber       String?
+
+  // Position
+  jobTitle             String
+  jobGrade             String?
+  orgNodeId            String
+  secondaryOrgNodeIds  String[]           @default([])
+  managerId            String?
+
+  // Employment
+  startDate            DateTime?
+  employmentStatus     EmploymentStatus   @default(FULL_TIME)
+  employmentType       EmploymentType     @default(PERMANENT)
+
+  // Location & Time
+  officeLocation       String?
+  timeZone             String             @default("UTC")
+  workingHours         Json?              // { mon: ["08:00","17:00"], ... }
+
+  // Live context (updated by services, not direct user input)
+  workloadStatus       WorkloadStatus     @default(AVAILABLE)
+  currentMeetingId     String?
+  currentProjectId     String?
+  availabilityNote     String?
+  vacationStatus       VacationStatus?
+  vacationFrom         DateTime?
+  vacationUntil        DateTime?
+
+  // Languages
+  languages            Json[]             @default([]) // [{ code:"fr", level:"NATIVE" }]
+
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  orgNode              OrgNode            @relation("PrimaryOrgNode", fields: [orgNodeId], references: [id])
+  manager              EmployeeProfile?   @relation("ReportingLine", fields: [managerId], references: [id])
+  directReports        EmployeeProfile[]  @relation("ReportingLine")
+  skills               EmployeeSkill[]
+  certifications       EmployeeCertification[]
+  endorsementsGiven    SkillEndorsement[] @relation("EndorsementFrom")
+  endorsementsReceived SkillEndorsement[] @relation("EndorsementTo")
+
+  @@index([organizationId])
+  @@index([orgNodeId])
+  @@index([managerId])
+  @@index([matricule])
+  @@index([employeeNumber])
+}
+
+enum EmploymentStatus {
+  FULL_TIME
+  PART_TIME
+  CONTRACTOR
+  INTERN
+  ON_LEAVE
+  TERMINATED
+}
+
+enum EmploymentType {
+  PERMANENT
+  FIXED_TERM
+  CONSULTANT
+}
+
+enum WorkloadStatus {
+  NOT_ASSIGNED
+  AVAILABLE
+  NORMAL
+  BUSY
+  OVERLOADED
+}
+
+enum VacationStatus {
+  VACATION
+  SICK_LEAVE
+  REMOTE
+  OFFICE
+  TRAVEL
+  TRAINING
+}
+
+// Skill taxonomy
+model Skill {
+  id          String        @id @default(uuid())
+  name        String
+  slug        String        @unique
+  category    SkillCategory
+  description String?
+  icon        String?
+  parentId    String?       // For hierarchical categories
+  isActive    Boolean       @default(true)
+  createdAt   DateTime      @default(now())
+
+  employees   EmployeeSkill[]
+
+  @@index([category])
+  @@index([slug])
+}
+
+enum SkillCategory {
+  TECHNICAL
+  DOMAIN
+  SOFT
+  LANGUAGE
+  CERTIFICATION
+}
+
+// Employee ↔ Skill junction with proficiency level
+model EmployeeSkill {
+  id             String           @id @default(uuid())
+  employeeId     String
+  skillId        String
+  level          SkillLevel       @default(INTERMEDIATE)
+  verified       Boolean          @default(false)
+  verifiedById   String?
+  endorsedCount  Int              @default(0)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  employee       EmployeeProfile  @relation(fields: [employeeId], references: [id])
+  skill          Skill            @relation(fields: [skillId], references: [id])
+
+  @@unique([employeeId, skillId])
+  @@index([skillId, level])
+}
+
+enum SkillLevel {
+  BEGINNER
+  INTERMEDIATE
+  EXPERT
+}
+
+// Peer skill endorsements
+model SkillEndorsement {
+  id               String          @id @default(uuid())
+  fromEmployeeId   String
+  toEmployeeId     String
+  skillId          String
+  message          String?
+  createdAt        DateTime        @default(now())
+
+  from             EmployeeProfile @relation("EndorsementFrom", fields: [fromEmployeeId], references: [id])
+  to               EmployeeProfile @relation("EndorsementTo", fields: [toEmployeeId], references: [id])
+
+  @@unique([fromEmployeeId, toEmployeeId, skillId])
+}
+
+// Professional certifications
+model Certification {
+  id          String                  @id @default(uuid())
+  name        String
+  issuingBody String
+  badgeUrl    String?
+  createdAt   DateTime                @default(now())
+
+  employees   EmployeeCertification[]
+}
+
+model EmployeeCertification {
+  id              String          @id @default(uuid())
+  employeeId      String
+  certificationId String
+  obtainedAt      DateTime
+  expiresAt       DateTime?
+  credentialId    String?
+  createdAt       DateTime        @default(now())
+
+  employee        EmployeeProfile @relation(fields: [employeeId], references: [id])
+  certification   Certification   @relation(fields: [certificationId], references: [id])
+
+  @@unique([employeeId, certificationId])
+  @@index([certificationId])
+  @@index([expiresAt])
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PHASE B — WORKSPACE MEMORY
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Append-only activity timeline for any entity
+model TimelineEntry {
+  id                String          @id @default(uuid())
+  organizationId    String
+  entityType        String          // 'project' | 'user' | 'channel' | 'document' | 'task' | ...
+  entityId          String
+  eventType         String          // e.g., 'task.completed', 'meeting.started'
+  actorId           String?
+  actorType         ActorType       @default(USER)
+  payload           Json            // Event-specific data
+  relatedEntityType String?
+  relatedEntityId   String?
+  occurredAt        DateTime
+  createdAt         DateTime        @default(now())
+
+  @@index([organizationId, entityType, entityId, occurredAt(sort: Desc)])
+  @@index([actorId])
+  @@index([eventType])
+}
+
+enum ActorType {
+  USER
+  SYSTEM
+  AI
+  INTEGRATION
+}
+
+// Unified cross-product search index
+model SearchIndex {
+  id            String   @id @default(uuid())
+  organizationId String
+  entityType    String
+  entityId      String
+  contentText   String   // Plaintext for FTS
+  // contentVector tsvector — managed via raw SQL trigger (Prisma does not support tsvector)
+  metadata      Json     @default("{}")  // Filterable facets
+  ownerId       String?  // For permission filtering
+  visibility    String   @default("ORGANIZATION") // ORGANIZATION | PRIVATE | RESTRICTED
+  indexedAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([entityType, entityId])
+  @@index([organizationId, entityType])
+}
+
+// AI Summary cache
+model AiSummaryCache {
+  id           String   @id @default(uuid())
+  organizationId String
+  entityType   String
+  entityId     String
+  sections     Json     // { summary, keyDecisions, openRisks, participants, outstandingTasks, importantDocuments }
+  generatedAt  DateTime @default(now())
+  expiresAt    DateTime
+
+  @@unique([entityType, entityId])
+  @@index([organizationId])
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PHASE C — MY WORK
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Personal dashboard layout/preferences per user
+model UserDashboardConfig {
+  id             String   @id @default(uuid())
+  userId         String   @unique
+  organizationId String
+  panelOrder     String[] @default([]) // ordered panel IDs
+  panelConfig    Json     @default("{}") // per-panel settings
+  updatedAt      DateTime @updatedAt
+}
+
+// Kanban board state (personal)
+model KanbanCard {
+  id             String       @id @default(uuid())
+  userId         String
+  organizationId String
+  taskId         String       // FK to Projects task
+  column         KanbanColumn @default(BACKLOG)
+  sortOrder      Int          @default(0)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([userId, column])
+  @@index([taskId])
+}
+
+enum KanbanColumn {
+  BACKLOG
+  IN_PROGRESS
+  WAITING
+  REVIEW
+  DONE
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PHASE D — CHAT FOUNDATION
+// ═══════════════════════════════════════════════════════════════════════════════
+
+model Conversation {
+  id              String           @id @default(uuid())
+  organizationId  String
+  type            ConversationType
+  name            String?
+  isArchived      Boolean          @default(false)
+  expiresAt       DateTime?        // For TEMPORARY conversations
+  lastMessageAt   DateTime?
+  lastMessageId   String?
+  createdById     String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  members         ConversationMember[]
+  messages        Message[]
+  channel         Channel?
+  pins            PinnedMessage[]
+
+  @@index([organizationId])
+  @@index([lastMessageAt(sort: Desc)])
+}
+
+enum ConversationType {
+  DIRECT_1_1
+  DIRECT_GROUP
+  SELF
+  TEMPORARY
+  CHANNEL_PUBLIC
+  CHANNEL_PRIVATE
+  CHANNEL_SECRET
+  CHANNEL_ANNOUNCEMENT
+  CHANNEL_PROJECT
+  CHANNEL_DEPARTMENT
+  CHANNEL_ORG_WIDE
+}
+
+model ConversationMember {
+  id               String              @id @default(uuid())
+  conversationId   String
+  userId           String
+  role             ChannelRole         @default(MEMBER)
+  isMuted          Boolean             @default(false)
+  isStarred        Boolean             @default(false)
+  isPinned         Boolean             @default(false)
+  lastReadAt       DateTime?
+  notifSetting     NotifSetting        @default(MENTIONS)
+  joinedAt         DateTime            @default(now())
+
+  conversation     Conversation        @relation(fields: [conversationId], references: [id])
+
+  @@unique([conversationId, userId])
+  @@index([userId])
+}
+
+enum ChannelRole {
+  OWNER
+  ADMIN
+  MEMBER
+  GUEST
+}
+
+enum NotifSetting {
+  ALL
+  MENTIONS
+  NOTHING
+}
+
+model Channel {
+  id               String       @id @default(uuid())
+  conversationId   String       @unique
+  organizationId   String
+  name             String
+  description      String?
+  topic            String?
+  templateId       String?
+  linkedEntityType String?      // 'department' | 'project' | 'meeting'
+  linkedEntityId   String?
+  retentionDays    Int?
+  isArchived       Boolean      @default(false)
+  memberCount      Int          @default(0)
+  createdById      String?
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  conversation     Conversation @relation(fields: [conversationId], references: [id])
+
+  @@unique([organizationId, name])
+  @@index([organizationId])
+}
+
+model Message {
+  id               String      @id @default(uuid())
+  conversationId   String
+  senderId         String?
+  organizationId   String
+  content          String      // ProseMirror JSON
+  contentText      String      // Plaintext for FTS
+  // contentVector tsvector  — managed via raw SQL trigger
+  type             MessageType @default(TEXT)
+  parentMessageId  String?     // Thread reply
+  isEdited         Boolean     @default(false)
+  isDeleted        Boolean     @default(false)
+  isPinned         Boolean     @default(false)
+  scheduledAt      DateTime?
+  editedAt         DateTime?
+  reactionCount    Int         @default(0)
+  replyCount       Int         @default(0)
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  conversation     Conversation     @relation(fields: [conversationId], references: [id])
+  attachments      MessageAttachment[]
+  reactions        Reaction[]
+  thread           Thread?      @relation("ThreadParent")
+  mentions         Mention[]
+  history          MessageHistory[]
+  pins             PinnedMessage[]
+  bookmarks        Bookmark[]
+  readReceipts     ReadReceipt[]
+
+  @@index([conversationId, createdAt(sort: Desc)])
+  @@index([parentMessageId])
+  @@index([organizationId, isDeleted])
+}
+
+enum MessageType {
+  TEXT
+  SYSTEM
+  AI
+  VOICE_NOTE
+  POLL
+  FORM
+  LOCATION
+  CONTACT
+}
+
+model MessageAttachment {
+  id                    String    @id @default(uuid())
+  messageId             String
+  organizationId        String
+  filename              String
+  mimeType              String
+  size                  BigInt
+  storageKey            String    // S3 key — never client-exposed
+  cdnUrl                String
+  thumbnailUrl          String?
+  transcription         String?   // AI voice note transcription
+  virusScanStatus       ScanStatus @default(PENDING)
+  version               Int       @default(1)
+  originalAttachmentId  String?
+  uploadedBy            String
+  createdAt             DateTime  @default(now())
+
+  message               Message   @relation(fields: [messageId], references: [id])
+
+  @@index([messageId])
+}
+
+enum ScanStatus {
+  PENDING
+  CLEAN
+  INFECTED
+  ERROR
+}
+
+model Reaction {
+  id         String      @id @default(uuid())
+  messageId  String
+  userId     String
+  emoji      String
+  emojiType  EmojiType   @default(UNICODE)
+  createdAt  DateTime    @default(now())
+
+  message    Message     @relation(fields: [messageId], references: [id])
+
+  @@unique([messageId, userId, emoji])
+  @@index([messageId])
+}
+
+enum EmojiType {
+  UNICODE
+  CUSTOM
+  ANIMATED
+}
+
+model Thread {
+  id               String    @id @default(uuid())
+  parentMessageId  String    @unique
+  conversationId   String
+  organizationId   String
+  isResolved       Boolean   @default(false)
+  isLocked         Boolean   @default(false)
+  replyCount       Int       @default(0)
+  lastReplyAt      DateTime?
+  participantIds   String[]  @default([])
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  parentMessage    Message   @relation("ThreadParent", fields: [parentMessageId], references: [id])
+  followers        ThreadFollower[]
+
+  @@index([conversationId])
+}
+
+model ThreadFollower {
+  id         String   @id @default(uuid())
+  threadId   String
+  userId     String
+  followedAt DateTime @default(now())
+
+  thread     Thread   @relation(fields: [threadId], references: [id])
+
+  @@unique([threadId, userId])
+}
+
+model ReadReceipt {
+  id          String        @id @default(uuid())
+  messageId   String
+  userId      String
+  status      ReceiptStatus @default(SENT)
+  deliveredAt DateTime?
+  readAt      DateTime?
+  createdAt   DateTime      @default(now())
+
+  message     Message       @relation(fields: [messageId], references: [id])
+
+  @@unique([messageId, userId])
+  @@index([userId, status])
+}
+
+enum ReceiptStatus {
+  SENT
+  DELIVERED
+  READ
+}
+
+// TypingIndicator is Redis-only — not persisted to DB
+// Key: typing:{conversationId}:{userId}  TTL: 5s
+
+model PinnedMessage {
+  id             String       @id @default(uuid())
+  conversationId String
+  messageId      String
+  pinnedById     String
+  pinnedAt       DateTime     @default(now())
+
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  message        Message      @relation(fields: [messageId], references: [id])
+
+  @@unique([conversationId, messageId])
+}
+
+model Draft {
+  id             String   @id @default(uuid())
+  conversationId String
+  userId         String
+  content        String   // ProseMirror JSON
+  attachmentIds  String[] @default([])
+  updatedAt      DateTime @updatedAt
+
+  @@unique([conversationId, userId])
+  @@index([userId])
+}
+
+model Bookmark {
+  id         String   @id @default(uuid())
+  userId     String
+  messageId  String
+  note       String?
+  createdAt  DateTime @default(now())
+
+  message    Message  @relation(fields: [messageId], references: [id])
+
+  @@unique([userId, messageId])
+  @@index([userId])
+}
+
+model Mute {
+  id             String    @id @default(uuid())
+  userId         String
+  conversationId String
+  muteUntil      DateTime?
+  createdAt      DateTime  @default(now())
+
+  @@unique([userId, conversationId])
+}
+
+model Favorite {
+  id             String   @id @default(uuid())
+  userId         String
+  conversationId String
+  sortOrder      Int      @default(0)
+  createdAt      DateTime @default(now())
+
+  @@unique([userId, conversationId])
+  @@index([userId])
+}
+
+model MessageHistory {
+  id          String   @id @default(uuid())
+  messageId   String
+  content     String   // Content BEFORE the edit
+  editedById  String
+  editedAt    DateTime @default(now())
+
+  message     Message  @relation(fields: [messageId], references: [id])
+
+  @@index([messageId])
+}
+
+model VoiceNote {
+  id            String   @id @default(uuid())
+  messageId     String   @unique
+  duration      Int      // seconds
+  transcription String?
+  waveformData  Json?    // amplitude samples array
+  createdAt     DateTime @default(now())
+}
+
+model Poll {
+  id          String     @id @default(uuid())
+  messageId   String     @unique
+  question    String
+  options     Json       // [{ text: string, index: number }]
+  isAnonymous Boolean    @default(false)
+  multiSelect Boolean    @default(false)
+  expiresAt   DateTime?
+  createdAt   DateTime   @default(now())
+
+  votes       PollVote[]
+}
+
+model PollVote {
+  id           String   @id @default(uuid())
+  pollId       String
+  userId       String
+  optionIndex  Int
+  votedAt      DateTime @default(now())
+
+  poll         Poll     @relation(fields: [pollId], references: [id])
+
+  @@unique([pollId, userId, optionIndex])
+}
+
+model Mention {
+  id               String      @id @default(uuid())
+  messageId        String
+  mentionedUserId  String?     // Null for @everyone/@here
+  mentionType      MentionType
+  notified         Boolean     @default(false)
+  createdAt        DateTime    @default(now())
+
+  message          Message     @relation(fields: [messageId], references: [id])
+
+  @@index([mentionedUserId, notified])
+  @@index([messageId])
+}
+
+enum MentionType {
+  USER
+  ROLE
+  DEPARTMENT
+  TEAM
+  ORGANIZATION
+  EVERYONE
+  HERE
+}
+
+model ChannelTemplate {
+  id             String   @id @default(uuid())
+  organizationId String
+  name           String
+  description    String?
+  config         Json     // channel type, default roles, pinned messages, integrations
+  createdById    String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([organizationId])
+}
+
+model CustomEmoji {
+  id             String   @id @default(uuid())
+  organizationId String
+  name           String
+  storageKey     String
+  isAnimated     Boolean  @default(false)
+  createdById    String
+  createdAt      DateTime @default(now())
+
+  @@unique([organizationId, name])
+}
+
+model ScheduledMessage {
+  id             String                  @id @default(uuid())
+  userId         String
+  conversationId String
+  content        String
+  attachmentIds  String[]                @default([])
+  scheduledAt    DateTime
+  status         ScheduledMessageStatus  @default(PENDING)
+  sentAt         DateTime?
+  createdAt      DateTime                @default(now())
+
+  @@index([scheduledAt, status])
+}
+
+enum ScheduledMessageStatus {
+  PENDING
+  SENT
+  CANCELLED
+  FAILED
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PHASE E — SMART ACTIONS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+model SmartActionLog {
+  id          String   @id @default(uuid())
+  messageId   String?
+  userId      String
+  orgId       String
+  intent      String
+  confidence  Float
+  actionTaken String?
+  executedAt  DateTime @default(now())
+
+  @@index([orgId, executedAt(sort: Desc)])
+}
+
+model SmartActionRule {
+  id             String   @id @default(uuid())
+  organizationId String
+  name           String
+  intentPattern  String
+  actionType     String
+  config         Json     @default("{}")
+  enabled        Boolean  @default(true)
+  createdById    String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([organizationId, enabled])
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PHASE F — WORKSPACE INTELLIGENCE
+// ═══════════════════════════════════════════════════════════════════════════════
+
+model OrgHealthSnapshot {
+  id          String   @id @default(uuid())
+  orgId       String
+  score       Int      // 0–100
+  breakdown   Json     // { taskCompletion, approvalTurnaround, meetingAttendance, responseTime, workloadBalance }
+  trend       Int      @default(0) // change vs last snapshot
+  computedAt  DateTime @default(now())
+
+  @@index([orgId, computedAt(sort: Desc)])
+}
+
+model DeptHealthSnapshot {
+  id         String   @id @default(uuid())
+  orgNodeId  String
+  orgId      String
+  score      Int
+  breakdown  Json
+  computedAt DateTime @default(now())
+
+  @@index([orgId, computedAt(sort: Desc)])
+  @@index([orgNodeId])
+}
+
+model RiskIndicator {
+  id          String       @id @default(uuid())
+  orgId       String
+  type        String       // 'overloaded_dept' | 'stalled_approval' | 'overdue_milestone' | ...
+  severity    RiskSeverity
+  payload     Json
+  resolvedAt  DateTime?
+  createdAt   DateTime     @default(now())
+
+  @@index([orgId, resolvedAt])
+  @@index([severity])
+}
+
+enum RiskSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+model AiRecommendation {
+  id             String   @id @default(uuid())
+  orgId          String
+  category       String   // 'people' | 'workflow' | 'project' | 'communication'
+  title          String
+  body           String
+  actionType     String?
+  actionPayload  Json?
+  shownAt        DateTime @default(now())
+  dismissedAt    DateTime?
+
+  @@index([orgId, dismissedAt])
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// END OF v1.3.0 SCHEMA ADDITIONS
+// Next migration set: 20260627_v1.3.0_people + memory + mywork + chat + intelligence
+// ─────────────────────────────────────────────────────────────────────────────

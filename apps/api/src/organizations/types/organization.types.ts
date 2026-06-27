@@ -1,5 +1,4 @@
-import type { Prisma } from "@prisma/client";
-import type { OrganizationStatus, OrganizationType } from "@prisma/client";
+import type { Prisma, OrganizationStatus, OrganizationType } from "@prisma/client";
 
 export type { OrganizationStatus, OrganizationType };
 

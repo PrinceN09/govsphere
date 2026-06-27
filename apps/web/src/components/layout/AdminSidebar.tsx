@@ -412,6 +412,19 @@ const NAV_SECTION_HR: NavItem[] = [
     icon: <GridIcon />,
     permission: PERMS.USER_READ,
   },
+  // v1.3.0 — People Foundation
+  {
+    href: "/admin/people",
+    label: "Annuaire",
+    icon: <UsersIcon />,
+    permission: PERMS.USER_READ,
+  },
+  {
+    href: "/admin/people/org-chart",
+    label: "Hiérarchie",
+    icon: <GridIcon />,
+    permission: PERMS.USER_READ,
+  },
 ];
 
 const NAV_SECTION_COLLAB: NavItem[] = [
