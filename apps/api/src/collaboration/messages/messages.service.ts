@@ -170,7 +170,7 @@ export class MessagesService {
   async edit(messageId: string, dto: EditMessageDto, actor: AuthenticatedUser) {
     const message = await this.prisma.message.findUnique({
       where: { id: messageId },
-      select: { id: true, senderId: true, channelId: true, deletedAt: true },
+      select: { id: true, senderId: true, channelId: true, content: true, deletedAt: true },
     });
     if (!message) throw new NotFoundException("Message not found");
     if (message.deletedAt) throw new BadRequestException("Cannot edit a deleted message");
@@ -178,11 +178,20 @@ export class MessagesService {
       throw new ForbiddenException("You can only edit your own messages");
     }
 
-    const updated = await this.prisma.message.update({
-      where: { id: messageId },
-      data: { content: dto.content, editedAt: new Date() },
-      select: MSG_SELECT,
-    });
+    // Save current content to history before overwriting
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const db = this.prisma as any;
+    const [updated] = await Promise.all([
+      this.prisma.message.update({
+        where: { id: messageId },
+        data: { content: dto.content, editedAt: new Date() },
+        select: MSG_SELECT,
+      }),
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+      db.messageHistory.create({
+        data: { messageId, content: message.content, editedById: actor.id },
+      }),
+    ]);
 
     void this.audit.log({
       userId: actor.id,
@@ -193,6 +202,17 @@ export class MessagesService {
     });
 
     return updated;
+  }
+
+  // ── History ───────────────────────────────────────────────────────────────
+
+  async getHistory(messageId: string) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
+    return (this.prisma as any).messageHistory.findMany({
+      where: { messageId },
+      orderBy: { editedAt: "desc" },
+      select: { id: true, content: true, editedById: true, editedAt: true },
+    });
   }
 
   // ── Delete (soft) ─────────────────────────────────────────────────────────

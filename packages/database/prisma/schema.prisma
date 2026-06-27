@@ -56,6 +56,9 @@ enum ChannelType {
   ANNOUNCEMENT
   DIRECT
   GROUP
+  DEPARTMENT  // v1.4.0 — department-scoped broadcast channel
+  ORGANIZATION // v1.4.0 — organisation-wide channel
+  PROJECT     // v1.4.0 — project or topic channel
 }
 
 enum MessageType {
@@ -677,6 +680,9 @@ model User {
   // Realtime (v1.2.0)
   connections                UserConnection[]          @relation("UserConnections")
   activityEvents             ActivityEvent[]           @relation("UserActivityEvents")
+  // Chat v1.4.0
+  drafts                     Draft[]                   @relation("UserDrafts")
+  bookmarks                  Bookmark[]                @relation("UserBookmarks")
   createdAt                  DateTime                  @default(now())
   updatedAt                  DateTime                  @updatedAt
   deletedAt                  DateTime?
@@ -976,6 +982,8 @@ model Channel {
   division       Division?       @relation(fields: [divisionId], references: [id])
   provinceId     String?
   province       Province?       @relation(fields: [provinceId], references: [id])
+  organizationId String?         // v1.4.0 — org-wide channels
+  organization   Organization?   @relation("ChannelOrganization", fields: [organizationId], references: [id])
   isArchived     Boolean         @default(false)
   archivedAt     DateTime?
   archivedById   String?
@@ -987,6 +995,7 @@ model Channel {
   pinnedMessages PinnedMessage[]
   mentions       Mention[]
   files          File[]
+  drafts         Draft[]         // v1.4.0
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
 
@@ -994,6 +1003,7 @@ model Channel {
   @@index([departmentId])
   @@index([divisionId])
   @@index([provinceId])
+  @@index([organizationId])
   @@index([type])
   @@index([isArchived])
   @@map("channels")
@@ -1035,6 +1045,8 @@ model Message {
   mentions      Mention[]
   readReceipts  ReadReceipt[]
   attachments   File[]         @relation("MessageFiles")
+  bookmarks     Bookmark[]     // v1.4.0
+  history       MessageHistory[] // v1.4.0
   editedAt      DateTime?
   deletedAt     DateTime?
   createdAt     DateTime       @default(now())
@@ -1123,6 +1135,7 @@ model Conversation {
   members       ConversationMember[]
   messages      DirectMessage[]
   settings      ConversationSettings[]
+  drafts        Draft[]                // v1.4.0
   createdAt     DateTime               @default(now())
   updatedAt     DateTime               @updatedAt
 
@@ -1159,6 +1172,7 @@ model DirectMessage {
   replyTo        DirectMessage?  @relation("DMReplies", fields: [replyToId], references: [id])
   replies        DirectMessage[] @relation("DMReplies")
   reactions      DMReaction[]
+  bookmarks      Bookmark[]     // v1.4.0
   editedAt       DateTime?
   deletedAt      DateTime?
   createdAt      DateTime        @default(now())
@@ -1197,6 +1211,62 @@ model ConversationSettings {
   @@unique([conversationId, userId])
   @@index([conversationId])
   @@map("conversation_settings")
+}
+
+// =============================================================================
+// CHAT v1.4.0 — Drafts, Bookmarks, Message History
+// =============================================================================
+
+// Draft — unsent message content, persisted per user × channel/conversation.
+// One draft per (user, channel) and one per (user, conversation).
+model Draft {
+  id             String        @id @default(cuid())
+  userId         String
+  user           User          @relation("UserDrafts", fields: [userId], references: [id], onDelete: Cascade)
+  channelId      String?
+  channel        Channel?      @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  conversationId String?
+  conversation   Conversation? @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  content        String        @db.Text
+  replyToId      String?       // Optional: drafting a reply to this message ID
+  updatedAt      DateTime      @updatedAt
+  createdAt      DateTime      @default(now())
+
+  @@unique([userId, channelId])
+  @@unique([userId, conversationId])
+  @@index([userId])
+  @@map("drafts")
+}
+
+// Bookmark — save any channel message or DM for later reference.
+model Bookmark {
+  id        String         @id @default(cuid())
+  userId    String
+  user      User           @relation("UserBookmarks", fields: [userId], references: [id], onDelete: Cascade)
+  messageId String?
+  message   Message?       @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  dmId      String?
+  dm        DirectMessage? @relation(fields: [dmId], references: [id], onDelete: Cascade)
+  note      String?        @db.VarChar(500)
+  createdAt DateTime       @default(now())
+
+  @@unique([userId, messageId])
+  @@unique([userId, dmId])
+  @@index([userId])
+  @@map("bookmarks")
+}
+
+// MessageHistory — stores each prior version of a message's content when edited.
+model MessageHistory {
+  id         String   @id @default(cuid())
+  messageId  String
+  message    Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  content    String   @db.Text
+  editedById String
+  editedAt   DateTime @default(now())
+
+  @@index([messageId])
+  @@map("message_history")
 }
 
 // =============================================================================
@@ -2764,6 +2834,7 @@ model Organization {
   departments    Department[]    @relation("OrganizationDepartments")
   users          User[]          @relation("OrganizationUsers")
   activityEvents ActivityEvent[] @relation("OrgActivityEvents") // v1.2.0
+  channels       Channel[]       @relation("ChannelOrganization") // v1.4.0
 
   @@index([type])
   @@index([status])

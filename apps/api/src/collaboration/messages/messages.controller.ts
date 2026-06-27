@@ -116,6 +116,12 @@ export class MessagesController {
     return this.messages.getThread(id, actor);
   }
 
+  /** GET /v1/messages/:id/history */
+  @Get("messages/:id/history")
+  getHistory(@Param("id") id: string) {
+    return this.messages.getHistory(id);
+  }
+
   /** GET /v1/messages/search */
   @Get("messages/search")
   search(@Query() query: MessageSearchDto, @CurrentUser() actor: AuthenticatedUser) {

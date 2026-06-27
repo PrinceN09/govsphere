@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Image from "next/image";
 
 import { PresenceBadge } from "./PresenceBadge";
 import { TypingIndicator } from "./TypingIndicator";
@@ -40,7 +41,16 @@ const COMMON_EMOJIS = ["👍", "❤️", "😄", "🎉", "👀", "✅"];
 
 function Avatar({ name, url }: { name: string; url: string | null }) {
   if (url) {
-    return <img src={url} alt={name} className="h-8 w-8 rounded-full object-cover flex-shrink-0" />;
+    return (
+      <Image
+        src={url}
+        alt={name}
+        width={32}
+        height={32}
+        className="h-8 w-8 rounded-full object-cover flex-shrink-0"
+        unoptimized
+      />
+    );
   }
   return (
     <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-primary-100 text-xs font-bold text-primary-700">

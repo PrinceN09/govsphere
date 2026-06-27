@@ -429,6 +429,11 @@ const NAV_SECTION_HR: NavItem[] = [
 
 const NAV_SECTION_COLLAB: NavItem[] = [
   {
+    href: "/admin/chat",
+    label: "Chat",
+    icon: <ChatBubbleIcon />,
+  },
+  {
     href: "/admin/messages",
     label: "Messages",
     icon: <ChatBubbleIcon />,
