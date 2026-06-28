@@ -100,10 +100,7 @@ export class CanvasController {
   }
 
   @Post()
-  createBoard(
-    @Body() dto: CreateBoardDto,
-    @CurrentUser() actor: AuthenticatedUser,
-  ) {
+  createBoard(@Body() dto: CreateBoardDto, @CurrentUser() actor: AuthenticatedUser) {
     return this.canvas.createBoard(dto, actor);
   }
 
@@ -155,10 +152,7 @@ export class CanvasController {
   }
 
   @Get(":id")
-  getBoard(
-    @Param("id") id: string,
-    @CurrentUser() actor: AuthenticatedUser,
-  ) {
+  getBoard(@Param("id") id: string, @CurrentUser() actor: AuthenticatedUser) {
     return this.canvas.getBoard(id, actor);
   }
 
@@ -173,20 +167,14 @@ export class CanvasController {
 
   @Delete(":id")
   @HttpCode(200)
-  deleteBoard(
-    @Param("id") id: string,
-    @CurrentUser() actor: AuthenticatedUser,
-  ) {
+  deleteBoard(@Param("id") id: string, @CurrentUser() actor: AuthenticatedUser) {
     return this.canvas.deleteBoard(id, actor);
   }
 
   // ── Elements ──────────────────────────────────────────────────────────────
 
   @Get(":id/elements")
-  async listElements(
-    @Param("id") boardId: string,
-    @CurrentUser() actor: AuthenticatedUser,
-  ) {
+  async listElements(@Param("id") boardId: string, @CurrentUser() actor: AuthenticatedUser) {
     await this.canvas.assertBoardAccess(boardId, actor);
     return this.elements.listElements(boardId);
   }
@@ -258,10 +246,7 @@ export class CanvasController {
   // ── Participants ──────────────────────────────────────────────────────────
 
   @Get(":id/participants")
-  async listParticipants(
-    @Param("id") boardId: string,
-    @CurrentUser() actor: AuthenticatedUser,
-  ) {
+  async listParticipants(@Param("id") boardId: string, @CurrentUser() actor: AuthenticatedUser) {
     await this.canvas.assertBoardAccess(boardId, actor);
     return this.participants.listParticipants(boardId);
   }
@@ -301,10 +286,7 @@ export class CanvasController {
   // ── Comments ──────────────────────────────────────────────────────────────
 
   @Get(":id/comments")
-  async listComments(
-    @Param("id") boardId: string,
-    @CurrentUser() actor: AuthenticatedUser,
-  ) {
+  async listComments(@Param("id") boardId: string, @CurrentUser() actor: AuthenticatedUser) {
     await this.canvas.assertBoardAccess(boardId, actor);
     return this.comments.listComments(boardId);
   }
@@ -344,10 +326,7 @@ export class CanvasController {
   // ── Exports ───────────────────────────────────────────────────────────────
 
   @Get(":id/exports")
-  async listExports(
-    @Param("id") boardId: string,
-    @CurrentUser() actor: AuthenticatedUser,
-  ) {
+  async listExports(@Param("id") boardId: string, @CurrentUser() actor: AuthenticatedUser) {
     await this.canvas.assertBoardAccess(boardId, actor);
     return this.exports.listExports(boardId, actor);
   }
@@ -375,10 +354,7 @@ export class CanvasController {
   // ── Shares ────────────────────────────────────────────────────────────────
 
   @Get(":id/shares")
-  async listShares(
-    @Param("id") boardId: string,
-    @CurrentUser() actor: AuthenticatedUser,
-  ) {
+  async listShares(@Param("id") boardId: string, @CurrentUser() actor: AuthenticatedUser) {
     await this.canvas.assertOwner(boardId, actor);
     return this.shares.listShares(boardId);
   }

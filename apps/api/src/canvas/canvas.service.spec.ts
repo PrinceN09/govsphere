@@ -9,11 +9,11 @@
 
 import { ForbiddenException, NotFoundException } from "@nestjs/common";
 import { Test } from "@nestjs/testing";
-import type { TestingModule } from "@nestjs/testing";
 
 import { CanvasService } from "./canvas.service";
 import { AuditService } from "../identity/audit/audit.service";
 import { PrismaService } from "../prisma/prisma.service";
+import type { TestingModule } from "@nestjs/testing";
 import type { AuthenticatedUser } from "../common/types/auth.types";
 
 // ─── Prisma mock ─────────────────────────────────────────────────────────────
@@ -120,10 +120,7 @@ describe("CanvasService", () => {
       mockCanvasBoard.create.mockResolvedValue(boardRow);
       mockCanvasParticipant.create.mockResolvedValue({ id: "p-1" });
 
-      const result = await service.createBoard(
-        { title: "Mon tableau" },
-        actor,
-      );
+      const result = await service.createBoard({ title: "Mon tableau" }, actor);
 
       expect(mockCanvasBoard.create).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -252,7 +249,7 @@ describe("CanvasService", () => {
       mockCanvasParticipant.findUnique.mockResolvedValue({ role: "EDITOR" });
       mockCanvasBoard.update.mockResolvedValue({ ...boardRow, title: "Nouveau titre" });
 
-      const result = await service.updateBoard("board-1", { title: "Nouveau titre" }, actor);
+      await service.updateBoard("board-1", { title: "Nouveau titre" }, actor);
       expect(mockCanvasBoard.update).toHaveBeenCalled();
     });
 
@@ -262,9 +259,9 @@ describe("CanvasService", () => {
         .mockResolvedValueOnce({ ownerId: "other-user" });
       mockCanvasParticipant.findUnique.mockResolvedValue({ role: "VIEWER" });
 
-      await expect(
-        service.updateBoard("board-1", { title: "Hack" }, actor),
-      ).rejects.toThrow(ForbiddenException);
+      await expect(service.updateBoard("board-1", { title: "Hack" }, actor)).rejects.toThrow(
+        ForbiddenException,
+      );
     });
   });
 
@@ -273,7 +270,10 @@ describe("CanvasService", () => {
   describe("deleteBoard", () => {
     it("soft-deletes board when owner", async () => {
       mockCanvasBoard.findUnique.mockResolvedValue({
-        id: "board-1", ownerId: "user-1", status: "ACTIVE", deletedAt: null,
+        id: "board-1",
+        ownerId: "user-1",
+        status: "ACTIVE",
+        deletedAt: null,
       });
       mockCanvasBoard.update.mockResolvedValue({ ...boardRow, deletedAt: new Date() });
 
@@ -306,7 +306,11 @@ describe("CanvasService", () => {
         organizerId: "user-1",
         participants: [{ userId: "user-2" }, { userId: "user-3" }],
       });
-      mockCanvasBoard.create.mockResolvedValue({ ...boardRow, meetingId: "meet-1", boardType: "MEETING_BOARD" });
+      mockCanvasBoard.create.mockResolvedValue({
+        ...boardRow,
+        meetingId: "meet-1",
+        boardType: "MEETING_BOARD",
+      });
       mockCanvasParticipant.upsert.mockResolvedValue({ id: "p-1" });
 
       await service.createFromMeeting("meet-1", {}, actor);
@@ -326,7 +330,9 @@ describe("CanvasService", () => {
     it("throws NotFoundException when meeting not found", async () => {
       mockMeeting.findUnique.mockResolvedValue(null);
 
-      await expect(service.createFromMeeting("bad-meet", {}, actor)).rejects.toThrow(NotFoundException);
+      await expect(service.createFromMeeting("bad-meet", {}, actor)).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     it("uses custom title when provided", async () => {
@@ -369,7 +375,9 @@ describe("CanvasService", () => {
     it("throws NotFoundException when channel not found", async () => {
       mockChannel.findUnique.mockResolvedValue(null);
 
-      await expect(service.createFromChannel("bad-ch", {}, actor)).rejects.toThrow(NotFoundException);
+      await expect(service.createFromChannel("bad-ch", {}, actor)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 

@@ -27,7 +27,7 @@ export class CanvasExportsService {
 
   async listExports(boardId: string, actor: AuthenticatedUser) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    return this.db.canvasExport.findMany({
+    return await this.db.canvasExport.findMany({
       where: { boardId, requestedById: actor.id },
       orderBy: { createdAt: "desc" },
       take: 20,
@@ -72,9 +72,15 @@ export class CanvasExportsService {
     const rec = await this.db.canvasExport.findFirst({
       where: { id: exportId, boardId },
       select: {
-        id: true, format: true, status: true, downloadUrl: true,
-        fileSizeBytes: true, errorMessage: true, expiresAt: true,
-        processedAt: true, createdAt: true,
+        id: true,
+        format: true,
+        status: true,
+        downloadUrl: true,
+        fileSizeBytes: true,
+        errorMessage: true,
+        expiresAt: true,
+        processedAt: true,
+        createdAt: true,
       },
     });
     if (!rec) throw new NotFoundException("Export not found");

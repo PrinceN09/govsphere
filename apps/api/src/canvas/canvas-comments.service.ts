@@ -2,12 +2,7 @@
  * Prinodia Canvas v1.6.0 — CanvasCommentsService
  */
 
-import {
-  ForbiddenException,
-  Injectable,
-  Logger,
-  NotFoundException,
-} from "@nestjs/common";
+import { ForbiddenException, Injectable, Logger, NotFoundException } from "@nestjs/common";
 
 import { PrismaService } from "../prisma/prisma.service";
 import type { AuthenticatedUser } from "../common/types/auth.types";
@@ -29,7 +24,7 @@ export class CanvasCommentsService {
 
   async listComments(boardId: string) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    return this.db.canvasComment.findMany({
+    return await this.db.canvasComment.findMany({
       where: { boardId, isDeleted: false, parentId: null },
       orderBy: { createdAt: "asc" },
       select: {
@@ -58,7 +53,7 @@ export class CanvasCommentsService {
 
   async createComment(boardId: string, dto: CreateCommentDto, actor: AuthenticatedUser) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    return this.db.canvasComment.create({
+    return await this.db.canvasComment.create({
       data: {
         boardId,
         authorId: actor.id,
@@ -69,7 +64,13 @@ export class CanvasCommentsService {
         posY: dto.posY,
       },
       select: {
-        id: true, content: true, elementId: true, parentId: true, posX: true, posY: true, createdAt: true,
+        id: true,
+        content: true,
+        elementId: true,
+        parentId: true,
+        posX: true,
+        posY: true,
+        createdAt: true,
         author: { select: { id: true, displayName: true, avatarUrl: true } },
       },
     });
@@ -84,7 +85,7 @@ export class CanvasCommentsService {
     if (!comment) throw new NotFoundException("Comment not found");
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    return this.db.canvasComment.update({
+    return await this.db.canvasComment.update({
       where: { id: commentId },
       data: { isResolved: true, resolvedBy: actor.id, resolvedAt: new Date() },
       select: { id: true, isResolved: true, resolvedAt: true },

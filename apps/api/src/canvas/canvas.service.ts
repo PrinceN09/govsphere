@@ -6,19 +6,17 @@
  * Extension points for AI (v2.0.0) and Drive (v2.0.0) are stubbed.
  */
 
-import {
-  BadRequestException,
-  ForbiddenException,
-  Injectable,
-  Logger,
-  NotFoundException,
-} from "@nestjs/common";
-import { randomBytes } from "crypto";
+import { ForbiddenException, Injectable, Logger, NotFoundException } from "@nestjs/common";
 
 import { PrismaService } from "../prisma/prisma.service";
 import { AuditService } from "../identity/audit/audit.service";
 import type { AuthenticatedUser } from "../common/types/auth.types";
-import type { CreateBoardDto, CreateFromChannelDto, CreateFromMeetingDto, UpdateBoardDto } from "./dto/canvas.dto";
+import type {
+  CreateBoardDto,
+  CreateFromChannelDto,
+  CreateFromMeetingDto,
+  UpdateBoardDto,
+} from "./dto/canvas.dto";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyPrisma = any;
@@ -60,8 +58,16 @@ const BOARD_SELECT = {
 
 // Cursor colors assigned to participants in order
 const CURSOR_COLORS = [
-  "#6366F1", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6",
-  "#EC4899", "#14B8A6", "#F97316", "#06B6D4", "#84CC16",
+  "#6366F1",
+  "#10B981",
+  "#F59E0B",
+  "#EF4444",
+  "#8B5CF6",
+  "#EC4899",
+  "#14B8A6",
+  "#F97316",
+  "#06B6D4",
+  "#84CC16",
 ];
 
 @Injectable()
@@ -93,7 +99,10 @@ export class CanvasService {
           OR: [
             { ownerId: actor.id },
             { participants: { some: { userId: actor.id, isActive: true } } },
-            { isPublic: true, organizationId: actor.ministryId ?? actor.departmentId ?? actor.divisionId },
+            {
+              isPublic: true,
+              organizationId: actor.ministryId ?? actor.departmentId ?? actor.divisionId,
+            },
           ],
         },
         orderBy: { lastActivityAt: "desc" },
@@ -177,11 +186,7 @@ export class CanvasService {
     return board;
   }
 
-  async createFromMeeting(
-    meetingId: string,
-    dto: CreateFromMeetingDto,
-    actor: AuthenticatedUser,
-  ) {
+  async createFromMeeting(meetingId: string, dto: CreateFromMeetingDto, actor: AuthenticatedUser) {
     // Verify meeting exists
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const meeting = await this.db.meeting.findUnique({
@@ -233,11 +238,7 @@ export class CanvasService {
     return board;
   }
 
-  async createFromChannel(
-    channelId: string,
-    dto: CreateFromChannelDto,
-    actor: AuthenticatedUser,
-  ) {
+  async createFromChannel(channelId: string, dto: CreateFromChannelDto, actor: AuthenticatedUser) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const channel = await this.db.channel.findUnique({
       where: { id: channelId },
@@ -319,7 +320,7 @@ export class CanvasService {
 
   async listTemplates(boardType?: string) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    return this.db.canvasTemplate.findMany({
+    return await this.db.canvasTemplate.findMany({
       where: {
         isPublic: true,
         ...(boardType ? { boardType } : {}),
@@ -404,11 +405,7 @@ export class CanvasService {
     }
   }
 
-  private async cloneFromTemplate(
-    boardId: string,
-    templateId: string,
-    createdBy: string,
-  ) {
+  private async cloneFromTemplate(boardId: string, templateId: string, createdBy: string) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const template = await this.db.canvasTemplate.findUnique({
       where: { id: templateId },
@@ -453,9 +450,9 @@ export class CanvasService {
   // ── Integration helpers ───────────────────────────────────────────────────
 
   /** Phase 5: All boards linked to a meeting */
-  async listBoardsForMeeting(meetingId: string, actor: AuthenticatedUser) {
+  async listBoardsForMeeting(meetingId: string, _actor: AuthenticatedUser) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    return this.db.canvasBoard.findMany({
+    return await this.db.canvasBoard.findMany({
       where: {
         meetingId,
         deletedAt: null,
@@ -467,9 +464,9 @@ export class CanvasService {
   }
 
   /** Phase 6: All boards linked to a channel */
-  async listBoardsForChannel(channelId: string, actor: AuthenticatedUser) {
+  async listBoardsForChannel(channelId: string, _actor: AuthenticatedUser) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    return this.db.canvasBoard.findMany({
+    return await this.db.canvasBoard.findMany({
       where: {
         channelId,
         deletedAt: null,

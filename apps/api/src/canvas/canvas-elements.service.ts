@@ -5,17 +5,11 @@
  * Lock/unlock for concurrent-editing safety.
  */
 
-import {
-  ForbiddenException,
-  Injectable,
-  Logger,
-  NotFoundException,
-} from "@nestjs/common";
+import { ForbiddenException, Injectable, Logger, NotFoundException } from "@nestjs/common";
 
 import { PrismaService } from "../prisma/prisma.service";
 import type { AuthenticatedUser } from "../common/types/auth.types";
 import type { CreateElementDto, UpdateElementDto } from "./dto/canvas.dto";
-import type { CanvasService } from "./canvas.service";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyPrisma = any;
@@ -35,7 +29,7 @@ export class CanvasElementsService {
 
   async listElements(boardId: string) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    return this.db.canvasElement.findMany({
+    return await this.db.canvasElement.findMany({
       where: { boardId, isDeleted: false },
       orderBy: [{ layerIndex: "asc" }, { createdAt: "asc" }],
       select: {
@@ -62,11 +56,7 @@ export class CanvasElementsService {
 
   // ── Create ────────────────────────────────────────────────────────────────
 
-  async createElement(
-    boardId: string,
-    dto: CreateElementDto,
-    actor: AuthenticatedUser,
-  ) {
+  async createElement(boardId: string, dto: CreateElementDto, actor: AuthenticatedUser) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const element = await this.db.canvasElement.create({
       data: {
@@ -82,7 +72,15 @@ export class CanvasElementsService {
         data: dto.data ?? {},
         style: dto.style ?? {},
       },
-      select: { id: true, elementType: true, x: true, y: true, data: true, style: true, createdAt: true },
+      select: {
+        id: true,
+        elementType: true,
+        x: true,
+        y: true,
+        data: true,
+        style: true,
+        createdAt: true,
+      },
     });
 
     // Bump board element count and activity
@@ -139,7 +137,7 @@ export class CanvasElementsService {
     });
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    return this.db.canvasElement.update({
+    return await this.db.canvasElement.update({
       where: { id: elementId },
       data: {
         ...(dto.x !== undefined ? { x: dto.x } : {}),
@@ -155,8 +153,17 @@ export class CanvasElementsService {
         updatedAt: new Date(),
       },
       select: {
-        id: true, elementType: true, x: true, y: true, width: true, height: true,
-        rotation: true, data: true, style: true, layerIndex: true, updatedAt: true,
+        id: true,
+        elementType: true,
+        x: true,
+        y: true,
+        width: true,
+        height: true,
+        rotation: true,
+        data: true,
+        style: true,
+        layerIndex: true,
+        updatedAt: true,
       },
     });
   }
@@ -188,7 +195,7 @@ export class CanvasElementsService {
       throw new ForbiddenException("Element is locked by another user");
     }
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    return this.db.canvasElement.update({
+    return await this.db.canvasElement.update({
       where: { id: elementId },
       data: { lockedBy: actor.id, lockedAt: new Date() },
       select: { id: true, lockedBy: true, lockedAt: true },
@@ -205,7 +212,7 @@ export class CanvasElementsService {
       }
     }
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    return this.db.canvasElement.update({
+    return await this.db.canvasElement.update({
       where: { id: elementId },
       data: { lockedBy: null, lockedAt: null },
       select: { id: true, lockedBy: true },
@@ -217,7 +224,7 @@ export class CanvasElementsService {
   async getElementVersions(boardId: string, elementId: string) {
     await this.getElementOrThrow(boardId, elementId);
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    return this.db.canvasElementVersion.findMany({
+    return await this.db.canvasElementVersion.findMany({
       where: { elementId },
       orderBy: { versionNum: "desc" },
       take: 50,
@@ -226,7 +233,11 @@ export class CanvasElementsService {
         versionNum: true,
         data: true,
         style: true,
-        x: true, y: true, width: true, height: true, rotation: true,
+        x: true,
+        y: true,
+        width: true,
+        height: true,
+        rotation: true,
         createdAt: true,
         editor: { select: { id: true, displayName: true } },
       },
@@ -240,8 +251,15 @@ export class CanvasElementsService {
     const element = await this.db.canvasElement.findFirst({
       where: { id: elementId, boardId, isDeleted: false },
       select: {
-        id: true, lockedBy: true, data: true, style: true,
-        x: true, y: true, width: true, height: true, rotation: true,
+        id: true,
+        lockedBy: true,
+        data: true,
+        style: true,
+        x: true,
+        y: true,
+        width: true,
+        height: true,
+        rotation: true,
       },
     });
     if (!element) throw new NotFoundException("Canvas element not found");

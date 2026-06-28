@@ -3,17 +3,14 @@
  */
 
 import {
-  IsArray,
   IsBoolean,
   IsEnum,
   IsInt,
   IsNumber,
   IsOptional,
   IsString,
-  IsUUID,
   MaxLength,
   Min,
-  ValidateNested,
 } from "class-validator";
 import { Type } from "class-transformer";
 

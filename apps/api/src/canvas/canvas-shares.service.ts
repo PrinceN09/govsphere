@@ -2,11 +2,7 @@
  * Prinodia Canvas v1.6.0 — CanvasSharesService
  */
 
-import {
-  Injectable,
-  Logger,
-  NotFoundException,
-} from "@nestjs/common";
+import { Injectable, Logger, NotFoundException } from "@nestjs/common";
 import { randomBytes } from "crypto";
 
 import { PrismaService } from "../prisma/prisma.service";
@@ -29,7 +25,7 @@ export class CanvasSharesService {
 
   async listShares(boardId: string) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    return this.db.canvasShare.findMany({
+    return await this.db.canvasShare.findMany({
       where: { boardId, revokedAt: null },
       orderBy: { createdAt: "desc" },
       select: {
@@ -50,7 +46,7 @@ export class CanvasSharesService {
     const token = randomBytes(32).toString("hex");
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    return this.db.canvasShare.create({
+    return await this.db.canvasShare.create({
       data: {
         boardId,
         createdById: actor.id,
@@ -63,8 +59,14 @@ export class CanvasSharesService {
         password: dto.password ?? null,
       },
       select: {
-        id: true, shareToken: true, access: true, label: true,
-        maxUses: true, uses: true, expiresAt: true, createdAt: true,
+        id: true,
+        shareToken: true,
+        access: true,
+        label: true,
+        maxUses: true,
+        uses: true,
+        expiresAt: true,
+        createdAt: true,
       },
     });
   }
@@ -89,8 +91,13 @@ export class CanvasSharesService {
     const share = await this.db.canvasShare.findUnique({
       where: { shareToken: token },
       select: {
-        id: true, boardId: true, access: true, revokedAt: true,
-        expiresAt: true, maxUses: true, uses: true,
+        id: true,
+        boardId: true,
+        access: true,
+        revokedAt: true,
+        expiresAt: true,
+        maxUses: true,
+        uses: true,
       },
     });
     if (!share) throw new NotFoundException("Invalid share link");
