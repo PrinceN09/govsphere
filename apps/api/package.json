@@ -37,7 +37,7 @@
     "@prinodia/database": "*",
     "@prinodia/types": "*",
     "@prinodia/utils": "*",
-    "@prisma/client": "^5.17.0",
+    "@prisma/client": "^7.8.0",
     "bcryptjs": "^2.4.3",
     "bull": "^4.16.2",
     "cache-manager": "^5.7.6",
